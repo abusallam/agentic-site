@@ -1,4 +1,39 @@
 {
   "mcpServers": {
+    "playwright-tools": {
+      "command": "uv",
+      "args": ["run", "python", "src/playwright_tools/main.py"],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/playwright-tools",
+      "disabled": false,
+      "autoApprove": ["scrape_page"]
+    },
+    "n8n-tools": {
+      "command": "uv",
+      "args": ["run", "python", "src/n8n_tools/main.py"],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/n8n-tools",
+      "env": {
+        "N8N_BASE_URL": "https://n8n.consulting.sa",
+        "N8N_API_KEY": "${N8N_API_KEY}"
+      },
+      "disabled": false,
+      "autoApprove": ["list_workflows", "get_executions"]
+    },
+    "github-tools": {
+      "command": "uv",
+      "args": ["run", "python", "src/github_tools/main.py"],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/github-tools",
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "disabled": false,
+      "autoApprove": ["list_repos", "get_repo_info"]
+    },
+    "file-utils": {
+      "command": "uv",
+      "args": ["run", "python", "src/file_utils/main.py"],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/file-utils",
+      "disabled": false,
+      "autoApprove": ["read_file", "list_directory"]
+    }
   }
 }

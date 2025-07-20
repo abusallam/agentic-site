@@ -1,204 +1,326 @@
-# Coolify Deployment Guide
+# 🚀 Coolify Deployment Guide - AI SaaS Platform
 
-This guide covers deploying the Main Consulting website to Coolify with the domain `main.consulting.sa`.
+This guide will help you deploy the AI SaaS Platform to Coolify with proper health checks and random port support.
 
-## 🚀 Quick Deployment
+## 📋 Prerequisites
 
-### Prerequisites
 - Coolify instance running
-- Domain `main.consulting.sa` pointing to your Coolify server
-- SSL certificate configured (Let's Encrypt recommended)
+- Git repository with your code
+- Domain name configured (e.g., consulting.sa)
+- Required environment variables
 
-### Deployment Steps
+## 🏗️ Deployment Files
 
-1. **Create New Application in Coolify**
-   - Go to your Coolify dashboard
-   - Click "New Application"
-   - Select "Docker Compose" as deployment type
+The following files have been created for Coolify deployment:
 
-2. **Configure Repository**
-   - Repository URL: `https://github.com/abusallam/agentic-site.git`
-   - Branch: `main`
-   - Build Pack: `Docker Compose`
+### Docker Files
+- `Dockerfile.simple` - Optimized single-container deployment
+- `Dockerfile.production` - Multi-stage production build
+- `docker-compose.coolify.yml` - Coolify-specific compose file
 
-3. **Set Environment Variables**
-   ```env
-   NODE_ENV=production
-   NEXT_TELEMETRY_DISABLED=1
-   NEXT_PUBLIC_SITE_URL=https://main.consulting.sa
-   NEXT_PUBLIC_CONTACT_EMAIL=asim@main.consulting.sa
-   
-   # Optional: Supabase Configuration
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
-   
-   # Optional: Analytics
-   NEXT_PUBLIC_GA_ID=your_google_analytics_id
-   ```
+### Scripts
+- `scripts/start-production.sh` - Production startup script
+- `scripts/health-check.sh` - Comprehensive health check
+- `scripts/deploy-coolify.sh` - Deployment preparation script
 
-4. **Configure Domain**
-   - Domain: `main.consulting.sa`
-   - Enable SSL: Yes (Let's Encrypt)
-   - Port: 3000
+### Configuration
+- `coolify.json` - Coolify application configuration
+- Enhanced health check at `/api/health`
 
-5. **Deploy**
-   - Click "Deploy"
-   - Monitor deployment logs
-   - Verify health check at `/api/health`
+## 🚀 Quick Deployment Steps
 
-## 🔧 Configuration Files
+### 1. Prepare for Deployment
 
-### Docker Compose
-The project includes a Coolify-optimized docker-compose file at `.coolify/docker-compose.yml`:
+```bash
+# Run the deployment preparation script
+./scripts/deploy-coolify.sh
 
-```yaml
-version: '3.8'
-services:
-  main-consulting:
-    build: 
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - NEXT_TELEMETRY_DISABLED=1
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+# Optional: Test build locally
+./scripts/deploy-coolify.sh --test-build
 ```
 
-### Dockerfile
-Multi-stage production build optimized for performance:
-- Node.js 18 Alpine base image
-- Optimized layer caching
-- Non-root user for security
-- Health check included
-- Standalone output for minimal image size
+### 2. Push to Git Repository
 
-## 🌐 Domain Configuration
-
-### DNS Settings
-Ensure your domain `main.consulting.sa` has the following DNS records:
-```
-A     main.consulting.sa     -> YOUR_COOLIFY_SERVER_IP
-AAAA  main.consulting.sa     -> YOUR_COOLIFY_SERVER_IPv6 (if available)
+```bash
+git add .
+git commit -m "Deploy to Coolify with enhanced health checks"
+git push origin main
 ```
 
-### SSL Certificate
-Coolify will automatically provision SSL certificates via Let's Encrypt when:
-- Domain is properly configured
-- DNS is pointing to your server
-- Port 80 and 443 are accessible
+### 3. Create Application in Coolify
 
-## 📊 Monitoring & Health Checks
+1. **Login to Coolify Dashboard**
+2. **Create New Application**
+   - Click "New Resource" → "Application"
+   - Select "Public Repository" or connect your Git provider
+   - Enter repository URL: `https://github.com/your-username/your-repo`
 
-### Health Check Endpoint
-The application includes a health check at `/api/health`:
+3. **Configure Build Settings**
+   - **Branch**: `main`
+   - **Dockerfile**: `Dockerfile.simple`
+   - **Build Command**: `npm run build` (optional, handled in Dockerfile)
+   - **Start Command**: `./start.sh` (handled in Dockerfile)
+
+### 4. Set Environment Variables
+
+Go to the **Environment** tab and add these variables:
+
+#### Required Variables
+```env
+NODE_ENV=production
+NEXT_TELEMETRY_DISABLED=1
+HOSTNAME=0.0.0.0
+
+# Supabase (Required)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+
+# AI Services (Required)
+GEMINI_API_KEY=your_gemini_api_key
+
+# Contact
+NEXT_PUBLIC_CONTACT_EMAIL=asim@consulting.sa
+```
+
+#### Optional Variables
+```env
+# OpenAI (Optional)
+OPENAI_API_KEY=your_openai_key
+
+# Stripe (Optional)
+STRIPE_SECRET_KEY=your_stripe_secret
+STRIPE_PUBLISHABLE_KEY=your_stripe_public
+STRIPE_WEBHOOK_SECRET=your_webhook_secret
+
+# Livekit (Optional)
+LIVEKIT_URL=wss://your-livekit-url
+LIVEKIT_API_KEY=your_livekit_key
+LIVEKIT_API_SECRET=your_livekit_secret
+
+# n8n (Optional)
+N8N_URL=https://n8n.consulting.sa
+N8N_API_KEY=your_n8n_api_key
+
+# Backend Port (Coolify will set this)
+BACKEND_PORT=8080
+```
+
+### 5. Configure Domains
+
+1. Go to **Domains** tab
+2. Add your domains:
+   - `consulting.sa`
+   - `www.consulting.sa`
+3. Enable **SSL/TLS**
+4. Enable **Redirect HTTP to HTTPS**
+
+### 6. Configure Health Check
+
+Coolify will automatically detect the health check from the Dockerfile, but you can verify:
+
+- **Health Check Path**: `/api/health`
+- **Port**: `3000` (frontend port)
+- **Interval**: `30s`
+- **Timeout**: `15s`
+- **Retries**: `3`
+- **Start Period**: `60s`
+
+### 7. Deploy
+
+1. Click **Deploy** button
+2. Monitor the build logs
+3. Wait for deployment to complete (usually 3-5 minutes)
+
+## 🔍 Health Check Details
+
+The enhanced health check endpoint (`/api/health`) provides:
+
 ```json
 {
   "status": "healthy",
-  "timestamp": "2025-01-18T10:00:00.000Z",
-  "service": "main-consulting-website"
+  "timestamp": "2025-07-20T13:00:00.000Z",
+  "service": "ai-saas-platform",
+  "version": "2.0.0",
+  "environment": "production",
+  "uptime": 3600,
+  "memory": {
+    "rss": 150000000,
+    "heapTotal": 100000000,
+    "heapUsed": 80000000,
+    "external": 5000000
+  },
+  "services": {
+    "frontend": {
+      "status": "healthy",
+      "port": 3000
+    },
+    "backend": {
+      "status": "healthy",
+      "port": 8080
+    }
+  }
 }
 ```
 
-### Monitoring
-- **Health Checks**: Automatic every 30 seconds
-- **Restart Policy**: Unless stopped
-- **Logs**: Available in Coolify dashboard
-- **Metrics**: CPU, Memory, Network usage
+### Status Codes
+- `200` - All services healthy
+- `503` - One or more services degraded
 
-## 🔒 Security Features
+## 🎯 Port Configuration
 
-### Production Security
-- Security headers configured
-- CSP (Content Security Policy) enabled
-- XSS protection
-- Frame options set to DENY
-- HTTPS redirect enforced
+Coolify automatically assigns random ports. The application handles this through:
 
-### Environment Security
-- Sensitive data via environment variables
-- No secrets in code
-- Production-only configurations
+- **Frontend Port**: `${PORT}` (default: 3000)
+- **Backend Port**: `${BACKEND_PORT}` (default: 8080)
+- **Health Check**: Adapts to assigned ports
 
-## 🚀 Performance Optimizations
+## 📊 Monitoring & Access Points
 
-### Build Optimizations
-- Multi-stage Docker build
-- Standalone Next.js output
-- Optimized dependencies
-- Image compression and optimization
+After deployment, access your application:
 
-### Runtime Performance
-- Static asset caching (1 year)
-- API response caching
-- Gzip/Brotli compression
-- CDN-ready configuration
+### Public URLs
+- **Main Website**: `https://consulting.sa`
+- **Health Check**: `https://consulting.sa/api/health`
+- **Admin Dashboard**: `https://consulting.sa/admin/dashboard`
+- **Customer Portal**: `https://consulting.sa/customer/dashboard`
 
-## 🔄 Deployment Workflow
+### Admin Access
+- **Password**: `admin123`
+- **Features**: Agent monitoring, customer sessions, analytics
 
-### Automatic Deployment
-1. Push changes to `main` branch
-2. Coolify detects changes via webhook
-3. Automatic build and deployment
-4. Health check verification
-5. Traffic routing to new version
+### Customer Access
+- **Login**: Any email address
+- **Features**: Personal agents, usage analytics, controls
 
-### Manual Deployment
-1. Go to Coolify dashboard
-2. Select your application
-3. Click "Deploy"
-4. Monitor deployment progress
-
-## 🐛 Troubleshooting
+## 🔧 Troubleshooting
 
 ### Common Issues
 
-1. **Build Failures**
-   ```bash
-   # Check build logs in Coolify
-   # Verify environment variables
-   # Ensure dependencies are up to date
-   ```
+#### 1. Build Failures
+```bash
+# Check build logs in Coolify
+# Common fixes:
+- Ensure all environment variables are set
+- Check Dockerfile.simple syntax
+- Verify package.json dependencies
+```
 
-2. **Health Check Failures**
-   ```bash
-   # Verify /api/health endpoint
-   # Check application logs
-   # Verify port 3000 is accessible
-   ```
+#### 2. Health Check Failures
+```bash
+# Test health check locally
+curl https://consulting.sa/api/health
 
-3. **Domain Issues**
-   ```bash
-   # Verify DNS configuration
-   # Check SSL certificate status
-   # Ensure domain points to correct IP
-   ```
+# Check both services
+curl https://consulting.sa/api/health | jq '.services'
+```
 
-### Log Access
-- **Application Logs**: Coolify Dashboard > Your App > Logs
-- **Build Logs**: Available during deployment
-- **System Logs**: Server-level monitoring
+#### 3. Backend Not Starting
+```bash
+# Check environment variables
+- BACKEND_PORT should be set by Coolify
+- Python dependencies should install correctly
+- Check startup logs for Python errors
+```
+
+#### 4. Frontend Issues
+```bash
+# Common fixes:
+- Clear Next.js cache: rm -rf .next
+- Check environment variables (NEXT_PUBLIC_*)
+- Verify build output in logs
+```
+
+### Debug Commands
+
+```bash
+# Check container logs
+docker logs <container_id>
+
+# Test health endpoints
+curl -v http://localhost:3000/api/health
+curl -v http://localhost:8080/api/health
+
+# Check processes
+ps aux | grep -E "(node|python)"
+
+# Check ports
+netstat -tlnp | grep -E "(3000|8080)"
+```
+
+## 🔄 Updates & Redeployment
+
+### Automatic Deployment
+- Push to `main` branch triggers automatic deployment
+- Coolify monitors Git repository for changes
+
+### Manual Deployment
+1. Go to Coolify dashboard
+2. Click **Deploy** button
+3. Monitor build progress
+
+### Rolling Updates
+- Coolify supports zero-downtime deployments
+- Health checks ensure service availability
+
+## 📈 Performance & Scaling
+
+### Resource Limits
+- **Memory**: 2GB (configurable)
+- **CPU**: 1.0 core (configurable)
+- **Auto-scaling**: Available in Coolify Pro
+
+### Optimization Tips
+1. **Enable caching** for static assets
+2. **Use CDN** for global distribution
+3. **Monitor metrics** through Coolify dashboard
+4. **Scale horizontally** for high traffic
+
+## 🔐 Security
+
+### Environment Variables
+- All secrets stored securely in Coolify
+- No sensitive data in code repository
+- Environment-specific configurations
+
+### SSL/TLS
+- Automatic SSL certificate generation
+- HTTPS redirect enabled
+- Security headers configured
+
+### Access Control
+- Admin dashboard password protected
+- Customer portal with email authentication
+- API endpoints secured
 
 ## 📞 Support
 
-### Deployment Support
-- **Technical Issues**: Check Coolify documentation
-- **Application Issues**: asim@main.consulting.sa
-- **Domain Issues**: Verify DNS and SSL configuration
+If you encounter issues:
 
-### Resources
-- [Coolify Documentation](https://coolify.io/docs)
-- [Next.js Deployment Guide](https://nextjs.org/docs/deployment)
-- [Docker Best Practices](https://docs.docker.com/develop/dev-best-practices/)
+1. **Check Coolify logs** first
+2. **Review health check** status
+3. **Verify environment variables**
+4. **Test locally** with Docker
+
+For additional support:
+- **Email**: asim@consulting.sa
+- **Documentation**: This guide
+- **Health Check**: `https://consulting.sa/api/health`
 
 ---
 
-**Deployment Status**: ✅ Ready for Production
-**Last Updated**: January 18, 2025
+## 🎉 Deployment Complete!
+
+Your AI SaaS Platform is now running on Coolify with:
+
+✅ **Automatic health checks**  
+✅ **Random port support**  
+✅ **SSL/TLS encryption**  
+✅ **Auto-deployment**  
+✅ **Monitoring & logging**  
+✅ **Scalable architecture**  
+
+**Main URL**: https://consulting.sa  
+**Admin Panel**: https://consulting.sa/admin/dashboard  
+**Customer Portal**: https://consulting.sa/customer/dashboard  
+
+Enjoy your production-ready AI SaaS platform! 🚀

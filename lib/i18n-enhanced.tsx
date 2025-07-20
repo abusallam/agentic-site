@@ -288,18 +288,46 @@ export function useEnhancedTranslation() {
 
 export function TranslationProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocale] = useState<Locale>("en")
+  const [mounted, setMounted] = useState(false)
   const isRTL = locale === "ar"
 
   const t = (key: string): string => {
-    const translation = translations[locale][key as keyof (typeof translations)[typeof locale]]
-    return translation || key
+    const keys = key.split(".")
+    let value: any = translations[locale]
+    for (const k of keys) {
+      value = value?.[k]
+    }
+    return value || key
   }
 
   useEffect(() => {
-    // Set document direction
-    document.documentElement.dir = isRTL ? "rtl" : "ltr"
-    document.documentElement.lang = locale
-  }, [locale, isRTL])
+    setMounted(true)
+    // Load saved locale from localStorage
+    try {
+      const savedLocale = localStorage.getItem("locale") as Locale
+      if (savedLocale && (savedLocale === "en" || savedLocale === "ar")) {
+        setLocale(savedLocale)
+      }
+    } catch (error) {
+      console.warn("Error loading locale from localStorage:", error)
+    }
+  }, [])
 
-  return <TranslationContext.Provider value={{ locale, setLocale, t, isRTL }}>{children}</TranslationContext.Provider>
+  useEffect(() => {
+    if (mounted) {
+      document.documentElement.lang = locale
+      document.documentElement.dir = isRTL ? "rtl" : "ltr"
+      try {
+        localStorage.setItem("locale", locale)
+      } catch (error) {
+        console.warn("Error saving locale to localStorage:", error)
+      }
+    }
+  }, [locale, isRTL, mounted])
+
+  const handleSetLocale = (newLocale: Locale) => {
+    setLocale(newLocale)
+  }
+
+  return <TranslationContext.Provider value={{ locale, setLocale: handleSetLocale, t, isRTL }}>{children}</TranslationContext.Provider>
 }

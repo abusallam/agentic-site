@@ -57,7 +57,7 @@ export function EnhancedHeroSection() {
           <div className="space-y-6 animate-fade-in-up">
             <h1
               className={cn(
-                "text-4xl sm:text-5xl lg:text-6xl font-bold font-heading leading-tight",
+                "hero-title text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight",
                 "bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent",
               )}
             >

@@ -2,12 +2,14 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Bitter, Noto_Sans_Arabic } from "next/font/google"
 import "./globals.css"
+import "./css-fix.css"
 import "../styles/animations.css"
 import { ThemeProvider } from "@/components/theme-provider-enhanced"
 import { TranslationProvider } from "@/lib/i18n-enhanced"
 import { Toaster } from "@/components/ui/toaster"
 import { ErrorBoundary } from "@/components/error-boundary"
 import PerformanceMonitor from "@/components/performance-monitor"
+import ChatbotWidget from "@/components/chatbot/ChatbotWidget"
 import { brandConfig } from "@/lib/brand"
 
 const bitter = Bitter({
@@ -93,6 +95,9 @@ export default function RootLayout({
               {children}
               <Toaster />
               <PerformanceMonitor />
+              <ChatbotWidget 
+                position="bottom-right"
+              />
             </TranslationProvider>
           </ThemeProvider>
         </ErrorBoundary>

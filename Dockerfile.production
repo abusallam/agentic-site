@@ -1,0 +1,95 @@
+# Multi-stage production Dockerfile for Coolify deployment
+# Supports both Next.js frontend and Python backend
+
+# Stage 1: Build Next.js frontend
+FROM node:20-alpine AS frontend-builder
+
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy source and build
+COPY . .
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN npm run build
+
+# Stage 2: Setup Python backend
+FROM python:3.11-slim AS backend-builder
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv for Python package management
+RUN pip install uv
+
+# Copy Python backend
+COPY agent/ ./agent/
+COPY .env ./
+
+# Install Python dependencies
+WORKDIR /app/agent
+RUN uv sync --frozen
+
+# Stage 3: Production runtime
+FROM python:3.11-slim AS production
+
+WORKDIR /app
+
+# Install system dependencies and Node.js
+RUN apt-get update && apt-get install -y \
+    curl \
+    nodejs \
+    npm \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv
+RUN pip install uv
+
+# Copy built frontend
+COPY --from=frontend-builder /app/.next/standalone ./
+COPY --from=frontend-builder /app/.next/static ./.next/static
+COPY --from=frontend-builder /app/public ./public
+
+# Copy Python backend
+COPY --from=backend-builder /app/agent ./agent
+COPY --from=backend-builder /app/.env ./
+
+# Copy startup scripts
+COPY scripts/start-production.sh ./
+COPY scripts/health-check.sh ./
+RUN chmod +x start-production.sh health-check.sh
+
+# Create non-root user
+RUN groupadd --gid 1001 appuser && \
+    useradd --uid 1001 --gid appuser --shell /bin/bash --create-home appuser
+
+# Set ownership
+RUN chown -R appuser:appuser /app
+
+USER appuser
+
+# Expose ports (will be overridden by Coolify)
+EXPOSE 3000 8080
+
+# Environment variables for Coolify
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+ENV PYTHONPATH=/app/agent
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=15s --start-period=60s --retries=3 \
+    CMD ./health-check.sh
+
+# Start both services
+CMD ["./start-production.sh"]

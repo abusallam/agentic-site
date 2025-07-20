@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 # Add the parent directory to the path so we can import our agents
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from my_adk_agent.agent import CustomerJourneyAgent
+from my_adk_agent.agent import AccountantAgent
 from n8n_mcp_agent.agent import N8nMCPAgent
 
 # Load environment variables from the root directory
@@ -33,7 +33,7 @@ async def test_n8n_mcp_integration():
         
         # Initialize agents
         logger.info("Initializing agents...")
-        main_agent = CustomerJourneyAgent()
+        main_agent = AccountantAgent()
         n8n_agent = N8nMCPAgent()
         
         # Test 1: Initialize n8n MCP server
@@ -153,7 +153,7 @@ async def test_customer_journey_with_n8n():
         logger.info("\n🎯 Testing Complete Customer Journey with n8n MCP...")
         
         # Initialize main agent
-        agent = CustomerJourneyAgent()
+        agent = AccountantAgent()
         
         # Test customer journey scenarios
         test_scenarios = [
@@ -229,7 +229,7 @@ async def test_json_commands():
     try:
         logger.info("\n🔧 Testing JSON Command Interface...")
         
-        agent = CustomerJourneyAgent()
+        agent = AccountantAgent()
         
         # Test JSON commands
         json_commands = [

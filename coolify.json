@@ -1,0 +1,52 @@
+{
+  "name": "AI SaaS Platform",
+  "description": "Complete AI SaaS platform with dual-agent architecture",
+  "type": "application",
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "startCommand": "./start.sh",
+  "dockerfile": "Dockerfile.simple",
+  "port": 3000,
+  "healthcheck": {
+    "enabled": true,
+    "path": "/api/health",
+    "port": 3000,
+    "interval": 30,
+    "timeout": 15,
+    "retries": 3,
+    "startPeriod": 60
+  },
+  "environment": {
+    "NODE_ENV": "production",
+    "NEXT_TELEMETRY_DISABLED": "1",
+    "HOSTNAME": "0.0.0.0"
+  },
+  "domains": [
+    "consulting.sa",
+    "www.consulting.sa"
+  ],
+  "ssl": true,
+  "redirect": true,
+  "autoDeployment": {
+    "enabled": true,
+    "branch": "main"
+  },
+  "resources": {
+    "memory": "2G",
+    "cpu": "1.0"
+  },
+  "volumes": [],
+  "secrets": [
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "GEMINI_API_KEY",
+    "OPENAI_API_KEY",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_PUBLISHABLE_KEY",
+    "LIVEKIT_URL",
+    "LIVEKIT_API_KEY",
+    "LIVEKIT_API_SECRET",
+    "N8N_URL",
+    "N8N_API_KEY"
+  ]
+}

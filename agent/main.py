@@ -5,7 +5,7 @@ import logging
 import os
 from dotenv import load_dotenv
 
-from my_adk_agent.agent import CustomerJourneyAgent
+from my_adk_agent.agent import AccountantAgent
 
 # Load environment variables
 load_dotenv(dotenv_path="../.env")
@@ -22,10 +22,10 @@ logger = logging.getLogger(__name__)
 async def main():
     """Main function to run the agent."""
     try:
-        logger.info("Starting Customer Journey Agent...")
+        logger.info("Starting Accountant Agent...")
         
         # Initialize the agent
-        agent = CustomerJourneyAgent()
+        agent = AccountantAgent()
         
         # Test the agent with a sample interaction
         test_input = "Hello, I'm interested in creating a chatbot for my business"
@@ -34,7 +34,7 @@ async def main():
         logger.info("Agent Response:")
         print(response)
         
-        logger.info("Customer Journey Agent is ready!")
+        logger.info("Accountant Agent is ready!")
         
     except Exception as e:
         logger.error(f"Failed to start agent: {e}")

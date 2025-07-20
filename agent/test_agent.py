@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 # Add the parent directory to the path so we can import our agent
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from my_adk_agent.agent import CustomerJourneyAgent
+from my_adk_agent.agent import AccountantAgent
 
 # Load environment variables from the root directory
 load_dotenv(dotenv_path="../.env")
@@ -26,8 +26,8 @@ logger = logging.getLogger(__name__)
 async def test_agent():
     """Test the agent with various scenarios."""
     try:
-        logger.info("Initializing Customer Journey Agent...")
-        agent = CustomerJourneyAgent()
+        logger.info("Initializing Accountant Agent...")
+        agent = AccountantAgent()
         
         # Test scenarios
         test_cases = [

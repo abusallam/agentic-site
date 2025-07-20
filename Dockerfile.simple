@@ -1,35 +1,107 @@
-# Simple Dockerfile for Coolify deployment
-FROM node:18-alpine
+# Simplified Dockerfile for Coolify deployment
+# Single container with both frontend and backend
 
-# Install dependencies
-RUN apk add --no-cache libc6-compat curl
+FROM node:20-alpine AS base
 
-# Set working directory
+# Install Python and system dependencies
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    curl \
+    bash \
+    build-base \
+    python3-dev
+
+# Install uv for Python package management
+RUN pip3 install uv
+
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
+COPY agent/pyproject.toml agent/uv.lock ./agent/
 
-# Install dependencies
-RUN npm ci --only=production
+# Install Node.js dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Install Python dependencies
+WORKDIR /app/agent
+RUN uv sync --frozen
 
 # Copy source code
+WORKDIR /app
 COPY . .
 
-# Build the application
+# Build Next.js
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-# Expose port
-EXPOSE 3000
+# Create startup script
+RUN cat > start.sh << 'EOF'
+#!/bin/bash
+set -e
 
-# Set environment variables
+# Get ports from environment
+FRONTEND_PORT=${PORT:-3000}
+BACKEND_PORT=${BACKEND_PORT:-8080}
+
+echo "Starting AI SaaS Platform..."
+echo "Frontend: $FRONTEND_PORT, Backend: $BACKEND_PORT"
+
+# Start backend
+cd /app/agent
+export PYTHONPATH=/app/agent
+export ADK_AGENT_PORT=$BACKEND_PORT
+uv run python api_server.py &
+
+# Wait for backend
+sleep 10
+
+# Start frontend
+cd /app
+export PORT=$FRONTEND_PORT
+node server.js &
+
+# Wait for all processes
+wait
+EOF
+
+RUN chmod +x start.sh
+
+# Create health check script
+RUN cat > health.sh << 'EOF'
+#!/bin/bash
+FRONTEND_PORT=${PORT:-3000}
+BACKEND_PORT=${BACKEND_PORT:-8080}
+
+curl -f http://localhost:$FRONTEND_PORT/api/health && \
+curl -f http://localhost:$BACKEND_PORT/api/health
+EOF
+
+RUN chmod +x health.sh
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+
+# Set permissions
+RUN chown -R nextjs:nodejs /app
+
+USER nextjs
+
+# Expose ports (Coolify will map these)
+EXPOSE 3000 8080
+
+# Environment variables
 ENV NODE_ENV=production
-ENV PORT=3000
-ENV HOSTNAME=0.0.0.0
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV HOSTNAME="0.0.0.0"
+ENV PYTHONPATH=/app/agent
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD curl -f http://localhost:3000/api/health || exit 1
+HEALTHCHECK --interval=30s --timeout=15s --start-period=60s --retries=3 \
+    CMD ./health.sh
 
-# Start the application
-CMD ["npm", "start"]
+# Start application
+CMD ["./start.sh"]

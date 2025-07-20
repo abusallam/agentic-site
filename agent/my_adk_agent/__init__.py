@@ -5,7 +5,7 @@ This agent handles the complete customer journey from initial contact
 through service delivery via automated workflows.
 """
 
-from .agent import CustomerJourneyAgent
+from .agent import AccountantAgent
 
 __version__ = "0.1.0"
-__all__ = ["CustomerJourneyAgent"]
+__all__ = ["AccountantAgent"]

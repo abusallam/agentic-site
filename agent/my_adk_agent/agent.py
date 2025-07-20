@@ -1,8 +1,9 @@
-"""Main ADK Agent for customer journey orchestration."""
+"""Main ADK Agent for accounting, invoicing, and sales management."""
 
 import json
 import logging
 from typing import Dict, Any, Optional, List
+from datetime import datetime, timedelta
 from google.adk.agents.base_agent import BaseAgent
 # Tool imports will be added once we have the correct ADK setup
 
@@ -23,14 +24,14 @@ from n8n_mcp_agent.agent import N8nMCPAgent
 logger = logging.getLogger(__name__)
 
 
-class CustomerJourneyAgent(BaseAgent):
-    """ADK Agent that orchestrates the complete customer journey."""
+class AccountantAgent(BaseAgent):
+    """ADK Agent specialized in accounting, invoicing, billing, and financial management."""
     
     def __init__(self):
-        """Initialize the customer journey agent."""
+        """Initialize the accountant agent."""
         super().__init__(
-            name="customer_journey_agent",
-            description="ADK Agent for orchestrating customer journey from initial contact to service delivery"
+            name="accountant_agent",
+            description="ADK Agent for managing invoices, billing, payments, and financial operations"
         )
         
         # Initialize services using object.__setattr__ to bypass Pydantic validation
@@ -46,7 +47,7 @@ class CustomerJourneyAgent(BaseAgent):
         # Register tools
         self._register_tools()
         
-        logger.info("CustomerJourneyAgent initialized")
+        logger.info("AccountantAgent initialized")
     
     def _register_tools(self):
         """Register all available tools."""
@@ -463,10 +464,390 @@ class CustomerJourneyAgent(BaseAgent):
         
         return steps
 
-    async def run(self, user_input: str) -> str:
-        """Main entry point for agent execution."""
+    async def create_customer_record(self, customer_email: str, customer_name: Optional[str] = None) -> Dict[str, Any]:
+        """Create a new customer record for billing purposes."""
         try:
-            logger.info(f"Processing user input: {user_input[:100]}...")
+            logger.info(f"Creating customer record for: {customer_email}")
+            
+            # Create customer in Supabase
+            customer_data = {
+                "email": customer_email,
+                "name": customer_name or customer_email.split("@")[0],
+                "status": "active",
+                "created_at": datetime.now().isoformat()
+            }
+            
+            result = await self.supabase_service.create_customer(customer_data)
+            
+            # Create Stripe customer
+            stripe_customer = await self.stripe_service.create_customer(
+                email=customer_email,
+                name=customer_name
+            )
+            
+            # Update customer record with Stripe ID
+            if stripe_customer and result:
+                await self.supabase_service.update_customer(
+                    result["id"], 
+                    {"stripe_customer_id": stripe_customer.get("id")}
+                )
+            
+            return {
+                "status": "success",
+                "customer_id": result.get("id") if result else None,
+                "stripe_customer_id": stripe_customer.get("id") if stripe_customer else None,
+                "message": "Customer record created successfully"
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to create customer record: {e}")
+            return {"status": "error", "error": str(e)}
+    
+    async def setup_billing_profile(self, customer_email: str, requirements: Dict[str, Any]) -> Dict[str, Any]:
+        """Set up billing profile and payment methods for customer."""
+        try:
+            logger.info(f"Setting up billing profile for: {customer_email}")
+            
+            # Get customer record
+            customer = await self.supabase_service.get_customer_by_email(customer_email)
+            if not customer:
+                return {"status": "error", "error": "Customer not found"}
+            
+            # Determine pricing based on requirements
+            pricing = await self._calculate_pricing(requirements)
+            
+            # Create billing profile
+            billing_profile = {
+                "customer_id": customer["id"],
+                "service_type": requirements.get("service_type", "unknown"),
+                "pricing_tier": pricing["tier"],
+                "monthly_amount": pricing["monthly_amount"],
+                "setup_fee": pricing["setup_fee"],
+                "billing_cycle": "monthly",
+                "created_at": datetime.now().isoformat()
+            }
+            
+            # Store billing profile
+            stored_profile = await self._store_billing_profile(billing_profile)
+            
+            return {
+                "status": "success",
+                "billing_profile_id": stored_profile.get("id") if stored_profile else None,
+                "pricing": pricing,
+                "billing_cycle": "monthly",
+                "next_billing_date": (datetime.now() + timedelta(days=30)).isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to setup billing profile: {e}")
+            return {"status": "error", "error": str(e)}
+    
+    async def generate_invoice(self, customer_email: str, requirements: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate invoice for customer services."""
+        try:
+            logger.info(f"Generating invoice for: {customer_email}")
+            
+            # Get customer and billing profile
+            customer = await self.supabase_service.get_customer_by_email(customer_email)
+            if not customer:
+                return {"status": "error", "error": "Customer not found"}
+            
+            # Calculate invoice items
+            invoice_items = await self._calculate_invoice_items(requirements)
+            
+            # Generate invoice
+            invoice_data = {
+                "customer_id": customer["id"],
+                "customer_email": customer_email,
+                "invoice_number": f"INV-{datetime.now().strftime('%Y%m%d')}-{customer['id'][:8]}",
+                "items": invoice_items,
+                "subtotal": sum(item["amount"] for item in invoice_items),
+                "tax_rate": 0.15,  # 15% tax
+                "tax_amount": sum(item["amount"] for item in invoice_items) * 0.15,
+                "total_amount": sum(item["amount"] for item in invoice_items) * 1.15,
+                "currency": "USD",
+                "due_date": (datetime.now() + timedelta(days=30)).isoformat(),
+                "status": "pending",
+                "created_at": datetime.now().isoformat()
+            }
+            
+            # Store invoice
+            stored_invoice = await self._store_invoice(invoice_data)
+            
+            # Create Stripe invoice
+            stripe_invoice = await self._create_stripe_invoice(customer, invoice_data)
+            
+            # Send invoice to customer
+            invoice_sent = await self._send_invoice_email(customer_email, invoice_data)
+            
+            return {
+                "status": "success",
+                "invoice_id": stored_invoice.get("id") if stored_invoice else None,
+                "invoice_number": invoice_data["invoice_number"],
+                "total_amount": invoice_data["total_amount"],
+                "due_date": invoice_data["due_date"],
+                "stripe_invoice_id": stripe_invoice.get("id") if stripe_invoice else None,
+                "invoice_sent": invoice_sent
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to generate invoice: {e}")
+            return {"status": "error", "error": str(e)}
+    
+    async def generate_final_invoice(self, customer_email: str, project_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate final invoice upon project completion."""
+        try:
+            logger.info(f"Generating final invoice for: {customer_email}")
+            
+            # Include project completion details
+            requirements = project_data.get("detailed_requirements", {})
+            requirements["project_completed"] = True
+            requirements["completion_date"] = datetime.now().isoformat()
+            
+            # Add any additional charges
+            additional_charges = await self._calculate_additional_charges(project_data)
+            requirements["additional_charges"] = additional_charges
+            
+            return await self.generate_invoice(customer_email, requirements)
+            
+        except Exception as e:
+            logger.error(f"Failed to generate final invoice: {e}")
+            return {"status": "error", "error": str(e)}
+    
+    async def process_payment(self, customer_email: str, payment_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Process payment for customer invoice."""
+        try:
+            logger.info(f"Processing payment for: {customer_email}")
+            
+            # Get customer record
+            customer = await self.supabase_service.get_customer_by_email(customer_email)
+            if not customer:
+                return {"status": "error", "error": "Customer not found"}
+            
+            # Process payment through Stripe
+            payment_result = await self.stripe_service.process_payment(
+                customer_id=customer.get("stripe_customer_id"),
+                amount=payment_data.get("amount"),
+                currency=payment_data.get("currency", "USD"),
+                description=payment_data.get("description", "Service payment")
+            )
+            
+            # Record payment in database
+            payment_record = {
+                "customer_id": customer["id"],
+                "stripe_payment_intent_id": payment_result.get("payment_intent_id"),
+                "amount": payment_data.get("amount"),
+                "currency": payment_data.get("currency", "USD"),
+                "status": payment_result.get("status", "failed"),
+                "description": payment_data.get("description"),
+                "processed_at": datetime.now().isoformat()
+            }
+            
+            stored_payment = await self._store_payment_record(payment_record)
+            
+            return {
+                "status": "success" if payment_result.get("status") == "succeeded" else "failed",
+                "payment_id": stored_payment.get("id") if stored_payment else None,
+                "stripe_payment_id": payment_result.get("payment_intent_id"),
+                "amount": payment_data.get("amount"),
+                "currency": payment_data.get("currency", "USD"),
+                "processed_at": payment_record["processed_at"]
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to process payment: {e}")
+            return {"status": "error", "error": str(e)}
+    
+    async def generate_financial_report(self, period: str = "monthly") -> Dict[str, Any]:
+        """Generate financial report for the specified period."""
+        try:
+            logger.info(f"Generating {period} financial report")
+            
+            # Calculate date range
+            end_date = datetime.now()
+            if period == "daily":
+                start_date = end_date - timedelta(days=1)
+            elif period == "weekly":
+                start_date = end_date - timedelta(weeks=1)
+            elif period == "monthly":
+                start_date = end_date - timedelta(days=30)
+            elif period == "quarterly":
+                start_date = end_date - timedelta(days=90)
+            else:
+                start_date = end_date - timedelta(days=30)
+            
+            # Get financial data
+            financial_data = await self._get_financial_data(start_date, end_date)
+            
+            # Calculate metrics
+            metrics = {
+                "total_revenue": sum(p.get("amount", 0) for p in financial_data.get("payments", [])),
+                "total_invoices": len(financial_data.get("invoices", [])),
+                "paid_invoices": len([i for i in financial_data.get("invoices", []) if i.get("status") == "paid"]),
+                "pending_invoices": len([i for i in financial_data.get("invoices", []) if i.get("status") == "pending"]),
+                "overdue_invoices": len([i for i in financial_data.get("invoices", []) if i.get("status") == "overdue"]),
+                "average_invoice_amount": 0,
+                "payment_success_rate": 0
+            }
+            
+            # Calculate averages
+            if metrics["total_invoices"] > 0:
+                total_invoice_amount = sum(i.get("total_amount", 0) for i in financial_data.get("invoices", []))
+                metrics["average_invoice_amount"] = total_invoice_amount / metrics["total_invoices"]
+                metrics["payment_success_rate"] = (metrics["paid_invoices"] / metrics["total_invoices"]) * 100
+            
+            return {
+                "status": "success",
+                "period": period,
+                "date_range": {
+                    "start": start_date.isoformat(),
+                    "end": end_date.isoformat()
+                },
+                "metrics": metrics,
+                "generated_at": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to generate financial report: {e}")
+            return {"status": "error", "error": str(e)}
+    
+    # Helper methods
+    async def _calculate_pricing(self, requirements: Dict[str, Any]) -> Dict[str, Any]:
+        """Calculate pricing based on service requirements."""
+        service_type = requirements.get("service_type", "unknown")
+        complexity = requirements.get("complexity", "medium")
+        
+        # Base pricing structure
+        pricing_tiers = {
+            "chatbot": {
+                "basic": {"monthly": 99, "setup": 299},
+                "standard": {"monthly": 199, "setup": 499},
+                "premium": {"monthly": 399, "setup": 999}
+            },
+            "ai_agent": {
+                "basic": {"monthly": 299, "setup": 999},
+                "standard": {"monthly": 599, "setup": 1999},
+                "premium": {"monthly": 1199, "setup": 3999}
+            },
+            "workflow_automation": {
+                "basic": {"monthly": 199, "setup": 699},
+                "standard": {"monthly": 399, "setup": 1299},
+                "premium": {"monthly": 799, "setup": 2499}
+            }
+        }
+        
+        # Determine tier based on complexity
+        if complexity == "low":
+            tier = "basic"
+        elif complexity == "high":
+            tier = "premium"
+        else:
+            tier = "standard"
+        
+        service_pricing = pricing_tiers.get(service_type, pricing_tiers["chatbot"])
+        tier_pricing = service_pricing.get(tier, service_pricing["standard"])
+        
+        return {
+            "service_type": service_type,
+            "tier": tier,
+            "monthly_amount": tier_pricing["monthly"],
+            "setup_fee": tier_pricing["setup"],
+            "currency": "USD"
+        }
+    
+    async def _calculate_invoice_items(self, requirements: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Calculate invoice line items."""
+        pricing = await self._calculate_pricing(requirements)
+        items = []
+        
+        # Setup fee
+        if not requirements.get("project_completed", False):
+            items.append({
+                "description": f"{pricing['service_type'].title()} Setup Fee",
+                "quantity": 1,
+                "unit_price": pricing["setup_fee"],
+                "amount": pricing["setup_fee"]
+            })
+        
+        # Monthly service fee
+        items.append({
+            "description": f"{pricing['service_type'].title()} Monthly Service",
+            "quantity": 1,
+            "unit_price": pricing["monthly_amount"],
+            "amount": pricing["monthly_amount"]
+        })
+        
+        # Additional charges
+        additional_charges = requirements.get("additional_charges", [])
+        for charge in additional_charges:
+            items.append({
+                "description": charge.get("description", "Additional Service"),
+                "quantity": charge.get("quantity", 1),
+                "unit_price": charge.get("unit_price", 0),
+                "amount": charge.get("amount", 0)
+            })
+        
+        return items
+    
+    async def _calculate_additional_charges(self, project_data: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Calculate any additional charges for the project."""
+        additional_charges = []
+        
+        # Check for scope changes
+        if project_data.get("scope_changes"):
+            additional_charges.append({
+                "description": "Scope Change Fee",
+                "quantity": 1,
+                "unit_price": 500,
+                "amount": 500
+            })
+        
+        # Check for rush delivery
+        if project_data.get("rush_delivery"):
+            additional_charges.append({
+                "description": "Rush Delivery Fee",
+                "quantity": 1,
+                "unit_price": 300,
+                "amount": 300
+            })
+        
+        return additional_charges
+    
+    # Mock database operations
+    async def _store_billing_profile(self, profile_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Store billing profile in database."""
+        return {"id": f"billing_{datetime.now().timestamp()}", **profile_data}
+    
+    async def _store_invoice(self, invoice_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Store invoice in database."""
+        return {"id": f"inv_{datetime.now().timestamp()}", **invoice_data}
+    
+    async def _store_payment_record(self, payment_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Store payment record in database."""
+        return {"id": f"pay_{datetime.now().timestamp()}", **payment_data}
+    
+    async def _create_stripe_invoice(self, customer: Dict[str, Any], invoice_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Create invoice in Stripe."""
+        # Mock implementation
+        return {"id": f"stripe_inv_{datetime.now().timestamp()}"}
+    
+    async def _send_invoice_email(self, customer_email: str, invoice_data: Dict[str, Any]) -> bool:
+        """Send invoice email to customer."""
+        logger.info(f"Sending invoice {invoice_data['invoice_number']} to {customer_email}")
+        return True
+    
+    async def _get_financial_data(self, start_date: datetime, end_date: datetime) -> Dict[str, Any]:
+        """Get financial data for date range."""
+        return {
+            "invoices": [],  # Would fetch from database
+            "payments": [],
+            "customers": []
+        }
+
+    async def run(self, user_input: str) -> str:
+        """Main entry point for accountant agent execution."""
+        try:
+            logger.info(f"Accountant agent processing: {user_input[:100]}...")
             
             # Try to parse as JSON command first
             try:
@@ -480,7 +861,7 @@ class CustomerJourneyAgent(BaseAgent):
             return await self._handle_natural_language(user_input)
             
         except Exception as e:
-            logger.error(f"Error in agent run: {e}")
+            logger.error(f"Error in accountant agent run: {e}")
             return f"I encountered an error: {str(e)}. Please try again or contact support."
     
     async def _handle_command(self, command: Dict[str, Any]) -> str:
@@ -612,3 +993,171 @@ Would you like me to:
 Please let me know how you'd like to proceed!"""
             else:
                 return "I'd be happy to help! Could you tell me more about what AI services you're looking for?"
+    
+    async def _handle_command(self, command: Dict[str, Any]) -> str:
+        """Handle structured JSON commands."""
+        action = command.get("action")
+        params = command.get("params", {})
+        
+        if action == "create_customer":
+            result = await self.create_customer_record(
+                customer_email=params.get("email"),
+                customer_name=params.get("name")
+            )
+        elif action == "setup_billing":
+            result = await self.setup_billing_profile(
+                customer_email=params.get("email"),
+                requirements=params.get("requirements", {})
+            )
+        elif action == "generate_invoice":
+            result = await self.generate_invoice(
+                customer_email=params.get("email"),
+                requirements=params.get("requirements", {})
+            )
+        elif action == "process_payment":
+            result = await self.process_payment(
+                customer_email=params.get("email"),
+                payment_data=params.get("payment_data", {})
+            )
+        elif action == "generate_report":
+            result = await self.generate_financial_report(
+                period=params.get("period", "monthly")
+            )
+        else:
+            return f"Unknown accountant action: {action}"
+        
+        return json.dumps(result, indent=2)
+    
+    async def _handle_natural_language(self, user_input: str) -> str:
+        """Handle natural language input for accounting operations."""
+        input_lower = user_input.lower()
+        
+        if any(word in input_lower for word in ["invoice", "bill", "billing"]):
+            return """💰 **Accountant Agent** - Invoicing & Billing
+
+I can help you with financial operations:
+
+**Invoice Management:**
+• Generate invoices for services
+• Track payment status
+• Send payment reminders
+
+**Billing Setup:**
+• Create customer billing profiles
+• Set up recurring billing
+• Configure payment methods
+
+**Payment Processing:**
+• Process customer payments
+• Handle refunds and disputes
+• Track payment history
+
+Use JSON format:
+```json
+{
+  "action": "generate_invoice",
+  "params": {
+    "email": "customer@example.com",
+    "requirements": {
+      "service_type": "chatbot",
+      "complexity": "standard"
+    }
+  }
+}
+```"""
+        
+        elif any(word in input_lower for word in ["payment", "pay", "charge"]):
+            return """💳 **Payment Processing**
+
+I handle all payment operations:
+• Process credit card payments
+• Set up payment plans
+• Handle subscription billing
+• Manage refunds
+
+Use JSON format:
+```json
+{
+  "action": "process_payment",
+  "params": {
+    "email": "customer@example.com",
+    "payment_data": {
+      "amount": 299,
+      "currency": "USD",
+      "description": "Chatbot setup fee"
+    }
+  }
+}
+```"""
+        
+        elif any(word in input_lower for word in ["report", "financial", "revenue"]):
+            return """📊 **Financial Reporting**
+
+I generate comprehensive financial reports:
+• Revenue analysis
+• Invoice tracking
+• Payment success rates
+• Customer billing metrics
+
+Use JSON format:
+```json
+{
+  "action": "generate_report",
+  "params": {
+    "period": "monthly"
+  }
+}
+```
+
+Available periods: daily, weekly, monthly, quarterly"""
+        
+        elif any(word in input_lower for word in ["customer", "create", "setup"]):
+            return """👤 **Customer Management**
+
+I manage customer accounts and billing:
+• Create new customer records
+• Set up billing profiles
+• Configure payment methods
+• Track customer status
+
+Use JSON format:
+```json
+{
+  "action": "create_customer",
+  "params": {
+    "email": "customer@example.com",
+    "name": "John Doe"
+  }
+}
+```"""
+        
+        else:
+            return """💰 **Accountant Agent** - Financial Operations
+
+I handle all accounting and financial operations:
+
+**💳 Billing & Invoicing:**
+• Generate invoices for services
+• Set up customer billing profiles
+• Track payment status
+• Send payment reminders
+
+**💰 Payment Processing:**
+• Process customer payments
+• Handle subscription billing
+• Manage refunds and disputes
+• Set up payment plans
+
+**📊 Financial Reporting:**
+• Generate revenue reports
+• Track payment metrics
+• Analyze customer billing
+• Monitor financial health
+
+**👤 Customer Management:**
+• Create customer records
+• Set up billing profiles
+• Manage payment methods
+• Track customer status
+
+What financial operation can I help you with today?"""
