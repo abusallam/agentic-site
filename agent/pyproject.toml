@@ -1,0 +1,32 @@
+[project]
+name = "my-adk-agent"
+version = "0.1.0"
+description = "ADK Agent for SaaS platform customer journey orchestration"
+authors = [
+    {name = "consulting.sa", email = "asim@consulting.sa"}
+]
+dependencies = [
+    "google-adk>=0.1.0",
+    "supabase>=2.0.0",
+    "stripe>=7.0.0",
+    "livekit>=0.10.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.0.0",
+    "httpx>=0.25.0",
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+]
+requires-python = ">=3.11"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.5.0",
+]
