@@ -5,6 +5,7 @@ FROM python:3.11-slim AS base
 RUN apt-get update && apt-get install -y \
     curl \
     build-essential \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv for Python package management
@@ -12,13 +13,26 @@ RUN pip install uv
 
 WORKDIR /app
 
-# Copy Python backend files
+# Copy all agent files including pyproject.toml and uv.lock
 COPY agent/ ./agent/
 COPY .env* ./
 
 # Install Python dependencies
 WORKDIR /app/agent
-RUN uv sync --frozen
+
+# Debug: List files to see what's available
+RUN ls -la
+
+# Create uv.lock if it doesn't exist, otherwise use existing one
+RUN if [ ! -f "uv.lock" ]; then \
+        echo "Creating uv.lock from pyproject.toml..."; \
+        uv lock; \
+    else \
+        echo "Using existing uv.lock file"; \
+    fi
+
+# Install dependencies
+RUN uv sync
 
 # Create startup script
 WORKDIR /app
