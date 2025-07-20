@@ -19,7 +19,14 @@ COPY . .
 # Build the application
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+
+# Debug: Show available packages
+RUN echo "=== Checking build dependencies ===" && \
+    npm list autoprefixer postcss tailwindcss || echo "Some packages not found, but continuing..."
+
+# Build with error handling
+RUN echo "=== Starting Next.js build ===" && \
+    npm run build
 
 # Production image
 FROM base AS runner
