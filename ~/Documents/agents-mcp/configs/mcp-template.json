@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "example-server": {
+      "command": "python",
+      "args": ["/home/asim/Documents/agents-mcp/servers/example-server/main.py"],
+      "env": {
+        "PYTHONPATH": "/home/asim/Documents/agents-mcp/servers/example-server"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
