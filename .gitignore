@@ -41,4 +41,3 @@ __pycache__/
 # Project specific
 n8n-mcp/
 agent/.venv/
-agent/uv.lock
