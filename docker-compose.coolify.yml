@@ -1,102 +1,84 @@
+# Coolify-specific Docker Compose configuration
+# This file extends the base docker-compose.yml for Coolify deployment
+
 version: '3.8'
 
 services:
-  ai-saas-platform:
-    build:
-      context: .
-      dockerfile: Dockerfile.production
-    restart: unless-stopped
-    
-    # Coolify will override these ports with random ones
+  frontend:
+    # Override for Coolify deployment
     ports:
       - "${PORT:-3000}:3000"
-      - "${BACKEND_PORT:-8080}:8080"
-    
     environment:
-      # Core settings
-      - NODE_ENV=production
-      - NEXT_TELEMETRY_DISABLED=1
-      - PORT=${PORT:-3000}
-      - BACKEND_PORT=${BACKEND_PORT:-8080}
-      - HOSTNAME=0.0.0.0
-      
-      # Supabase Configuration
-      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-      
-      # Contact Configuration
-      - NEXT_PUBLIC_CONTACT_EMAIL=${NEXT_PUBLIC_CONTACT_EMAIL:-asim@consulting.sa}
-      
-      # API Keys
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      
-      # Stripe Configuration
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
-      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
-      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
-      
-      # Livekit Configuration
-      - LIVEKIT_URL=${LIVEKIT_URL}
-      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
-      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}
-      
-      # n8n Configuration
-      - N8N_URL=${N8N_URL}
-      - N8N_BASE_URL=${N8N_BASE_URL}
-      - N8N_API_KEY=${N8N_API_KEY}
-      
-      # Agent Configuration
-      - ADK_AGENT_PORT=${BACKEND_PORT:-8080}
-      - ADK_LOG_LEVEL=${ADK_LOG_LEVEL:-INFO}
-      - ADK_WEB_PORT=${ADK_WEB_PORT:-8082}
-      
-      # MCP Configuration
-      - MCP_SERVER_URL=${MCP_SERVER_URL:-http://localhost:8000}
-      - MCP_SERVER_PORT=${MCP_SERVER_PORT:-8000}
-      - N8N_MCP_PORT=${N8N_MCP_PORT:-8003}
-    
-    # Health check for Coolify
-    healthcheck:
-      test: ["CMD-SHELL", "./health-check.sh"]
-      interval: 30s
-      timeout: 15s
-      retries: 3
-      start_period: 60s
-    
-    # Resource limits
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-          cpus: '1.0'
-        reservations:
-          memory: 512M
-          cpus: '0.25'
-    
-    # Coolify labels
+      # Coolify-specific environment variables
+      - COOLIFY_DEPLOYMENT=true
+      - BACKEND_URL=http://backend:8080
     labels:
+      # Coolify labels for service discovery
       - "coolify.managed=true"
       - "coolify.name=ai-saas-platform"
       - "coolify.type=application"
-      - "coolify.pullRequestDeployment=true"
-      - "coolify.domains=${DOMAIN:-consulting.sa}"
+      - "coolify.framework=nextjs"
       
-      # Health check endpoint for Coolify
+      # Domain configuration
+      - "coolify.domains=${DOMAIN:-consulting.sa,www.consulting.sa}"
+      - "coolify.ssl=true"
+      - "coolify.redirect=true"
+      
+      # Health check configuration
       - "coolify.healthcheck.enabled=true"
       - "coolify.healthcheck.path=/api/health"
-      - "coolify.healthcheck.port=${PORT:-3000}"
+      - "coolify.healthcheck.port=3000"
       - "coolify.healthcheck.interval=30s"
       
       # Auto-deployment
       - "coolify.autodeploy=true"
       - "coolify.branch=main"
       
-      # SSL/TLS
-      - "coolify.ssl=true"
-      - "coolify.redirect=true"
+      # Load balancer configuration
+      - "coolify.loadbalancer=true"
+      - "coolify.port=3000"
 
+  backend:
+    # Backend service configuration for Coolify
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    environment:
+      - COOLIFY_DEPLOYMENT=true
+    labels:
+      - "coolify.managed=true"
+      - "coolify.name=ai-saas-backend"
+      - "coolify.type=application"
+      - "coolify.framework=python"
+      
+      # Internal service (not exposed to public)
+      - "coolify.internal=true"
+      
+      # Health check
+      - "coolify.healthcheck.enabled=true"
+      - "coolify.healthcheck.path=/api/health"
+      - "coolify.healthcheck.port=8080"
+      - "coolify.healthcheck.interval=30s"
+
+  db-migrate:
+    # Migration service - runs once
+    labels:
+      - "coolify.managed=true"
+      - "coolify.name=ai-saas-migrate"
+      - "coolify.type=oneshot"
+      - "coolify.runonce=true"
+
+# Coolify network configuration
 networks:
   default:
+    external: true
     name: coolify
+
+# Resource limits for Coolify
+x-deploy: &deploy-config
+  resources:
+    limits:
+      memory: 1G
+      cpus: '0.5'
+    reservations:
+      memory: 256M
+      cpus: '0.1'

@@ -1,0 +1,73 @@
+# Backend Dockerfile - Python Agent System
+FROM python:3.11-slim AS base
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv for Python package management
+RUN pip install uv
+
+WORKDIR /app
+
+# Copy Python backend files
+COPY agent/ ./agent/
+COPY .env* ./
+
+# Install Python dependencies
+WORKDIR /app/agent
+RUN uv sync --frozen
+
+# Create startup script
+WORKDIR /app
+RUN cat > start-backend.sh << 'EOF'
+#!/bin/bash
+set -e
+
+echo "🤖 Starting AI Agent Backend..."
+
+# Set environment
+export PYTHONPATH=/app/agent
+export ADK_AGENT_PORT=${ADK_AGENT_PORT:-8080}
+
+# Navigate to agent directory
+cd /app/agent
+
+# Start the API server
+echo "Starting FastAPI server on port $ADK_AGENT_PORT..."
+uv run python api_server.py
+EOF
+
+RUN chmod +x start-backend.sh
+
+# Create health check script
+RUN cat > health-backend.sh << 'EOF'
+#!/bin/bash
+PORT=${ADK_AGENT_PORT:-8080}
+curl -f http://localhost:$PORT/api/health
+EOF
+
+RUN chmod +x health-backend.sh
+
+# Create non-root user
+RUN groupadd --gid 1001 appuser && \
+    useradd --uid 1001 --gid appuser --shell /bin/bash --create-home appuser
+
+# Set ownership
+RUN chown -R appuser:appuser /app
+
+USER appuser
+
+EXPOSE 8080
+
+# Environment variables
+ENV PYTHONPATH=/app/agent
+ENV ADK_AGENT_PORT=8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD ./health-backend.sh
+
+CMD ["./start-backend.sh"]
