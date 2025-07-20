@@ -11,19 +11,16 @@ services:
       - COOLIFY_DEPLOYMENT=true
       - BACKEND_URL=http://backend:8080
     labels:
-      # Coolify labels for service discovery
+      # Coolify management labels (let Coolify handle Traefik configuration)
       - "coolify.managed=true"
       - "coolify.name=ai-saas-platform"
       - "coolify.type=application"
       - "coolify.framework=nextjs"
       
-      # Domain configuration
+      # Domain configuration for Coolify
       - "coolify.domains=site.consulting.sa,admin.consulting.sa"
       - "coolify.ssl=true"
-      - "coolify.ssl.letsencrypt=true"
-      - "coolify.ssl.force=true"
       - "coolify.redirect=true"
-      - "coolify.redirect.www=false"
       
       # Health check configuration
       - "coolify.healthcheck.enabled=true"
@@ -31,12 +28,7 @@ services:
       - "coolify.healthcheck.port=3000"
       - "coolify.healthcheck.interval=30s"
       
-      # Auto-deployment
-      - "coolify.autodeploy=true"
-      - "coolify.branch=main"
-      
       # Load balancer configuration
-      - "coolify.loadbalancer=true"
       - "coolify.port=3000"
 
   backend:
