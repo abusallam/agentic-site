@@ -28,6 +28,11 @@ services:
       # Backend URL for API calls
       - NEXT_PUBLIC_BACKEND_URL=http://backend:8080
       
+      # SSL Configuration
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-https://site.consulting.sa}
+      - NEXT_PUBLIC_ADMIN_URL=${NEXT_PUBLIC_ADMIN_URL:-https://admin.consulting.sa}
+      - FORCE_HTTPS=${FORCE_HTTPS:-true}
+      
     depends_on:
       - backend
     healthcheck:

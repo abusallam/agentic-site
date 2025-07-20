@@ -18,9 +18,12 @@ services:
       - "coolify.framework=nextjs"
       
       # Domain configuration
-      - "coolify.domains=${DOMAIN:-consulting.sa,www.consulting.sa}"
+      - "coolify.domains=site.consulting.sa,admin.consulting.sa"
       - "coolify.ssl=true"
+      - "coolify.ssl.letsencrypt=true"
+      - "coolify.ssl.force=true"
       - "coolify.redirect=true"
+      - "coolify.redirect.www=false"
       
       # Health check configuration
       - "coolify.healthcheck.enabled=true"
