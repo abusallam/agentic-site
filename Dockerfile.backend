@@ -21,18 +21,30 @@ COPY .env* ./
 WORKDIR /app/agent
 
 # Debug: List files to see what's available
-RUN ls -la
+RUN echo "=== Files in /app/agent ===" && ls -la
 
-# Create uv.lock if it doesn't exist, otherwise use existing one
+# Ensure we have the required files
+RUN if [ ! -f "pyproject.toml" ]; then \
+        echo "ERROR: pyproject.toml not found!"; \
+        exit 1; \
+    fi
+
+# Handle uv.lock file
 RUN if [ ! -f "uv.lock" ]; then \
-        echo "Creating uv.lock from pyproject.toml..."; \
+        echo "uv.lock not found, creating from pyproject.toml..."; \
         uv lock; \
     else \
         echo "Using existing uv.lock file"; \
+        echo "=== uv.lock content preview ==="; \
+        head -10 uv.lock; \
     fi
 
-# Install dependencies
-RUN uv sync
+# Install dependencies with better error handling
+RUN echo "Installing Python dependencies..." && \
+    uv sync --verbose || \
+    (echo "uv sync failed, trying without lock file..." && \
+     rm -f uv.lock && \
+     uv sync --verbose)
 
 # Create startup script
 WORKDIR /app
