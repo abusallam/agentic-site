@@ -6,8 +6,6 @@ version: '3.8'
 services:
   frontend:
     # Override for Coolify deployment
-    ports:
-      - "${PORT:-3000}:3000"
     environment:
       # Coolify-specific environment variables
       - COOLIFY_DEPLOYMENT=true
@@ -40,8 +38,6 @@ services:
 
   backend:
     # Backend service configuration for Coolify
-    ports:
-      - "${BACKEND_PORT:-8080}:8080"
     environment:
       - COOLIFY_DEPLOYMENT=true
     labels:
