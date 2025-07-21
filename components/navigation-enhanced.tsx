@@ -25,20 +25,19 @@ export function EnhancedNavigation() {
   }, [])
 
   const navItems = [
-    { href: "/", label: t("nav.home") },
-    { href: "/services", label: t("nav.services") },
-    { href: "/privacy-policy", label: t("footer.privacy") },
-    { href: "/consulting", label: t("nav.consulting") },
-    { href: "/documentation", label: t("nav.documentation") },
-    { href: "/about", label: t("nav.about") },
-    { href: "/contact", label: t("nav.contact") },
+    { href: "/", label: "Home" },
+    { href: "/services", label: "Services" },
+    { href: "/consulting", label: "Consulting" },
+    { href: "/about", label: "About" },
+    { href: "/docs", label: "Documentation" },
+    { href: "/contact", label: "Contact" },
   ]
 
   return (
     <header
       className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? "bg-background/80 backdrop-blur-md border-b shadow-sm" : "bg-transparent",
+        isScrolled ? "nav-blur shadow-sm" : "bg-transparent",
       )}
     >
       <div className="container mx-auto px-4">
@@ -95,10 +94,10 @@ export function EnhancedNavigation() {
             {/* Auth Buttons */}
             <div className="hidden md:flex items-center gap-2">
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/auth/login">{t("nav.login")}</Link>
+                <Link href="/auth/login">Login</Link>
               </Button>
-              <Button size="sm" asChild>
-                <Link href="/auth/signup">{t("nav.signup")}</Link>
+              <Button size="sm" asChild className="btn-primary">
+                <Link href="/auth/signup">Sign Up</Link>
               </Button>
             </div>
 
@@ -122,10 +121,10 @@ export function EnhancedNavigation() {
                   ))}
                   <div className="flex flex-col gap-2 mt-4">
                     <Button variant="outline" asChild>
-                      <Link href="/auth/login">{t("nav.login")}</Link>
+                      <Link href="/auth/login">Login</Link>
                     </Button>
-                    <Button asChild>
-                      <Link href="/auth/signup">{t("nav.signup")}</Link>
+                    <Button asChild className="btn-primary">
+                      <Link href="/auth/signup">Sign Up</Link>
                     </Button>
                   </div>
                 </div>

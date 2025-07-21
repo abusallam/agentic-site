@@ -12,43 +12,32 @@ export function EnhancedHeroSection() {
     {
       icon: Users,
       value: "500+",
-      label: t("hero.stats.clients"),
+      label: "Happy Clients",
     },
     {
       icon: CheckCircle,
       value: "1000+",
-      label: t("hero.stats.projects"),
+      label: "Projects Completed",
     },
     {
       icon: Clock,
       value: "10+",
-      label: t("hero.stats.experience"),
+      label: "Years Experience",
     },
     {
       icon: Star,
       value: "98%",
-      label: t("hero.stats.satisfaction"),
+      label: "Client Satisfaction",
     },
   ]
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-muted/20">
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: "url('/bg1.webp')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-      </div>
-
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden hero-background">
       {/* Floating Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-float-slow" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-float-slow" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/2 right-1/3 w-32 h-32 bg-accent/10 rounded-full blur-2xl animate-float" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -61,11 +50,11 @@ export function EnhancedHeroSection() {
                 "bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent",
               )}
             >
-              {t("hero.title")}
+              Transform Your Business with AI Solutions
             </h1>
 
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              {t("hero.subtitle")}
+              Professional AI consulting services and cutting-edge SaaS solutions for modern businesses
             </p>
           </div>
 
@@ -75,7 +64,7 @@ export function EnhancedHeroSection() {
               size="lg"
               className="group bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary"
             >
-              {t("hero.cta.primary")}
+              Get Started
               <ArrowRight
                 className={cn(
                   "ml-2 h-4 w-4 transition-transform group-hover:translate-x-1",
@@ -84,7 +73,7 @@ export function EnhancedHeroSection() {
               />
             </Button>
             <Button size="lg" variant="outline" className="hover-lift bg-transparent">
-              {t("hero.cta.secondary")}
+              Learn More
             </Button>
           </div>
 

@@ -13,8 +13,8 @@ export function EnhancedServicesSection() {
   const services = [
     {
       icon: Bot,
-      title: t("services.aiAgents.title"),
-      description: t("services.aiAgents.description"),
+      title: "AI Agents",
+      description: "Intelligent automation solutions",
       href: "/ai-agents",
       features: [
         "Intelligent Process Automation",
@@ -26,16 +26,16 @@ export function EnhancedServicesSection() {
     },
     {
       icon: MessageSquare,
-      title: t("services.chatbots.title"),
-      description: t("services.chatbots.description"),
+      title: "Chatbots",
+      description: "Conversational AI interfaces",
       href: "/chatbots",
       features: ["Natural Language Processing", "Multi-language Support", "Integration Ready", "Real-time Learning"],
       badge: "New",
     },
     {
       icon: Brain,
-      title: t("services.consulting.title"),
-      description: t("services.consulting.description"),
+      title: "AI Consulting",
+      description: "Strategic AI implementation guidance",
       href: "/consulting",
       features: ["Strategic AI Planning", "Implementation Guidance", "Team Training", "Ongoing Support"],
       badge: "Premium",
@@ -43,13 +43,13 @@ export function EnhancedServicesSection() {
   ]
 
   return (
-    <section className="py-20 bg-muted/30">
+    <section className="section-padding bg-muted/20">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16 space-y-4">
-            <h2 className="text-3xl sm:text-4xl font-bold font-heading">{t("services.title")}</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t("services.subtitle")}</p>
+            <h2 className="text-3xl sm:text-4xl font-bold font-heading gradient-text">Our AI Solutions</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Comprehensive AI services to accelerate your digital transformation</p>
           </div>
 
           {/* Services Grid */}
@@ -57,8 +57,8 @@ export function EnhancedServicesSection() {
             {services.map((service, index) => (
               <Card
                 key={index}
-                className="group hover-lift glass-effect border-0 bg-background/50 relative overflow-hidden animate-fade-in-up"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="group service-card glass-effect-enhanced border-0 bg-background/60 relative overflow-hidden animate-fade-in-up"
+                style={{ animationDelay: `${index * 150}ms` }}
               >
                 {/* Badge */}
                 {service.badge && (
