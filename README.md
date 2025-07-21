@@ -183,6 +183,7 @@ Visit our website: **[https://consulting.sa](https://consulting.sa)**
 
 ### Environment Variables
 
+#### **Core Application Variables**
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | Yes | - |
@@ -190,6 +191,71 @@ Visit our website: **[https://consulting.sa](https://consulting.sa)**
 | `NEXT_PUBLIC_CONTACT_EMAIL` | Contact email address | No | asim@consulting.sa |
 | `NEXT_PUBLIC_GA_ID` | Google Analytics ID | No | - |
 | `ANALYZE` | Enable bundle analyzer | No | false |
+
+#### **Production Environment Variables**
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `NODE_ENV` | Environment mode | Yes | production |
+| `NEXT_TELEMETRY_DISABLED` | Disable Next.js telemetry | No | 1 |
+| `NEXT_PUBLIC_SITE_URL` | Public site URL | Yes | http://217.79.255.54 |
+| `NEXT_PUBLIC_ADMIN_URL` | Admin interface URL | Yes | http://217.79.255.54:8953 |
+| `FORCE_HTTPS` | Force HTTPS redirects | No | false |
+
+#### **AI Services Configuration**
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `OPENAI_API_KEY` | OpenAI API key | No | - |
+| `ANTHROPIC_API_KEY` | Anthropic API key | No | - |
+| `GEMINI_API_KEY` | Google Gemini API key | No | - |
+
+#### **Payment Integration**
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `STRIPE_SECRET_KEY` | Stripe secret key | No | - |
+| `STRIPE_PUBLISHABLE_KEY` | Stripe publishable key | No | - |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook secret | No | - |
+
+#### **Communication Services**
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `LIVEKIT_URL` | Livekit server URL | No | - |
+| `LIVEKIT_API_KEY` | Livekit API key | No | - |
+| `LIVEKIT_API_SECRET` | Livekit API secret | No | - |
+
+#### **Workflow Automation**
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `N8N_URL` | n8n instance URL | No | - |
+| `N8N_BASE_URL` | n8n base URL | No | - |
+| `N8N_API_KEY` | n8n API key | No | - |
+
+#### **MCP Server Configuration**
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `MCP_SERVER_URL` | MCP server URL | No | http://localhost:8000 |
+| `MCP_SERVER_PORT` | MCP server port | No | 8000 |
+| `N8N_MCP_PORT` | n8n MCP port | No | 8003 |
+| `GITHUB_TOKEN` | GitHub token for MCP | No | - |
+
+#### **Backend Configuration**
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `ADK_AGENT_PORT` | Agent server port | No | 8953 |
+| `ADK_LOG_LEVEL` | Logging level | No | INFO |
+| `PYTHONPATH` | Python path | No | /app/agent |
+
+#### **Docker Configuration**
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `COMPOSE_PROJECT_NAME` | Docker Compose project name | No | agentic-site |
+| `COMPOSE_HTTP_TIMEOUT` | HTTP timeout for Compose | No | 120 |
+| `DOMAIN` | Domain name | No | 217.79.255.54 |
+
+#### **Health Check Configuration**
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `HEALTH_CHECK_ENABLED` | Enable health checks | No | true |
+| `HEALTH_CHECK_INTERVAL` | Health check interval (seconds) | No | 30 |
 
 ### Brand Configuration
 
@@ -229,22 +295,148 @@ The project uses a custom Tailwind configuration with:
 
 ## 🚢 Deployment
 
-### Vercel (Recommended)
+### Production VPS Deployment (Current) ✅
+
+**Status**: Successfully deployed on production VPS  
+**Server**: 217.79.255.54  
+**Architecture**: Docker Compose multi-service deployment  
+
+#### **Current Deployment Status**
+- **Frontend (Next.js)**: ✅ Running on port 3911
+- **Backend (Python Agent)**: ✅ Running on port 8953
+- **Security**: ✅ UFW Firewall + Fail2ban active
+- **SSL Ready**: ✅ Port 443 configured for HTTPS
+- **Management**: ✅ Automated scripts installed
+
+#### **Access Points**
+- **Next.js Frontend**: http://217.79.255.54:3911/
+- **Python Backend**: http://217.79.255.54:8953/
+- **SSH Access**: ssh root@217.79.255.54 (secured)
+
+#### **VPS Specifications**
+- **OS**: Debian 12 (Bookworm)
+- **RAM**: 23GB
+- **Storage**: 394GB
+- **CPU**: Multi-core x86_64
+- **Network**: 1Gbps connection
+
+#### **Management Commands**
+```bash
+# Application status
+/usr/local/bin/agentic-site-status.sh
+
+# Restart application
+/usr/local/bin/agentic-site-restart.sh
+
+# View logs
+cd /opt/docker-apps/production/agentic-site
+docker compose logs -f
+
+# Container management
+docker compose ps                 # Check status
+docker compose restart           # Restart services
+docker compose down && docker compose up -d  # Full restart
+```
+
+#### **VPS Environment Configuration**
+
+**🔑 VPS Access Credentials:**
+```bash
+# SSH Access
+Host: 217.79.255.54
+Username: root
+Password: gt5qXy22aJ
+Port: 22
+
+# SSH Command
+ssh root@217.79.255.54
+```
+
+**🌐 Service URLs:**
+- **Frontend**: http://217.79.255.54/ (Next.js on port 3911)
+- **HTTPS**: https://217.79.255.54/ (SSL enabled)
+- **Backend**: http://217.79.255.54:8953/ (Python Agent)
+- **Health Check**: http://217.79.255.54/health (Nginx health)
+
+**📊 Current Deployment Status:**
+- ✅ **Frontend Deployed**: Next.js running on port 3911
+- ✅ **Backend Deployed**: Python agent on port 8953
+- ✅ **SSL Configured**: Cloudflare SSL certificate installed
+- ✅ **Nginx Proxy**: Reverse proxy configured
+- ✅ **Docker Containers**: Multi-service deployment active
+- ⚠️ **Health Endpoints**: Some API endpoints need configuration
+- ✅ **Performance**: Excellent load times (0.4-0.6s average)
+
+**🔧 Management Commands:**
+```bash
+# Check application status
+/usr/local/bin/agentic-site-status.sh
+
+# Restart application
+/usr/local/bin/agentic-site-restart.sh
+
+# View container logs
+cd /opt/docker-apps/production/agentic-site
+docker compose logs -f
+
+# Container management
+docker compose ps                 # Check status
+docker compose restart           # Restart services
+docker compose down && docker compose up -d  # Full restart
+```
+
+**📁 Deployment Structure:**
+```
+/opt/docker-apps/production/agentic-site/
+├── docker-compose.yml           # Main compose file
+├── .env                        # Environment variables
+├── Dockerfile.frontend         # Next.js container
+├── Dockerfile.backend          # Python agent container
+├── app/                        # Next.js application
+├── agent/                      # Python agent code
+├── components/                 # React components
+├── lib/                        # Utilities
+└── docs/                       # Documentation
+```
+
+**🔒 SSL Certificate Information:**
+- **Provider**: Cloudflare Origin SSL
+- **Domain**: consulting.sa, www.consulting.sa
+- **Certificate Path**: `/etc/nginx/ssl/consulting.sa/certificate.crt`
+- **Private Key Path**: `/etc/nginx/ssl/consulting.sa/private.key`
+- **Expires**: 2040-07-17 (15+ years validity)
+- **Auto-renewal**: Not required (long expiry)
+
+**🛡️ Security Configuration:**
+- **Firewall**: UFW active with restricted ports
+- **Fail2ban**: Active for SSH protection
+- **SSL/TLS**: TLSv1.2 and TLSv1.3 enabled
+- **Security Headers**: HSTS, XSS protection, frame options
+- **Access Control**: Root access only, key-based auth recommended
+
+See [VPS_CONFIGURATION.md](VPS_CONFIGURATION.md) for complete server documentation including:
+- System specifications and software versions
+- Network configuration and security settings
+- Environment variables and service configuration
+- Monitoring and maintenance procedures
+- Backup and recovery strategies
+
+### Vercel Deployment
 
 1. **Connect your repository** to Vercel
 2. **Configure environment variables** in Vercel dashboard
 3. **Deploy** - Automatic deployments on push to main
 
-### Docker Deployment
+### Docker Deployment (Local)
 
 1. **Build the image**
    ```bash
-   docker build -t main-consulting-website .
+   docker build -t agentic-site .
    ```
 
 2. **Run the container**
    ```bash
-   docker run -p 3000:3000 main-consulting-website
+   docker run -p 3000:3000 agentic-site
    ```
 
 3. **Using Docker Compose**

@@ -34,6 +34,13 @@
       "cwd": "/home/asim/Documents/agents-mcp/servers/file-utils",
       "disabled": false,
       "autoApprove": ["read_file", "list_directory"]
+    },
+    "ssh-control": {
+      "command": "uv",
+      "args": ["run", "python", "src/ssh_control/main.py"],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/ssh-control",
+      "disabled": false,
+      "autoApprove": ["ssh_get_system_info", "ssh_execute", "ssh_monitor_resources"]
     }
   }
 }
