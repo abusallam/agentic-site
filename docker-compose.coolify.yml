@@ -9,7 +9,7 @@ services:
     environment:
       # Coolify-specific environment variables
       - COOLIFY_DEPLOYMENT=true
-      - BACKEND_URL=http://backend:8080
+      - BACKEND_URL=http://backend:8953
     labels:
       # Coolify management labels - let Coolify UI handle domains and SSL
       - "coolify.managed=true"
@@ -20,7 +20,7 @@ services:
       # Health check configuration
       - "coolify.healthcheck.enabled=true"
       - "coolify.healthcheck.path=/api/health"
-      - "coolify.healthcheck.port=3000"
+      - "coolify.healthcheck.port=3911"
       - "coolify.healthcheck.interval=30s"
       
       # Auto-deployment
@@ -43,7 +43,7 @@ services:
       # Health check
       - "coolify.healthcheck.enabled=true"
       - "coolify.healthcheck.path=/api/health"
-      - "coolify.healthcheck.port=8080"
+      - "coolify.healthcheck.port=8953"
       - "coolify.healthcheck.interval=30s"
 
   db-migrate:

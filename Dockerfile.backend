@@ -56,7 +56,7 @@ echo "🤖 Starting AI Agent Backend..."
 
 # Set environment
 export PYTHONPATH=/app/agent
-export ADK_AGENT_PORT=${ADK_AGENT_PORT:-8080}
+export ADK_AGENT_PORT=${ADK_AGENT_PORT:-8953}
 
 # Navigate to agent directory
 cd /app/agent
@@ -71,7 +71,7 @@ RUN chmod +x start-backend.sh
 # Create health check script
 RUN cat > health-backend.sh << 'EOF'
 #!/bin/bash
-PORT=${ADK_AGENT_PORT:-8080}
+PORT=${ADK_AGENT_PORT:-8953}
 curl -f http://localhost:$PORT/api/health
 EOF
 
@@ -86,11 +86,11 @@ RUN chown -R appuser:appuser /app
 
 USER appuser
 
-EXPOSE 8080
+EXPOSE 8953
 
 # Environment variables
 ENV PYTHONPATH=/app/agent
-ENV ADK_AGENT_PORT=8080
+ENV ADK_AGENT_PORT=8953
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \

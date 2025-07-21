@@ -8,11 +8,11 @@ services:
       dockerfile: Dockerfile.frontend
     restart: unless-stopped
     expose:
-      - "3000"
+      - "3911"
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
-      - PORT=3000
+      - PORT=3911
       - HOSTNAME=0.0.0.0
       
       # Supabase Configuration
@@ -26,7 +26,7 @@ services:
       - NEXT_PUBLIC_GA_ID=${NEXT_PUBLIC_GA_ID}
       
       # Backend URL for API calls
-      - NEXT_PUBLIC_BACKEND_URL=http://backend:8080
+      - NEXT_PUBLIC_BACKEND_URL=http://backend:8953
       
       # SSL Configuration
       - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-https://site.consulting.sa}
@@ -36,7 +36,7 @@ services:
     depends_on:
       - backend
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:3911/api/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -56,11 +56,11 @@ services:
       dockerfile: Dockerfile.backend
     restart: unless-stopped
     expose:
-      - "8080"
+      - "8953"
     environment:
       - NODE_ENV=production
       - PYTHONPATH=/app/agent
-      - ADK_AGENT_PORT=8080
+      - ADK_AGENT_PORT=8953
       - ADK_LOG_LEVEL=${ADK_LOG_LEVEL:-INFO}
       
       # Database Configuration
@@ -96,7 +96,7 @@ services:
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/api/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8953/api/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
