@@ -1,6 +1,6 @@
 "use client"
-import { EnhancedNavigation } from "@/components/navigation-enhanced"
-import { EnhancedFooter } from "@/components/footer-enhanced"
+import { EnhancedNavigation } from "@/components/layout/navigation-enhanced"
+import { EnhancedFooter } from "@/components/layout/footer-enhanced"
 import { Code, Rocket, Settings, Users, FileText, Video, MessageSquare, ExternalLink } from "lucide-react"
 
 export default function DocumentationPage() {

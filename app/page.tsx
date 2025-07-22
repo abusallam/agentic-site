@@ -1,8 +1,8 @@
-import { EnhancedNavigation } from "@/components/navigation-enhanced"
-import { EnhancedHeroSection } from "@/components/hero-section-enhanced"
-import { EnhancedServicesSection } from "@/components/services-section-enhanced"
-import { EnhancedTestimonialsSection } from "@/components/testimonials-section-enhanced"
-import { EnhancedFooter } from "@/components/footer-enhanced"
+import { EnhancedNavigation } from "@/components/layout/navigation-enhanced"
+import { EnhancedHeroSection } from "@/components/layout/hero-section-enhanced"
+import { EnhancedServicesSection } from "@/components/features/services-section-enhanced"
+import { EnhancedTestimonialsSection } from "@/components/features/testimonials-section-enhanced"
+import { EnhancedFooter } from "@/components/layout/footer-enhanced"
 
 export default function HomePage() {
   return (

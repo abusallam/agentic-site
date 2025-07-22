@@ -1,6 +1,6 @@
 "use client"
-import { EnhancedNavigation } from "@/components/navigation-enhanced"
-import { EnhancedFooter } from "@/components/footer-enhanced"
+import { EnhancedNavigation } from "@/components/layout/navigation-enhanced"
+import { EnhancedFooter } from "@/components/layout/footer-enhanced"
 import { useEnhancedTranslation } from "@/lib/i18n-enhanced"
 
 export default function AiAgentsClientPage() {

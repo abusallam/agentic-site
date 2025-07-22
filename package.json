@@ -33,10 +33,16 @@
     "format:check": "prettier --check .",
     "analyze": "cross-env ANALYZE=true next build",
     "clean": "rm -rf .next out node_modules/.cache",
-    "test": "echo \"No tests specified\" && exit 0",
+    "test": "python tests/run_all_tests.py",
+    "test:unit": "cd tests/unit && python -m pytest .",
+    "test:integration": "cd tests/integration && python -m pytest .",
+    "test:e2e": "cd tests/e2e && python -m pytest .",
+    "test:agent": "cd tests/integration/agent && python -m pytest .",
     "docker:build": "docker build -t main-consulting-website .",
     "docker:run": "docker run -p 3000:3000 main-consulting-website",
     "docker:compose": "docker-compose up --build",
+    "deploy:vps": "./scripts/deploy-to-vps.sh",
+    "health:check": "./scripts/health-check.sh",
     "prepare": "husky install || true"
   },
   "dependencies": {

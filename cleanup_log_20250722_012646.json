@@ -1,0 +1,12 @@
+{
+  "duplicates_removed": [],
+  "unique_files_moved": [],
+  "conflicts_resolved": [
+    {
+      "file": "test_complete_system.py",
+      "action": "KEEP_LARGER",
+      "automated": true
+    }
+  ],
+  "errors": []
+}

@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useEnhancedTranslation } from "@/lib/i18n-enhanced"
 import { brandConfig } from "@/lib/brand"
-import { ThemeToggle } from "./theme-provider-enhanced"
+import { ThemeToggle } from "../theme-provider-enhanced"
 import { Menu, Globe, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
