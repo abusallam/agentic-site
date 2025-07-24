@@ -103,29 +103,22 @@ export default function AboutPage() {
       <EnhancedNavigation />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative py-20 bg-gradient-to-br from-background via-background to-muted/20">
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl animate-pulse delay-1000" />
+        <HeroBackground className="py-20">
+          <div className="max-w-4xl mx-auto text-center space-y-6">
+            <h1 className={cn(
+              "text-4xl sm:text-5xl lg:text-6xl font-bold font-heading leading-tight",
+              "bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent"
+            )}>
+              {locale === "ar" ? "مستشار المهندس / عاصم أبو سلام" : "Consultant Eng / Asim Abu Sallam"}
+            </h1>
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              {locale === "ar" 
+                ? "خبير في الذكاء الاصطناعي والتحول الرقمي، متخصص في تطوير حلول مبتكرة للشركات"
+                : "AI Expert & Digital Transformation Specialist, dedicated to developing innovative solutions for businesses"
+              }
+            </p>
           </div>
-          
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-4xl mx-auto text-center space-y-6">
-              <h1 className={cn(
-                "text-4xl sm:text-5xl lg:text-6xl font-bold font-heading leading-tight",
-                "bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent"
-              )}>
-                {locale === "ar" ? "مستشار المهندس / عاصم أبو سلام" : "Consultant Eng / Asim Abu Sallam"}
-              </h1>
-              <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                {locale === "ar" 
-                  ? "خبير في الذكاء الاصطناعي والتحول الرقمي، متخصص في تطوير حلول مبتكرة للشركات"
-                  : "AI Expert & Digital Transformation Specialist, dedicated to developing innovative solutions for businesses"
-                }
-              </p>
-            </div>
-          </div>
-        </section>
+        </HeroBackground>
 
         {/* Profile Section */}
         <section className="py-20">
