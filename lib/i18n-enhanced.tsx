@@ -39,6 +39,7 @@ export const translations = {
     "hero.stats.projects": "Projects Completed",
     "hero.stats.experience": "Years Experience",
     "hero.stats.satisfaction": "Client Satisfaction",
+    "hero.stats.support": "Support Available",
 
     // Services
     "services.title": "Our AI Solutions",
@@ -169,6 +170,7 @@ export const translations = {
     "hero.stats.projects": "مشروع مكتمل",
     "hero.stats.experience": "سنوات خبرة",
     "hero.stats.satisfaction": "رضا العملاء",
+    "hero.stats.support": "دعم متاح",
 
     // Services
     "services.title": "حلول الذكاء الاصطناعي",

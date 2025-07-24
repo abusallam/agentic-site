@@ -26,6 +26,7 @@
   "exclude": [
     "node_modules",
     "components/ui/calendar.tsx",
-    "components/ui/chart.tsx"
+    "components/ui/chart.tsx",
+    "n8n-mcp/**/*"
   ]
 }

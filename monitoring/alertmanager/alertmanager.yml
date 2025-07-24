@@ -1,0 +1,328 @@
+global:
+  resolve_timeout: 5m
+  smtp_smarthost: '${SMTP_HOST:-smtp.gmail.com}:${SMTP_PORT:-587}'
+  smtp_from: '${ALERT_EMAIL:-alerts@consulting.sa}'
+  smtp_auth_username: '${SMTP_USER}'
+  smtp_auth_password: '${SMTP_PASS}'
+  smtp_require_tls: true
+
+# Templates for notifications
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Route tree for alerts
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'default-receiver'
+  routes:
+    # Critical alerts go to all channels immediately
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 10s
+      repeat_interval: 1h
+      routes:
+        # Infrastructure critical alerts
+        - match:
+            category: infrastructure
+          receiver: 'infrastructure-critical'
+        # Application critical alerts
+        - match:
+            category: application
+          receiver: 'application-critical'
+        # Security critical alerts
+        - match:
+            category: security
+          receiver: 'security-critical'
+
+    # Warning alerts go to standard channels
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+      group_wait: 2m
+      repeat_interval: 6h
+
+    # Performance alerts
+    - match:
+        category: performance
+      receiver: 'performance-alerts'
+      repeat_interval: 2h
+
+    # Monitoring system alerts
+    - match:
+        category: monitoring
+      receiver: 'monitoring-alerts'
+      repeat_interval: 12h
+
+# Inhibition rules to reduce noise
+inhibit_rules:
+  # Inhibit warning if critical is firing
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']
+
+  # Inhibit individual service alerts if instance is down
+  - source_match:
+      alertname: 'InstanceDown'
+    target_match_re:
+      alertname: '(ServiceDown|ContainerDown|HighCPUUsage|HighMemoryUsage)'
+    equal: ['instance']
+
+# Receivers define how to send notifications
+receivers:
+  # Default receiver for unmatched alerts
+  - name: 'default-receiver'
+    webhook_configs:
+      - url: 'http://n8n:5678/webhook/alertmanager-default'
+        send_resolved: true
+        http_config:
+          basic_auth:
+            username: 'alertmanager'
+            password: '${ALERTMANAGER_WEBHOOK_PASSWORD:-agentic-webhook-2025}'
+
+  # Critical alerts - all channels
+  - name: 'critical-alerts'
+    email_configs:
+      - to: '${ALERT_EMAIL:-admin@consulting.sa}'
+        subject: '🚨 CRITICAL ALERT: {{ .GroupLabels.alertname }} - Agentic Platform'
+        body: |
+          🚨 **CRITICAL ALERT** 🚨
+          
+          **Alert:** {{ .GroupLabels.alertname }}
+          **Severity:** {{ .CommonLabels.severity }}
+          **Environment:** {{ .CommonLabels.environment }}
+          
+          **Affected Services:**
+          {{ range .Alerts }}
+          - **{{ .Labels.instance }}** ({{ .Labels.job }})
+            - **Status:** {{ .Status }}
+            - **Summary:** {{ .Annotations.summary }}
+            - **Description:** {{ .Annotations.description }}
+            - **Started:** {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+            {{- if .Annotations.runbook_url }}
+            - **Runbook:** {{ .Annotations.runbook_url }}
+            {{- end }}
+          {{ end }}
+          
+          **Dashboard:** https://consulting.sa/monitoring/
+          **Prometheus:** https://consulting.sa/prometheus/
+          
+          This is an automated alert from the Agentic Platform monitoring system.
+        headers:
+          X-Priority: '1'
+          X-MSMail-Priority: 'High'
+          Importance: 'high'
+
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '#alerts'
+        title: '🚨 CRITICAL: {{ .GroupLabels.alertname }}'
+        text: |
+          🚨 **CRITICAL ALERT** - Agentic Platform
+          
+          **Alert:** {{ .GroupLabels.alertname }}
+          **Environment:** {{ .CommonLabels.environment }}
+          
+          {{ range .Alerts }}
+          **{{ .Labels.instance }}** ({{ .Labels.job }})
+          • {{ .Annotations.summary }}
+          • Started: {{ .StartsAt.Format "15:04:05 UTC" }}
+          {{- if .Annotations.runbook_url }}
+          • <{{ .Annotations.runbook_url }}|Runbook>
+          {{- end }}
+          {{ end }}
+          
+          <https://consulting.sa/monitoring/|📊 Dashboard> | <https://consulting.sa/prometheus/|🔍 Prometheus>
+        color: 'danger'
+        send_resolved: true
+
+    webhook_configs:
+      - url: 'http://n8n:5678/webhook/alertmanager-critical'
+        send_resolved: true
+        http_config:
+          basic_auth:
+            username: 'alertmanager'
+            password: '${ALERTMANAGER_WEBHOOK_PASSWORD:-agentic-webhook-2025}'
+
+  # Infrastructure critical alerts
+  - name: 'infrastructure-critical'
+    email_configs:
+      - to: '${INFRASTRUCTURE_EMAIL:-${ALERT_EMAIL:-admin@consulting.sa}}'
+        subject: '🏗️ INFRASTRUCTURE CRITICAL: {{ .GroupLabels.alertname }}'
+        body: |
+          🏗️ **INFRASTRUCTURE CRITICAL ALERT**
+          
+          **System:** {{ .GroupLabels.alertname }}
+          **Environment:** {{ .CommonLabels.environment }}
+          
+          {{ range .Alerts }}
+          **Instance:** {{ .Labels.instance }}
+          **Issue:** {{ .Annotations.summary }}
+          **Details:** {{ .Annotations.description }}
+          **Started:** {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+          {{- if .Annotations.runbook_url }}
+          **Runbook:** {{ .Annotations.runbook_url }}
+          {{- end }}
+          {{ end }}
+          
+          **Immediate Actions Required:**
+          1. Check system status: ssh root@217.79.255.54
+          2. Review logs: docker compose logs
+          3. Follow runbook procedures
+          
+          **Monitoring:** https://consulting.sa/monitoring/
+        headers:
+          X-Priority: '1'
+
+    webhook_configs:
+      - url: 'http://n8n:5678/webhook/infrastructure-critical'
+        send_resolved: true
+
+  # Application critical alerts
+  - name: 'application-critical'
+    email_configs:
+      - to: '${APPLICATION_EMAIL:-${ALERT_EMAIL:-admin@consulting.sa}}'
+        subject: '🚀 APPLICATION CRITICAL: {{ .GroupLabels.alertname }}'
+        body: |
+          🚀 **APPLICATION CRITICAL ALERT**
+          
+          **Application:** {{ .GroupLabels.alertname }}
+          **Environment:** {{ .CommonLabels.environment }}
+          
+          {{ range .Alerts }}
+          **Service:** {{ .Labels.job }}
+          **Instance:** {{ .Labels.instance }}
+          **Issue:** {{ .Annotations.summary }}
+          **Details:** {{ .Annotations.description }}
+          **Started:** {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+          {{- if .Annotations.runbook_url }}
+          **Runbook:** {{ .Annotations.runbook_url }}
+          {{- end }}
+          {{ end }}
+          
+          **Quick Actions:**
+          1. Check service health: https://consulting.sa/api/health
+          2. Review application logs
+          3. Restart service if necessary
+          
+          **Dashboard:** https://consulting.sa/monitoring/
+        headers:
+          X-Priority: '1'
+
+    webhook_configs:
+      - url: 'http://n8n:5678/webhook/application-critical'
+        send_resolved: true
+
+  # Security critical alerts
+  - name: 'security-critical'
+    email_configs:
+      - to: '${SECURITY_EMAIL:-${ALERT_EMAIL:-admin@consulting.sa}}'
+        subject: '🔒 SECURITY CRITICAL: {{ .GroupLabels.alertname }}'
+        body: |
+          🔒 **SECURITY CRITICAL ALERT**
+          
+          **Security Issue:** {{ .GroupLabels.alertname }}
+          **Environment:** {{ .CommonLabels.environment }}
+          
+          {{ range .Alerts }}
+          **Target:** {{ .Labels.instance }}
+          **Issue:** {{ .Annotations.summary }}
+          **Details:** {{ .Annotations.description }}
+          **Started:** {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+          {{- if .Annotations.runbook_url }}
+          **Runbook:** {{ .Annotations.runbook_url }}
+          {{- end }}
+          {{ end }}
+          
+          **IMMEDIATE SECURITY ACTIONS REQUIRED**
+          
+          **Dashboard:** https://consulting.sa/monitoring/
+        headers:
+          X-Priority: '1'
+          X-MSMail-Priority: 'High'
+
+    webhook_configs:
+      - url: 'http://n8n:5678/webhook/security-critical'
+        send_resolved: true
+
+  # Warning alerts
+  - name: 'warning-alerts'
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '#monitoring'
+        title: '⚠️ WARNING: {{ .GroupLabels.alertname }}'
+        text: |
+          ⚠️ **WARNING** - Agentic Platform
+          
+          **Alert:** {{ .GroupLabels.alertname }}
+          **Category:** {{ .CommonLabels.category }}
+          
+          {{ range .Alerts }}
+          **{{ .Labels.instance }}** ({{ .Labels.job }})
+          • {{ .Annotations.summary }}
+          • Started: {{ .StartsAt.Format "15:04:05 UTC" }}
+          {{ end }}
+          
+          <https://consulting.sa/monitoring/|📊 Dashboard>
+        color: 'warning'
+        send_resolved: true
+
+    webhook_configs:
+      - url: 'http://n8n:5678/webhook/alertmanager-warning'
+        send_resolved: true
+
+  # Performance alerts
+  - name: 'performance-alerts'
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL}'
+        channel: '#performance'
+        title: '📈 PERFORMANCE: {{ .GroupLabels.alertname }}'
+        text: |
+          📈 **PERFORMANCE ALERT** - Agentic Platform
+          
+          **Metric:** {{ .GroupLabels.alertname }}
+          
+          {{ range .Alerts }}
+          **{{ .Labels.instance }}** ({{ .Labels.job }})
+          • {{ .Annotations.summary }}
+          • Value: {{ .Annotations.description }}
+          • Started: {{ .StartsAt.Format "15:04:05 UTC" }}
+          {{ end }}
+          
+          <https://consulting.sa/monitoring/|📊 Performance Dashboard>
+        color: '#ff9900'
+        send_resolved: true
+
+    webhook_configs:
+      - url: 'http://n8n:5678/webhook/performance-alerts'
+        send_resolved: true
+
+  # Monitoring system alerts
+  - name: 'monitoring-alerts'
+    email_configs:
+      - to: '${MONITORING_EMAIL:-${ALERT_EMAIL:-admin@consulting.sa}}'
+        subject: '📊 MONITORING: {{ .GroupLabels.alertname }}'
+        body: |
+          📊 **MONITORING SYSTEM ALERT**
+          
+          **Component:** {{ .GroupLabels.alertname }}
+          
+          {{ range .Alerts }}
+          **Service:** {{ .Labels.job }}
+          **Issue:** {{ .Annotations.summary }}
+          **Details:** {{ .Annotations.description }}
+          **Started:** {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+          {{ end }}
+          
+          **Note:** This affects monitoring capabilities but not core services.
+          
+          **Dashboard:** https://consulting.sa/monitoring/
+
+    webhook_configs:
+      - url: 'http://n8n:5678/webhook/monitoring-alerts'
+        send_resolved: true

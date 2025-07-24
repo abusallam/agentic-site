@@ -1,70 +1,127 @@
 # Implementation Plan
 
-- [x] 1. Create backup and analysis system
-  - Implement backup creation script to preserve current state before cleanup
-  - Create file analysis script to categorize all files in the project
-  - Generate cleanup report showing what will be removed, moved, or preserved
-  - _Requirements: 1.4, 2.3_
+- [ ] 1. Create project analysis and backup system
+  - Write Python script to analyze current project structure and categorize all files
+  - Implement backup mechanism to create full project snapshot before cleanup
+  - Create rollback functionality to restore original structure if needed
+  - Generate detailed analysis report of files to move, merge, or delete
+  - _Requirements: 1.1, 4.1_
 
-- [x] 2. Implement cleanup engine for temporary files
-  - Create script to identify and remove temporary deployment Python scripts
-  - Remove backup archives and log files that shouldn't be in version control
-  - Clean up test reports and analysis JSON files
-  - Preserve essential deployment scripts (deploy-to-vps.sh, direct_vps_deploy.sh)
-  - _Requirements: 1.1, 2.1_
-
-- [x] 3. Enhance .gitignore configuration
-  - Update .gitignore to exclude additional temporary file patterns
-  - Add patterns for deployment scripts, test reports, and analysis files
-  - Ensure all Python cache files and virtual environments are excluded
-  - Verify essential configuration templates are preserved
-  - _Requirements: 2.1, 2.2, 2.3_
-
-- [x] 4. Organize component structure
-  - Move layout components (hero, navigation, footer) to components/layout/
-  - Move feature-specific components (services, testimonials) to components/features/
-  - Organize consulting components into components/consulting/ subdirectory
-  - Preserve existing components/ui/ structure with shadcn/ui components
+- [ ] 2. Implement file categorization and mapping logic
+  - Create file categorization system (frontend, backend, infrastructure, docs, temp)
+  - Build dependency tracking to identify file relationships and import paths
+  - Implement conflict detection for files that need manual review
+  - Generate file mapping plan with source/target paths and actions
   - _Requirements: 1.2, 1.3_
 
-- [x] 5. Restructure test organization
-  - Create tests/unit/, tests/integration/, and tests/e2e/ directories
-  - Move existing test files to appropriate test category directories
-  - Organize agent tests within tests/integration/agent/ subdirectory
-  - Ensure all test files maintain their executable permissions and naming conventions
-  - _Requirements: 3.1, 3.2, 3.3, 3.4_
+- [ ] 3. Set up new workspace directory structure
+  - Create new directory structure (frontend/, backend/, infrastructure/, docs/)
+  - Set up workspace configuration files (workspace.json, root package.json)
+  - Create proper .gitignore files for each directory
+  - Implement directory-specific README files with clear purposes
+  - _Requirements: 1.4, 2.1_
 
-- [x] 6. Consolidate documentation structure
-  - Create docs/ directory and move all markdown files except README.md
-  - Organize documentation by category (deployment, configuration, API reference)
-  - Update internal documentation links to reflect new file locations
-  - Preserve README.md at project root with updated project overview
-  - _Requirements: 4.1, 4.2, 4.3_
+- [ ] 4. Consolidate and standardize Docker configurations
+  - Merge multiple Dockerfile variants into single production-ready versions
+  - Create unified docker-compose.yml with proper service separation
+  - Move all Docker files to infrastructure/docker/ directory
+  - Update Docker configurations to work with new directory structure
+  - _Requirements: 3.2, 3.3_
 
-- [x] 7. Update project metadata and scripts
-  - Update package.json scripts to reflect new file organization
-  - Add cleanup and organization scripts to package.json
-  - Update project description and keywords in package.json
-  - Ensure all build and development scripts work with new structure
-  - _Requirements: 4.4_
+- [ ] 5. Reorganize frontend code structure
+  - Move Next.js app code to frontend/ directory maintaining structure
+  - Update all import paths in frontend components and pages
+  - Move frontend-specific configurations (next.config.mjs, tailwind.config.ts)
+  - Create frontend-specific package.json with only frontend dependencies
+  - _Requirements: 2.1, 2.2_
 
-- [x] 8. Validate organized structure integrity
-  - Create validation script to verify all files moved to correct locations
-  - Test that Next.js build process works with reorganized components
-  - Verify all import paths resolve correctly after reorganization
-  - Run existing test suite to ensure functionality is preserved
-  - _Requirements: 1.4, 3.4_
+- [ ] 6. Reorganize backend code structure
+  - Consolidate Python agent code in backend/ directory
+  - Organize service integrations into proper service layer modules
+  - Move backend-specific configurations and dependencies
+  - Update Python import paths and module references
+  - _Requirements: 2.1, 2.2_
 
-- [x] 9. Commit organized codebase to version control
-  - Stage all organized files and updated configurations
-  - Create comprehensive commit message describing the organization changes
-  - Verify no sensitive files or large binaries are included in commit
-  - Ensure .gitignore properly excludes temporary and generated files
-  - _Requirements: 5.1, 5.3_
+- [ ] 7. Consolidate configuration files
+  - Merge multiple environment files into single .env.example with documentation
+  - Standardize linting configurations (.eslintrc.json, Python linting)
+  - Consolidate package management files (package.json, pyproject.toml)
+  - Create unified formatting configuration (Prettier, Black)
+  - _Requirements: 3.1, 3.3, 3.4_
 
-- [x] 10. Push clean codebase to GitHub
-  - Push organized codebase to GitHub repository
-  - Verify remote repository reflects the clean, organized structure
-  - Confirm all essential files are present and properly organized
-  - Validate that the repository is ready for collaboration and deployment
-  - _Requirements: 5.2, 5.4_
+- [ ] 8. Organize deployment and infrastructure scripts
+  - Move all deployment scripts to infrastructure/scripts/ directory
+  - Consolidate duplicate deployment scripts into single authoritative versions
+  - Update script paths and references to work with new structure
+  - Create infrastructure documentation and usage guides
+  - _Requirements: 3.2, 4.4_
+
+- [ ] 9. Clean up temporary and unnecessary files
+  - Remove temporary Python scripts used for one-time operations
+  - Delete old cleanup logs, analysis files, and temporary data
+  - Remove duplicate configuration files after consolidation
+  - Clean up unused dependencies from package files
+  - _Requirements: 4.1, 4.2_
+
+- [ ] 10. Reorganize and consolidate test files
+  - Move frontend tests to frontend/tests/ directory
+  - Move backend tests to backend/tests/ directory
+  - Keep integration and E2E tests in root tests/ directory
+  - Update test configurations and import paths
+  - _Requirements: 4.3, 2.3_
+
+- [ ] 11. Update import paths and dependencies
+  - Scan all code files for import statements that need updating
+  - Update relative import paths to work with new directory structure
+  - Fix module references in Python backend code
+  - Update asset references in frontend code
+  - _Requirements: 2.4, 4.2_
+
+- [ ] 12. Standardize development tooling
+  - Configure unified linting rules for both frontend and backend
+  - Set up consistent code formatting across the entire project
+  - Configure pre-commit hooks for code quality enforcement
+  - Update package.json scripts to work with new structure
+  - _Requirements: 5.1, 5.2, 5.3_
+
+- [ ] 13. Update build and deployment configurations
+  - Modify Docker build contexts to work with new directory structure
+  - Update CI/CD workflows to handle new project organization
+  - Fix build scripts and deployment processes
+  - Test build process for both frontend and backend
+  - _Requirements: 5.4, 3.3, 3.4_
+
+- [ ] 14. Organize external integrations and MCP servers
+  - Ensure MCP servers remain in their proper external location
+  - Organize integration code within backend service layer
+  - Remove unused external dependencies and clean up integration code
+  - Standardize API integration patterns and error handling
+  - _Requirements: 6.1, 6.2, 6.3, 6.4_
+
+- [ ] 15. Update documentation and project metadata
+  - Rewrite README.md to reflect new project structure
+  - Update all documentation to reference correct file paths
+  - Create directory-specific documentation (frontend/README.md, backend/README.md)
+  - Update package.json metadata and project descriptions
+  - _Requirements: 4.4, 1.4_
+
+- [ ] 16. Validate and test new project structure
+  - Run comprehensive build tests for both frontend and backend
+  - Execute all existing tests to ensure functionality is preserved
+  - Test deployment process with new directory structure
+  - Validate that all import paths and dependencies work correctly
+  - _Requirements: 1.4, 2.4, 3.4, 4.3_
+
+- [ ] 17. Perform final cleanup and optimization
+  - Remove any remaining temporary files or backup directories
+  - Optimize package.json dependencies and remove unused packages
+  - Clean up any remaining dead code or unused imports
+  - Verify all linting and formatting rules are properly applied
+  - _Requirements: 4.1, 4.2, 5.1, 5.2_
+
+- [ ] 18. Create maintenance and governance documentation
+  - Document the new project structure and organization principles
+  - Create contribution guidelines for maintaining code organization
+  - Set up automated checks to prevent future structure degradation
+  - Create troubleshooting guide for common organization issues
+  - _Requirements: 4.4, 5.3, 5.4_

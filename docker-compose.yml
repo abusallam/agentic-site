@@ -41,13 +41,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    labels:
-      - "coolify.managed=true"
-      - "coolify.name=ai-saas-frontend"
-      - "coolify.type=application"
-      - "coolify.domains=${DOMAIN:-consulting.sa}"
-      - "coolify.ssl=true"
-      - "coolify.redirect=true"
+
 
   # Backend Service - Python Agent
   backend:
@@ -101,10 +95,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    labels:
-      - "coolify.managed=true"
-      - "coolify.name=ai-saas-backend"
-      - "coolify.type=application"
+
 
   # Database Migration Service (runs once)
   db-migrate:
@@ -117,16 +108,13 @@ services:
     depends_on:
       - backend
     restart: "no"
-    labels:
-      - "coolify.managed=true"
-      - "coolify.name=ai-saas-migrate"
-      - "coolify.type=oneshot"
+
 
 networks:
   default:
     name: ai-saas-network
 
-# Health check for Coolify
+# Health check configuration
 x-healthcheck-config: &healthcheck
   interval: 30s
   timeout: 15s

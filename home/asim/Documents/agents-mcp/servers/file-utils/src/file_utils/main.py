@@ -143,8 +143,10 @@ async def handle_call_tool(
 
 async def main():
     """Run the MCP server."""
-    async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
-        await server.run(read_stream, write_stream)
+    from mcp.server.stdio import stdio_server
+    
+    async with stdio_server() as streams:
+        await server.run(*streams)
 
 if __name__ == "__main__":
     asyncio.run(main())

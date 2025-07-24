@@ -1,12 +1,36 @@
 # consulting.sa Website (المستشار.السعودية)
 
-[![Deployed on Coolify](https://img.shields.io/badge/Deployed%20on-Coolify-blue?style=for-the-badge&logo=docker)](https://consulting.sa)
+[![Deployed with Docker](https://img.shields.io/badge/Deployed%20with-Docker-blue?style=for-the-badge&logo=docker)](https://consulting.sa)
 [![Built with Next.js](https://img.shields.io/badge/Built%20with-Next.js-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
 Professional AI consulting services and SaaS solutions website for **consulting.sa** (المستشار.السعودية), specializing in artificial intelligence, chatbots, AI agents, and digital transformation services in Saudi Arabia.
+
+## 🚨 **CURRENT PROJECT STATUS - READ FIRST**
+
+**⚠️ PRODUCTION SYSTEM LIVE - DO NOT DISRUPT ⚠️**
+
+### **🎯 System Status**: ✅ **PRODUCTION READY & OPERATIONAL**
+- **Website**: https://consulting.sa ✅ **LIVE**
+- **VPS**: 217.79.255.54 ✅ **RUNNING**
+- **Last Updated**: July 23, 2025
+- **Current Phase**: CI/CD Pipeline Enhancement Ready
+
+### **🔄 CI/CD Pipeline Progress**
+- **Completed**: Tasks 1, 2.1, 2.2, 3.1, 4.1, **4.2** ✅, 5.1, 6.1, 7.1, **7.2** ✅
+- **Next Available**: Tasks 2.3, 3.2, 5.2, 8.1-8.2, 9.1-9.2, 10.1-10.2, 11.1-11.2, 12.1-12.2
+- **Status**: Monitoring system deployed, ready for next development phase
+
+### **⚠️ IMPORTANT FOR DEVELOPERS**
+Before making ANY changes:
+1. **Check Status**: Run `./scripts/validate-deployment.sh`
+2. **Read Context**: Check `.kiro/PROJECT_STATUS.md` for full details
+3. **Never Restart**: Production services without explicit permission
+4. **Ask First**: Before any production changes
+
+---
 
 ## 🚀 Live Website
 
@@ -304,6 +328,7 @@ The project uses a custom Tailwind configuration with:
 #### **Current Deployment Status**
 - **Frontend (Next.js)**: ✅ Running on port 3911
 - **Backend (Python Agent)**: ✅ Running on port 8953
+- **Monitoring Stack**: ✅ N8N, Grafana, Prometheus deployed
 - **Security**: ✅ UFW Firewall + Fail2ban active
 - **SSL Ready**: ✅ Port 443 configured for HTTPS
 - **Management**: ✅ Automated scripts installed
@@ -311,6 +336,9 @@ The project uses a custom Tailwind configuration with:
 #### **Access Points**
 - **Next.js Frontend**: http://217.79.255.54:3911/
 - **Python Backend**: http://217.79.255.54:8953/
+- **N8N Workflows**: http://217.79.255.54:5678/
+- **Prometheus Metrics**: http://217.79.255.54:9090/
+- **Grafana Dashboards**: http://217.79.255.54:3001/
 - **SSH Access**: ssh root@217.79.255.54 (secured)
 
 #### **VPS Specifications**

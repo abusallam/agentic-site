@@ -1,0 +1,406 @@
+{
+  "name": "Agentic Platform - System Alerts",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "alertmanager-critical",
+        "options": {
+          "auth": {
+            "user": "alertmanager",
+            "password": "agentic-webhook-2025"
+          }
+        }
+      },
+      "name": "Critical Alerts Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "critical-alerts"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "alertmanager-warning",
+        "options": {
+          "auth": {
+            "user": "alertmanager",
+            "password": "agentic-webhook-2025"
+          }
+        }
+      },
+      "name": "Warning Alerts Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 500],
+      "webhookId": "warning-alerts"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "alertmanager-default",
+        "options": {
+          "auth": {
+            "user": "alertmanager",
+            "password": "agentic-webhook-2025"
+          }
+        }
+      },
+      "name": "Default Alerts Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 700],
+      "webhookId": "default-alerts"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Process incoming Prometheus/Alertmanager webhook\\nconst alerts = $input.item.json.alerts || [];\\nconst status = $input.item.json.status || 'unknown';\\nconst groupLabels = $input.item.json.groupLabels || {};\\nconst commonLabels = $input.item.json.commonLabels || {};\\n\\n// Determine alert severity and category\\nlet severity = 'info';\\nlet category = 'general';\\nlet emoji = '📊';\\n\\nif (alerts.length > 0) {\\n  severity = alerts[0].labels?.severity || 'info';\\n  category = alerts[0].labels?.category || 'general';\\n}\\n\\n// Set emoji based on severity and category\\nswitch (severity) {\\n  case 'critical':\\n    emoji = '🚨';\\n    break;\\n  case 'warning':\\n    emoji = '⚠️';\\n    break;\\n  default:\\n    switch (category) {\\n      case 'infrastructure':\\n        emoji = '🏗️';\\n        break;\\n      case 'application':\\n        emoji = '🚀';\\n        break;\\n      case 'security':\\n        emoji = '🔒';\\n        break;\\n      case 'performance':\\n        emoji = '📈';\\n        break;\\n      case 'network':\\n        emoji = '🌐';\\n        break;\\n      case 'database':\\n        emoji = '🗄️';\\n        break;\\n      case 'monitoring':\\n        emoji = '📊';\\n        break;\\n      default:\\n        emoji = '🔔';\\n    }\\n}\\n\\n// Format alert message\\nlet message = `${emoji} **${severity.toUpperCase()} ALERT** - Agentic Platform\\\\n\\\\n`;\\nmessage += `**Alert:** ${groupLabels.alertname || 'Unknown'}\\\\n`;\\nmessage += `**Status:** ${status}\\\\n`;\\nmessage += `**Category:** ${category}\\\\n`;\\nmessage += `**Environment:** ${commonLabels.environment || 'production'}\\\\n\\\\n`;\\n\\n// Add individual alert details\\nfor (const alert of alerts) {\\n  const alertName = alert.labels?.alertname || 'Unknown Alert';\\n  const instance = alert.labels?.instance || 'Unknown Instance';\\n  const job = alert.labels?.job || 'Unknown Job';\\n  const summary = alert.annotations?.summary || '';\\n  const description = alert.annotations?.description || '';\\n  const runbookUrl = alert.annotations?.runbook_url || '';\\n  \\n  message += `**${instance}** (${job})\\\\n`;\\n  if (summary) message += `• ${summary}\\\\n`;\\n  if (description) message += `• ${description}\\\\n`;\\n  message += `• Started: ${new Date(alert.startsAt).toLocaleString()}\\\\n`;\\n  if (alert.endsAt && alert.endsAt !== '0001-01-01T00:00:00Z') {\\n    message += `• Ended: ${new Date(alert.endsAt).toLocaleString()}\\\\n`;\\n  }\\n  if (runbookUrl) message += `• [Runbook](${runbookUrl})\\\\n`;\\n  message += '\\\\n';\\n}\\n\\n// Add dashboard links\\nmessage += '**Quick Links:**\\\\n';\\nmessage += '• [📊 Monitoring Dashboard](https://consulting.sa/monitoring/)\\\\n';\\nmessage += '• [🔍 Prometheus](https://consulting.sa/prometheus/)\\\\n';\\nmessage += '• [🚨 Alertmanager](https://consulting.sa/alertmanager/)\\\\n';\\nmessage += '• [📈 Grafana](https://consulting.sa/grafana/)\\\\n\\\\n';\\n\\n// Add timestamp\\nmessage += `*Alert processed at ${new Date().toLocaleString()} UTC*`;\\n\\n// Determine notification channels based on severity\\nconst shouldNotifySlack = ['critical', 'warning'].includes(severity);\\nconst shouldNotifyEmail = severity === 'critical';\\nconst shouldNotifyTelegram = severity === 'critical';\\nconst shouldNotifySMS = severity === 'critical' && category === 'infrastructure';\\n\\n// Create structured output\\nreturn {\\n  message,\\n  severity,\\n  category,\\n  emoji,\\n  status,\\n  alertCount: alerts.length,\\n  alerts,\\n  groupLabels,\\n  commonLabels,\\n  shouldNotifySlack,\\n  shouldNotifyEmail,\\n  shouldNotifyTelegram,\\n  shouldNotifySMS,\\n  timestamp: new Date().toISOString(),\\n  dashboardUrl: 'https://consulting.sa/monitoring/',\\n  prometheusUrl: 'https://consulting.sa/prometheus/',\\n  alertmanagerUrl: 'https://consulting.sa/alertmanager/'\\n};"
+      },
+      "name": "Process Alert Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.shouldNotifySlack}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Should Notify Slack?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.shouldNotifyEmail}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Should Notify Email?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.shouldNotifyTelegram}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Should Notify Telegram?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 600]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SLACK_WEBHOOK_URL}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "channel",
+              "value": "={{$json.severity === 'critical' ? '#alerts' : '#monitoring'}}"
+            },
+            {
+              "name": "username",
+              "value": "Agentic Platform Monitor"
+            },
+            {
+              "name": "icon_emoji",
+              "value": "={{$json.emoji}}"
+            },
+            {
+              "name": "text",
+              "value": "={{$json.message}}"
+            },
+            {
+              "name": "color",
+              "value": "={{$json.severity === 'critical' ? 'danger' : ($json.severity === 'warning' ? 'warning' : 'good')}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [900, 100]
+    },
+    {
+      "parameters": {
+        "fromEmail": "alerts@consulting.sa",
+        "toEmail": "={{$env.ALERT_EMAIL}}",
+        "subject": "={{$json.emoji}} {{$json.severity.toUpperCase()}} ALERT: {{$json.groupLabels.alertname}} - Agentic Platform",
+        "text": "={{$json.message}}",
+        "options": {
+          "priority": "={{$json.severity === 'critical' ? 'high' : 'normal'}}"
+        }
+      },
+      "name": "Send Email Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [900, 300],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-alerts",
+          "name": "SMTP Alerts"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$env.TELEGRAM_CHAT_ID}}",
+        "text": "={{$json.message}}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "name": "Send Telegram Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [900, 500],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-alerts",
+          "name": "Telegram Alerts"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Log alert to database/monitoring system\\nconst alertData = {\\n  timestamp: $json.timestamp,\\n  severity: $json.severity,\\n  category: $json.category,\\n  alertName: $json.groupLabels?.alertname,\\n  status: $json.status,\\n  alertCount: $json.alertCount,\\n  environment: $json.commonLabels?.environment || 'production',\\n  processed: true\\n};\\n\\n// Store in monitoring database or send to logging service\\nconsole.log('Alert processed:', JSON.stringify(alertData, null, 2));\\n\\nreturn { alertData, processed: true };"
+      },
+      "name": "Log Alert",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.status}}",
+              "operation": "equals",
+              "value2": "resolved"
+            }
+          ]
+        }
+      },
+      "name": "Is Resolved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SLACK_WEBHOOK_URL}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "channel",
+              "value": "#alerts"
+            },
+            {
+              "name": "username",
+              "value": "Agentic Platform Monitor"
+            },
+            {
+              "name": "icon_emoji",
+              "value": ":white_check_mark:"
+            },
+            {
+              "name": "text",
+              "value": "✅ **RESOLVED** - {{$json.groupLabels.alertname}}\\n\\nThe alert has been resolved automatically.\\n\\n*Resolved at {{$json.timestamp}}*"
+            },
+            {
+              "name": "color",
+              "value": "good"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Send Resolution Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1560, 200]
+    },
+    {
+      "parameters": {},
+      "name": "Alert Processed",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1560, 400]
+    }
+  ],
+  "connections": {
+    "Critical Alerts Webhook": {
+      "main": [
+        [
+          {
+            "node": "Process Alert Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Warning Alerts Webhook": {
+      "main": [
+        [
+          {
+            "node": "Process Alert Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Alerts Webhook": {
+      "main": [
+        [
+          {
+            "node": "Process Alert Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Alert Data": {
+      "main": [
+        [
+          {
+            "node": "Should Notify Slack?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Should Notify Email?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Should Notify Telegram?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Notify Slack?": {
+      "true": [
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Notify Email?": {
+      "true": [
+        [
+          {
+            "node": "Send Email Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Notify Telegram?": {
+      "true": [
+        [
+          {
+            "node": "Send Telegram Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Alert": {
+      "main": [
+        [
+          {
+            "node": "Is Resolved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Resolved?": {
+      "true": [
+        [
+          {
+            "node": "Send Resolution Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "false": [
+        [
+          {
+            "node": "Alert Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "timezone": "UTC"
+  },
+  "id": "system-alerts-comprehensive"
+}

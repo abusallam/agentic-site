@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Comprehensive health check for Coolify
+# Comprehensive health check for Docker deployment
 # Checks both frontend and backend services
 
 set -e

@@ -1,0 +1,92 @@
+{
+  "mcpServers": {
+    "ssh-control": {
+      "command": "python3",
+      "args": ["src/ssh_control/main.py"],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/ssh-control",
+      "env": {
+        "VPS_HOST": "217.79.255.54",
+        "VPS_USER": "root",
+        "VPS_PASSWORD": "gt5qXy22aJ",
+        "VPS_PORT": "22"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "ssh_get_system_info",
+        "ssh_get_security_status",
+        "ssh_list_connections",
+        "docker_status",
+        "docker_ps",
+        "monitor_logs",
+        "system_status",
+        "process_monitor",
+        "disk_usage"
+      ]
+    },
+    "file-utils": {
+      "command": "uv",
+      "args": ["run", "python", "src/file_utils/main.py"],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/file-utils",
+      "disabled": false,
+      "autoApprove": ["read_file", "list_directory"]
+    },
+    "filesystem-advanced": {
+      "command": "uv",
+      "args": ["run", "python", "src/filesystem_advanced/main.py"],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/filesystem-advanced",
+      "disabled": true,
+      "autoApprove": ["get_file_info", "search_files"]
+    },
+    "github-tools": {
+      "command": "uv",
+      "args": ["run", "python", "src/github_tools/main.py"],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/github-tools",
+      "env": {
+        "GITHUB_TOKEN": "your_github_token_here"
+      },
+      "disabled": true,
+      "autoApprove": ["list_repos", "get_repo_info"]
+    },
+    "n8n-tools": {
+      "command": "uv",
+      "args": ["run", "python", "src/n8n_tools/main.py"],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/n8n-tools",
+      "env": {
+        "N8N_BASE_URL": "http://localhost:5678",
+        "N8N_API_KEY": "your_n8n_api_key_here"
+      },
+      "disabled": true,
+      "autoApprove": ["list_workflows", "get_executions"]
+    },
+    "coolify-tools": {
+      "command": "uv",
+      "args": ["run", "python", "src/coolify_tools/main.py"],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/coolify-tools",
+      "env": {
+        "COOLIFY_BASE_URL": "http://localhost:8000",
+        "COOLIFY_API_TOKEN": "your_coolify_token_here"
+      },
+      "disabled": true,
+      "autoApprove": ["list_applications", "list_servers"]
+    },
+    "mem0-tools": {
+      "command": "uv",
+      "args": ["run", "python", "src/mem0_tools/main.py"],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/mem0-tools",
+      "env": {
+        "OPENAI_API_KEY": "your_openai_key_here",
+        "QDRANT_HOST": "localhost",
+        "QDRANT_PORT": "6333"
+      },
+      "disabled": true,
+      "autoApprove": ["search_memories", "get_all_memories"]
+    },
+    "playwright-tools": {
+      "command": "uv",
+      "args": ["run", "python", "src/playwright_tools/main.py"],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/playwright-tools",
+      "disabled": true,
+      "autoApprove": ["scrape_page"]
+    }
+  }
+}

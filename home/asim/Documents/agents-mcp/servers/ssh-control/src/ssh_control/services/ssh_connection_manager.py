@@ -55,7 +55,7 @@ class SSHConnectionManager:
                 Logger.info(f"Loaded default SSH config: {name}")
     
     async def connect(self, connection_name: str = "vps") -> Dict[str, Any]:
-        """Connect to SSH server"""
+        """Connect to SSH server with improved password authentication handling"""
         if connection_name not in self.configs:
             return {
                 "success": False,
@@ -66,50 +66,107 @@ class SSHConnectionManager:
         
         try:
             client = paramiko.SSHClient()
+            
+            # Set host key policy to automatically accept unknown hosts
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             
-            # Connect based on auth type
+            # Configure SSH client for better password authentication
+            Logger.info(f"Attempting to connect to {config.username}@{config.host}:{config.port}")
+            
+            # Connect based on auth type with improved error handling
             if config.auth_type == "password" and config.password:
-                client.connect(
-                    hostname=config.host,
-                    port=config.port,
-                    username=config.username,
-                    password=config.password,
-                    timeout=config.timeout
-                )
+                # Use explicit connection parameters for better control
+                connect_kwargs = {
+                    'hostname': config.host,
+                    'port': config.port,
+                    'username': config.username,
+                    'password': config.password,
+                    'timeout': config.timeout,
+                    'allow_agent': False,  # Disable SSH agent to force password auth
+                    'look_for_keys': False,  # Don't look for SSH keys
+                    'auth_timeout': 30,  # Set authentication timeout
+                    'banner_timeout': 30  # Set banner timeout
+                }
+                
+                Logger.info(f"Connecting with password authentication...")
+                client.connect(**connect_kwargs)
+                
             elif config.auth_type == "key" and config.private_key_path:
-                private_key = paramiko.RSAKey.from_private_key_file(config.private_key_path)
+                try:
+                    private_key = paramiko.RSAKey.from_private_key_file(config.private_key_path)
+                except paramiko.PasswordRequiredException:
+                    return {
+                        "success": False,
+                        "error": "Private key requires a passphrase (not supported in this version)"
+                    }
+                except Exception as key_error:
+                    return {
+                        "success": False,
+                        "error": f"Failed to load private key: {str(key_error)}"
+                    }
+                
                 client.connect(
                     hostname=config.host,
                     port=config.port,
                     username=config.username,
                     pkey=private_key,
-                    timeout=config.timeout
+                    timeout=config.timeout,
+                    auth_timeout=30,
+                    banner_timeout=30
                 )
             else:
                 return {
                     "success": False,
-                    "error": "Invalid authentication configuration"
+                    "error": "Invalid authentication configuration - password or private_key_path required"
+                }
+            
+            # Test the connection by running a simple command
+            Logger.info("Testing connection with simple command...")
+            test_stdin, test_stdout, test_stderr = client.exec_command('echo "Connection test successful"', timeout=10)
+            test_result = test_stdout.read().decode('utf-8').strip()
+            
+            if "Connection test successful" not in test_result:
+                client.close()
+                return {
+                    "success": False,
+                    "error": "Connection established but command execution failed"
                 }
             
             self.connections[connection_name] = client
             self.last_activity[connection_name] = datetime.now()
             
-            Logger.info(f"Successfully connected to {config.username}@{config.host}:{config.port}")
+            Logger.info(f"Successfully connected and tested {config.username}@{config.host}:{config.port}")
             
             return {
                 "success": True,
                 "connection_id": connection_name,
                 "host": config.host,
                 "username": config.username,
-                "message": f"Connected to {connection_name}"
+                "port": config.port,
+                "auth_type": config.auth_type,
+                "test_result": test_result,
+                "message": f"Successfully connected to {connection_name} and verified command execution"
             }
             
-        except Exception as e:
-            Logger.error(f"SSH connection failed for {connection_name}: {e}")
+        except paramiko.AuthenticationException as e:
+            Logger.error(f"SSH authentication failed for {connection_name}: {e}")
             return {
                 "success": False,
-                "error": str(e),
+                "error": f"Authentication failed: {str(e)}",
+                "message": f"Failed to authenticate to {connection_name} - check username/password"
+            }
+        except paramiko.SSHException as e:
+            Logger.error(f"SSH connection error for {connection_name}: {e}")
+            return {
+                "success": False,
+                "error": f"SSH connection error: {str(e)}",
+                "message": f"SSH connection failed to {connection_name}"
+            }
+        except Exception as e:
+            Logger.error(f"Unexpected error connecting to {connection_name}: {e}")
+            return {
+                "success": False,
+                "error": f"Connection failed: {str(e)}",
                 "message": f"Failed to connect to {connection_name}"
             }
     
@@ -140,7 +197,7 @@ class SSHConnectionManager:
             }
     
     async def execute_command(self, command: str, connection_name: str = "vps", timeout: int = 60) -> CommandResult:
-        """Execute command on remote server"""
+        """Execute command on remote server with improved error handling"""
         if connection_name not in self.connections:
             # Try to connect if not already connected
             connect_result = await self.connect(connection_name)
@@ -158,12 +215,48 @@ class SSHConnectionManager:
         start_time = time.time()
         
         try:
-            stdin, stdout, stderr = client.exec_command(command, timeout=timeout)
+            # Check if connection is still alive
+            if not await self._check_connection_health(connection_name):
+                Logger.warning(f"Connection {connection_name} appears to be dead, reconnecting...")
+                connect_result = await self.connect(connection_name)
+                if not connect_result["success"]:
+                    return CommandResult(
+                        success=False,
+                        exit_code=-1,
+                        stdout="",
+                        stderr=f"Reconnection failed: {connect_result['error']}",
+                        command=command,
+                        execution_time=0.0
+                    )
+                client = self.connections[connection_name]
             
-            # Read output
-            stdout_data = stdout.read().decode('utf-8')
-            stderr_data = stderr.read().decode('utf-8')
-            exit_code = stdout.channel.recv_exit_status()
+            Logger.debug(f"Executing command on {connection_name}: {command}")
+            
+            # Execute command with proper timeout handling
+            stdin, stdout, stderr = client.exec_command(
+                command, 
+                timeout=timeout,
+                get_pty=False  # Don't allocate pseudo-terminal to avoid interactive prompts
+            )
+            
+            # Read output with timeout protection
+            stdout_data = ""
+            stderr_data = ""
+            exit_code = -1
+            
+            try:
+                # Set channel timeout
+                stdout.channel.settimeout(timeout)
+                stderr.channel.settimeout(timeout)
+                
+                # Read stdout and stderr
+                stdout_data = stdout.read().decode('utf-8', errors='replace')
+                stderr_data = stderr.read().decode('utf-8', errors='replace')
+                exit_code = stdout.channel.recv_exit_status()
+                
+            except Exception as read_error:
+                Logger.error(f"Error reading command output: {read_error}")
+                stderr_data = f"Error reading output: {str(read_error)}"
             
             execution_time = time.time() - start_time
             self.last_activity[connection_name] = datetime.now()
@@ -177,9 +270,21 @@ class SSHConnectionManager:
                 execution_time=execution_time
             )
             
-            Logger.debug(f"Command executed on {connection_name}: {command} (exit: {exit_code})")
+            Logger.debug(f"Command completed on {connection_name}: {command} (exit: {exit_code}, time: {execution_time:.2f}s)")
             return result
             
+        except paramiko.SSHException as e:
+            execution_time = time.time() - start_time
+            Logger.error(f"SSH error executing command on {connection_name}: {e}")
+            
+            return CommandResult(
+                success=False,
+                exit_code=-1,
+                stdout="",
+                stderr=f"SSH error: {str(e)}",
+                command=command,
+                execution_time=execution_time
+            )
         except Exception as e:
             execution_time = time.time() - start_time
             Logger.error(f"Command execution failed on {connection_name}: {e}")
@@ -188,10 +293,30 @@ class SSHConnectionManager:
                 success=False,
                 exit_code=-1,
                 stdout="",
-                stderr=str(e),
+                stderr=f"Execution error: {str(e)}",
                 command=command,
                 execution_time=execution_time
             )
+    
+    async def _check_connection_health(self, connection_name: str) -> bool:
+        """Check if SSH connection is still healthy"""
+        if connection_name not in self.connections:
+            return False
+        
+        try:
+            client = self.connections[connection_name]
+            transport = client.get_transport()
+            
+            if transport is None or not transport.is_active():
+                return False
+            
+            # Send a keep-alive packet
+            transport.send_ignore()
+            return True
+            
+        except Exception as e:
+            Logger.warning(f"Connection health check failed for {connection_name}: {e}")
+            return False
     
     async def get_system_info(self, connection_name: str = "vps") -> str:
         """Get comprehensive system information"""

@@ -1,219 +1,183 @@
-"""FastAPI server for the ADK Agent to handle HTTP requests from the frontend."""
+"""FastAPI server for agent health checks and API endpoints."""
 
-import asyncio
-import logging
 import os
-from typing import Dict, Any, Optional
+import logging
+from datetime import datetime
+from typing import Dict, Any
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel
-from dotenv import load_dotenv
-
-from my_adk_agent.agent import AccountantAgent
-
-# Load environment variables
-load_dotenv(dotenv_path="../.env")
+import uvicorn
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize FastAPI app
 app = FastAPI(
-    title="ADK Agent API",
-    description="HTTP API for the ADK Agent",
+    title="Agentic AI Backend",
+    description="Backend API for the Agentic AI SaaS platform",
     version="1.0.0"
 )
 
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://consulting.sa"],
+    allow_origins=["*"],  # Configure appropriately for production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Global agent instance
-agent: Optional[AccountantAgent] = None
 
-class ChatRequest(BaseModel):
-    message: str
-    conversation_id: str = "default"
-    agent_type: str = "root_agent"
+class HealthResponse(BaseModel):
+    """Health check response model."""
+    status: str
+    timestamp: str
+    environment: str
+    services: Dict[str, str]
+    uptime: float
 
-class ChatResponse(BaseModel):
-    response: str
-    type: str = "general"
-    service_type: Optional[str] = None
-    handoff_required: bool = False
 
-@app.on_event("startup")
-async def startup_event():
-    """Initialize the agent on startup."""
-    global agent
+class ServiceStatus(BaseModel):
+    """Service status model."""
+    name: str
+    status: str
+    last_check: str
+    details: Dict[str, Any] = {}
+
+
+@app.get("/health", response_model=HealthResponse)
+async def health_check():
+    """Health check endpoint."""
     try:
-        logger.info("Initializing ADK Agent...")
-        agent = AccountantAgent()
-        logger.info("ADK Agent initialized successfully")
+        # Check service configurations
+        services = {
+            "supabase": "configured" if os.getenv("SUPABASE_URL") else "missing",
+            "gemini": "configured" if os.getenv("GEMINI_API_KEY") else "missing",
+            "n8n": "configured" if os.getenv("N8N_URL") else "missing",
+            "mcp": "configured" if os.getenv("MCP_SERVER_URL") else "missing",
+            "livekit": "configured" if os.getenv("LIVEKIT_URL") else "missing",
+            "stripe": "configured" if os.getenv("STRIPE_SECRET_KEY") else "missing",
+        }
+        
+        # Determine overall status
+        status = "healthy" if all(s == "configured" for s in services.values()) else "degraded"
+        
+        return HealthResponse(
+            status=status,
+            timestamp=datetime.utcnow().isoformat(),
+            environment=os.getenv("ENVIRONMENT", "development"),
+            services=services,
+            uptime=0.0  # Would be calculated from startup time in real implementation
+        )
     except Exception as e:
-        logger.error(f"Failed to initialize agent: {e}")
-        raise
+        logger.error(f"Health check failed: {e}")
+        raise HTTPException(status_code=500, detail="Health check failed")
+
+
+@app.get("/health/detailed")
+async def detailed_health_check():
+    """Detailed health check with service connectivity tests."""
+    try:
+        service_checks = []
+        
+        # Test Supabase connection
+        try:
+            from my_adk_agent.services.supabase_service import SupabaseService
+            supabase_service = SupabaseService()
+            supabase_healthy = await supabase_service.health_check()
+            service_checks.append(ServiceStatus(
+                name="supabase",
+                status="healthy" if supabase_healthy else "unhealthy",
+                last_check=datetime.utcnow().isoformat()
+            ))
+        except Exception as e:
+            service_checks.append(ServiceStatus(
+                name="supabase",
+                status="error",
+                last_check=datetime.utcnow().isoformat(),
+                details={"error": str(e)}
+            ))
+        
+        # Test MCP connection
+        try:
+            from my_adk_agent.services.mcp_service import MCPService
+            mcp_service = MCPService()
+            mcp_tools = await mcp_service.list_available_tools()
+            service_checks.append(ServiceStatus(
+                name="mcp",
+                status="healthy" if mcp_tools is not None else "unhealthy",
+                last_check=datetime.utcnow().isoformat(),
+                details={"tools_count": len(mcp_tools) if mcp_tools else 0}
+            ))
+        except Exception as e:
+            service_checks.append(ServiceStatus(
+                name="mcp",
+                status="error",
+                last_check=datetime.utcnow().isoformat(),
+                details={"error": str(e)}
+            ))
+        
+        return {
+            "status": "healthy",
+            "timestamp": datetime.utcnow().isoformat(),
+            "services": service_checks
+        }
+    except Exception as e:
+        logger.error(f"Detailed health check failed: {e}")
+        raise HTTPException(status_code=500, detail="Detailed health check failed")
+
 
 @app.get("/")
 async def root():
     """Root endpoint."""
     return {
-        "message": "ADK Agent API is running",
+        "message": "Agentic AI Backend API",
         "version": "1.0.0",
-        "endpoints": {
-            "POST /api/chat": "Send a message to the agent",
-            "GET /api/health": "Health check",
-            "GET /api/status": "Agent status"
-        }
+        "status": "running"
     }
 
-@app.get("/api/health")
-async def health_check():
-    """Health check endpoint."""
-    return {
-        "status": "healthy",
-        "agent_initialized": agent is not None,
-        "timestamp": "2025-07-20T13:00:00Z"
-    }
 
-@app.get("/api/status")
-async def agent_status():
-    """Get agent status."""
-    if not agent:
-        raise HTTPException(status_code=503, detail="Agent not initialized")
-    
-    return {
-        "status": "running",
-        "agent_type": "AccountantAgent",
-        "services": {
-            "supabase": "connected",
-            "n8n_mcp": "available",
-            "stripe": "configured",
-            "livekit": "mock_mode"
-        }
-    }
-
-@app.post("/api/chat")
-async def chat_endpoint(request: ChatRequest) -> ChatResponse:
-    """Handle chat messages from the frontend."""
-    if not agent:
-        raise HTTPException(status_code=503, detail="Agent not initialized")
-    
+@app.get("/metrics")
+async def metrics():
+    """Prometheus metrics endpoint."""
     try:
-        logger.info(f"Processing chat message: {request.message[:50]}...")
+        from my_adk_agent.services.monitoring_service import MonitoringService
+        monitoring_service = MonitoringService()
         
-        # Process the message through the agent
-        response = await agent.run(request.message)
+        # Generate Prometheus format metrics
+        prometheus_metrics = await monitoring_service.generate_prometheus_metrics()
         
-        # Analyze the response to determine type and handoff requirements
-        response_type = "general"
-        service_type = None
-        handoff_required = False
-        
-        message_lower = request.message.lower()
-        
-        # Detect service types
-        if any(word in message_lower for word in ['chatbot', 'chat bot']):
-            service_type = "chatbot"
-            response_type = "service_info"
-        elif any(word in message_lower for word in ['ai agent', 'artificial intelligence']):
-            service_type = "ai_agent"
-            response_type = "service_info"
-        elif any(word in message_lower for word in ['workflow', 'automation']):
-            service_type = "workflow_automation"
-            response_type = "service_info"
-        elif any(word in message_lower for word in ['price', 'cost', 'pricing']):
-            response_type = "pricing_info"
-            handoff_required = True
-        
-        # Detect handoff requirements
-        if any(word in message_lower for word in ['demo', 'call', 'speak', 'human', 'specialist']):
-            handoff_required = True
-            response_type = "handoff"
-        
-        return ChatResponse(
-            response=response,
-            type=response_type,
-            service_type=service_type,
-            handoff_required=handoff_required
+        return Response(
+            content=prometheus_metrics,
+            media_type="text/plain; charset=utf-8"
         )
-        
     except Exception as e:
-        logger.error(f"Error processing chat message: {e}")
-        raise HTTPException(
-            status_code=500, 
-            detail=f"Failed to process message: {str(e)}"
+        logger.error(f"Error generating metrics: {e}")
+        # Fallback to basic metrics
+        basic_metrics = f"""# HELP app_info Application information
+# TYPE app_info gauge
+app_info{{version="1.0.0",environment="{os.getenv('ENVIRONMENT', 'development')}",job="agentic-backend"}} 1
+
+# HELP app_up Application up status
+# TYPE app_up gauge
+app_up{{job="agentic-backend"}} 1
+"""
+        return Response(
+            content=basic_metrics,
+            media_type="text/plain; charset=utf-8"
         )
 
-@app.post("/api/requirements")
-async def gather_requirements(request: Dict[str, Any]):
-    """Gather customer requirements."""
-    if not agent:
-        raise HTTPException(status_code=503, detail="Agent not initialized")
-    
-    try:
-        email = request.get("email")
-        input_text = request.get("input", "")
-        
-        if not email:
-            raise HTTPException(status_code=400, detail="Email is required")
-        
-        result = await agent.gather_requirements(email, input_text)
-        return result
-        
-    except Exception as e:
-        logger.error(f"Error gathering requirements: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to gather requirements: {str(e)}"
-        )
-
-@app.post("/api/deploy")
-async def deploy_service(request: Dict[str, Any]):
-    """Deploy a service for a customer."""
-    if not agent:
-        raise HTTPException(status_code=503, detail="Agent not initialized")
-    
-    try:
-        email = request.get("email")
-        service_type = request.get("service_type")
-        config = request.get("config", {})
-        
-        if not email or not service_type:
-            raise HTTPException(status_code=400, detail="Email and service_type are required")
-        
-        result = await agent.deploy_ai_service(email, service_type, config)
-        return result
-        
-    except Exception as e:
-        logger.error(f"Error deploying service: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to deploy service: {str(e)}"
-        )
 
 if __name__ == "__main__":
-    import uvicorn
-    
-    port = int(os.getenv("ADK_AGENT_PORT", 8080))
-    host = os.getenv("ADK_WEB_HOST", "localhost")
-    
-    logger.info(f"Starting ADK Agent API server on {host}:{port}")
+    port = int(os.getenv("PORT", 8000))
+    host = os.getenv("HOST", "0.0.0.0")
     
     uvicorn.run(
         "api_server:app",
         host=host,
         port=port,
-        reload=True,
+        reload=os.getenv("ENVIRONMENT") == "development",
         log_level="info"
     )

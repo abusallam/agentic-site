@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Production startup script for Coolify deployment
+# Production startup script for Docker deployment
 # Starts both Next.js frontend and Python backend
 
 set -e

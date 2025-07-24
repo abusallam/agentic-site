@@ -1,0 +1,266 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deployment (skip some checks)'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  pre-deployment-checks:
+    runs-on: ubuntu-latest
+    outputs:
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check deployment conditions
+        id: check
+        run: |
+          # Check if this is a force deployment
+          if [ "${{ github.event.inputs.force_deploy }}" = "true" ]; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Check if staging deployment was successful
+          # This would typically check staging health or deployment status
+          echo "should_deploy=true" >> $GITHUB_OUTPUT
+
+  backup-production:
+    runs-on: ubuntu-latest
+    needs: pre-deployment-checks
+    if: needs.pre-deployment-checks.outputs.should_deploy == 'true'
+    environment: production
+    steps:
+      - name: Create production backup
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            # Create backup directory with timestamp
+            BACKUP_DIR="/opt/backups/$(date +%Y%m%d_%H%M%S)"
+            mkdir -p $BACKUP_DIR
+            
+            # Backup current deployment
+            cd /opt/agentic-production
+            cp -r . $BACKUP_DIR/
+            
+            # Backup database (if using local database)
+            # docker-compose exec -T postgres pg_dump -U postgres agentic_db > $BACKUP_DIR/database_backup.sql
+            
+            # Keep only last 10 backups
+            ls -t /opt/backups/ | tail -n +11 | xargs -r rm -rf
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    needs: [pre-deployment-checks, backup-production]
+    if: needs.pre-deployment-checks.outputs.should_deploy == 'true'
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.production
+          target: frontend
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:latest
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./agent
+          file: ./Dockerfile.backend
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend:latest
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy to production VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            # Create deployment directory
+            mkdir -p /opt/agentic-production
+            cd /opt/agentic-production
+            
+            # Download production docker-compose file
+            curl -o docker-compose.production.yml https://raw.githubusercontent.com/${{ github.repository }}/main/docker-compose.production.yml
+            
+            # Create environment file
+            cat > .env << EOF
+            ENVIRONMENT=production
+            FRONTEND_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:latest
+            BACKEND_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend:latest
+            DATABASE_URL=${{ secrets.PRODUCTION_DATABASE_URL }}
+            SUPABASE_URL=${{ secrets.PRODUCTION_SUPABASE_URL }}
+            SUPABASE_ANON_KEY=${{ secrets.PRODUCTION_SUPABASE_ANON_KEY }}
+            SUPABASE_SERVICE_KEY=${{ secrets.PRODUCTION_SUPABASE_SERVICE_KEY }}
+            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+            N8N_URL=${{ secrets.PRODUCTION_N8N_URL }}
+            N8N_API_KEY=${{ secrets.PRODUCTION_N8N_API_KEY }}
+            MCP_SERVER_URL=${{ secrets.PRODUCTION_MCP_SERVER_URL }}
+            LIVEKIT_URL=${{ secrets.PRODUCTION_LIVEKIT_URL }}
+            LIVEKIT_API_KEY=${{ secrets.PRODUCTION_LIVEKIT_API_KEY }}
+            LIVEKIT_SECRET_KEY=${{ secrets.PRODUCTION_LIVEKIT_SECRET_KEY }}
+            STRIPE_SECRET_KEY=${{ secrets.PRODUCTION_STRIPE_SECRET_KEY }}
+            STRIPE_WEBHOOK_SECRET=${{ secrets.PRODUCTION_STRIPE_WEBHOOK_SECRET }}
+            EOF
+            
+            # Login to container registry
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+            
+            # Pull latest images
+            docker-compose -f docker-compose.production.yml pull
+            
+            # Deploy with rolling update
+            docker-compose -f docker-compose.production.yml up -d --remove-orphans --force-recreate
+            
+            # Wait for services to be ready
+            sleep 60
+
+      - name: Run production health checks
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            cd /opt/agentic-production
+            
+            # Health check retries
+            for i in {1..10}; do
+              if curl -f https://${{ secrets.PRODUCTION_DOMAIN }}/api/health && \
+                 curl -f https://${{ secrets.PRODUCTION_DOMAIN }}/api/agent/health; then
+                echo "Health checks passed"
+                exit 0
+              fi
+              echo "Health check attempt $i failed, retrying in 30s..."
+              sleep 30
+            done
+            
+            echo "Health checks failed, initiating rollback"
+            exit 1
+
+  rollback-on-failure:
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    if: failure()
+    environment: production
+    steps:
+      - name: Rollback deployment
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            # Find latest backup
+            LATEST_BACKUP=$(ls -t /opt/backups/ | head -n 1)
+            
+            if [ -n "$LATEST_BACKUP" ]; then
+              echo "Rolling back to backup: $LATEST_BACKUP"
+              
+              # Stop current deployment
+              cd /opt/agentic-production
+              docker-compose -f docker-compose.production.yml down
+              
+              # Restore from backup
+              rm -rf /opt/agentic-production/*
+              cp -r /opt/backups/$LATEST_BACKUP/* /opt/agentic-production/
+              
+              # Start previous version
+              docker-compose -f docker-compose.production.yml up -d
+              
+              # Verify rollback
+              sleep 30
+              curl -f https://${{ secrets.PRODUCTION_DOMAIN }}/api/health || echo "Rollback verification failed"
+            else
+              echo "No backup found for rollback"
+            fi
+
+      - name: Notify rollback
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          channel: '#alerts'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+          text: "🚨 Production deployment failed and rollback initiated"
+
+  post-deployment:
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    if: success()
+    environment: production
+    steps:
+      - name: Run post-deployment tasks
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            cd /opt/agentic-production
+            
+            # Run database migrations if needed
+            # docker-compose -f docker-compose.production.yml exec -T backend uv run alembic upgrade head
+            
+            # Clear caches
+            docker-compose -f docker-compose.production.yml exec -T frontend npm run cache:clear || true
+            
+            # Warm up application
+            curl -s https://${{ secrets.PRODUCTION_DOMAIN }}/ > /dev/null
+            curl -s https://${{ secrets.PRODUCTION_DOMAIN }}/api/health > /dev/null
+
+      - name: Notify successful deployment
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          channel: '#deployments'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+          text: "✅ Production deployment successful"

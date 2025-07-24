@@ -6,23 +6,14 @@ import json
 from typing import Any, Dict
 import mcp.types as types
 
-def register_docker_tools(server, docker_manager):
+def register_docker_tools(server, ssh_manager, docker_manager):
     """Register Docker-related tools"""
-    
-    @server.call_tool()
-    async def docker_install(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """Install Docker on remote server"""
-        connection_name = arguments.get("connection_name", "vps")
-        
-        try:
-            result = await docker_manager.install_docker(connection_name)
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
-        except Exception as e:
-            return [types.TextContent(type="text", text=f"Error: {str(e)}")]
+    # Set SSH manager reference in docker manager
+    docker_manager.set_ssh_manager(ssh_manager)
     
     @server.call_tool()
     async def docker_status(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """Get Docker status and information"""
+        """Get Docker system status"""
         connection_name = arguments.get("connection_name", "vps")
         
         try:
@@ -32,488 +23,230 @@ def register_docker_tools(server, docker_manager):
             return [types.TextContent(type="text", text=f"Error: {str(e)}")]
     
     @server.call_tool()
-    async def docker_list_containers(arguments: Dict[str, Any]) -> list[types.TextContent]:
+    async def docker_ps(arguments: Dict[str, Any]) -> list[types.TextContent]:
         """List Docker containers"""
         connection_name = arguments.get("connection_name", "vps")
-        all_containers = arguments.get("all", True)
+        all_containers = arguments.get("all", False)
         
         try:
             result = await docker_manager.list_containers(connection_name, all_containers)
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+            return [types.TextContent(type="text", text=result)]
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error: {str(e)}")]
     
     @server.call_tool()
-    async def docker_create_container(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """Create a new Docker container"""
-        connection_name = arguments.get("connection_name", "vps")
-        
-        # Remove connection_name from kwargs before passing to docker_manager
-        kwargs = {k: v for k, v in arguments.items() if k != "connection_name"}
-        
-        try:
-            result = await docker_manager.create_container(connection_name, **kwargs)
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
-        except Exception as e:
-            return [types.TextContent(type="text", text=f"Error: {str(e)}")]
-    
-    @server.call_tool()
-    async def docker_start_container(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """Start a Docker container"""
-        container_id = arguments.get("container_id")
-        connection_name = arguments.get("connection_name", "vps")
-        
-        if not container_id:
-            return [types.TextContent(type="text", text="Error: Container ID is required")]
-        
-        try:
-            result = await docker_manager.start_container(container_id, connection_name)
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
-        except Exception as e:
-            return [types.TextContent(type="text", text=f"Error: {str(e)}")]
-    
-    @server.call_tool()
-    async def docker_stop_container(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """Stop a Docker container"""
-        container_id = arguments.get("container_id")
-        connection_name = arguments.get("connection_name", "vps")
-        
-        if not container_id:
-            return [types.TextContent(type="text", text="Error: Container ID is required")]
-        
-        try:
-            result = await docker_manager.stop_container(container_id, connection_name)
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
-        except Exception as e:
-            return [types.TextContent(type="text", text=f"Error: {str(e)}")]
-    
-    @server.call_tool()
-    async def docker_remove_container(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """Remove a Docker container"""
-        container_id = arguments.get("container_id")
-        connection_name = arguments.get("connection_name", "vps")
-        force = arguments.get("force", False)
-        
-        if not container_id:
-            return [types.TextContent(type="text", text="Error: Container ID is required")]
-        
-        try:
-            result = await docker_manager.remove_container(container_id, connection_name, force)
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
-        except Exception as e:
-            return [types.TextContent(type="text", text=f"Error: {str(e)}")]
-    
-    @server.call_tool()
-    async def docker_get_logs(arguments: Dict[str, Any]) -> list[types.TextContent]:
+    async def docker_logs(arguments: Dict[str, Any]) -> list[types.TextContent]:
         """Get Docker container logs"""
-        container_id = arguments.get("container_id")
         connection_name = arguments.get("connection_name", "vps")
-        lines = arguments.get("lines", 100)
+        container_name = arguments.get("container_name")
+        lines = arguments.get("lines", 50)
+        follow = arguments.get("follow", False)
         
-        if not container_id:
-            return [types.TextContent(type="text", text="Error: Container ID is required")]
+        if not container_name:
+            return [types.TextContent(type="text", text="Error: container_name is required")]
         
         try:
-            result = await docker_manager.get_container_logs(container_id, connection_name, lines)
+            result = await docker_manager.get_container_logs(connection_name, container_name, lines, follow)
+            return [types.TextContent(type="text", text=result)]
+        except Exception as e:
+            return [types.TextContent(type="text", text=f"Error: {str(e)}")]
+    
+    @server.call_tool()
+    async def docker_start(arguments: Dict[str, Any]) -> list[types.TextContent]:
+        """Start Docker container"""
+        connection_name = arguments.get("connection_name", "vps")
+        container_name = arguments.get("container_name")
+        
+        if not container_name:
+            return [types.TextContent(type="text", text="Error: container_name is required")]
+        
+        try:
+            result = await docker_manager.start_container(connection_name, container_name)
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error: {str(e)}")]
     
     @server.call_tool()
-    async def docker_list_images(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """List Docker images"""
+    async def docker_stop(arguments: Dict[str, Any]) -> list[types.TextContent]:
+        """Stop Docker container"""
         connection_name = arguments.get("connection_name", "vps")
+        container_name = arguments.get("container_name")
+        
+        if not container_name:
+            return [types.TextContent(type="text", text="Error: container_name is required")]
         
         try:
-            result = await docker_manager.list_images(connection_name)
+            result = await docker_manager.stop_container(connection_name, container_name)
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error: {str(e)}")]
     
     @server.call_tool()
-    async def docker_pull_image(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """Pull Docker image"""
-        image_name = arguments.get("image_name")
+    async def docker_restart(arguments: Dict[str, Any]) -> list[types.TextContent]:
+        """Restart Docker container"""
         connection_name = arguments.get("connection_name", "vps")
+        container_name = arguments.get("container_name")
         
-        if not image_name:
-            return [types.TextContent(type="text", text="Error: Image name is required")]
+        if not container_name:
+            return [types.TextContent(type="text", text="Error: container_name is required")]
         
         try:
-            result = await docker_manager.pull_image(image_name, connection_name)
+            result = await docker_manager.restart_container(connection_name, container_name)
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error: {str(e)}")]
     
     @server.call_tool()
-    async def docker_remove_image(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """Remove Docker image"""
-        image_id = arguments.get("image_id")
+    async def docker_exec(arguments: Dict[str, Any]) -> list[types.TextContent]:
+        """Execute command in Docker container"""
         connection_name = arguments.get("connection_name", "vps")
-        force = arguments.get("force", False)
+        container_name = arguments.get("container_name")
+        command = arguments.get("command")
         
-        if not image_id:
-            return [types.TextContent(type="text", text="Error: Image ID is required")]
+        if not container_name or not command:
+            return [types.TextContent(type="text", text="Error: container_name and command are required")]
         
         try:
-            result = await docker_manager.remove_image(image_id, connection_name, force)
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
-        except Exception as e:
-            return [types.TextContent(type="text", text=f"Error: {str(e)}")]
-    
-    @server.call_tool()
-    async def docker_list_networks(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """List Docker networks"""
-        connection_name = arguments.get("connection_name", "vps")
-        
-        try:
-            result = await docker_manager.list_networks(connection_name)
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
-        except Exception as e:
-            return [types.TextContent(type="text", text=f"Error: {str(e)}")]
-    
-    @server.call_tool()
-    async def docker_create_network(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """Create Docker network"""
-        network_name = arguments.get("network_name")
-        connection_name = arguments.get("connection_name", "vps")
-        driver = arguments.get("driver", "bridge")
-        
-        if not network_name:
-            return [types.TextContent(type="text", text="Error: Network name is required")]
-        
-        try:
-            result = await docker_manager.create_network(network_name, connection_name, driver)
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
-        except Exception as e:
-            return [types.TextContent(type="text", text=f"Error: {str(e)}")]
-    
-    @server.call_tool()
-    async def docker_remove_network(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """Remove Docker network"""
-        network_name = arguments.get("network_name")
-        connection_name = arguments.get("connection_name", "vps")
-        
-        if not network_name:
-            return [types.TextContent(type="text", text="Error: Network name is required")]
-        
-        try:
-            result = await docker_manager.remove_network(network_name, connection_name)
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
-        except Exception as e:
-            return [types.TextContent(type="text", text=f"Error: {str(e)}")]
-    
-    @server.call_tool()
-    async def docker_list_volumes(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """List Docker volumes"""
-        connection_name = arguments.get("connection_name", "vps")
-        
-        try:
-            result = await docker_manager.list_volumes(connection_name)
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
-        except Exception as e:
-            return [types.TextContent(type="text", text=f"Error: {str(e)}")]
-    
-    @server.call_tool()
-    async def docker_create_volume(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """Create Docker volume"""
-        volume_name = arguments.get("volume_name")
-        connection_name = arguments.get("connection_name", "vps")
-        
-        if not volume_name:
-            return [types.TextContent(type="text", text="Error: Volume name is required")]
-        
-        try:
-            result = await docker_manager.create_volume(volume_name, connection_name)
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
-        except Exception as e:
-            return [types.TextContent(type="text", text=f"Error: {str(e)}")]
-    
-    @server.call_tool()
-    async def docker_remove_volume(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """Remove Docker volume"""
-        volume_name = arguments.get("volume_name")
-        connection_name = arguments.get("connection_name", "vps")
-        
-        if not volume_name:
-            return [types.TextContent(type="text", text="Error: Volume name is required")]
-        
-        try:
-            result = await docker_manager.remove_volume(volume_name, connection_name)
+            result = await docker_manager.exec_container(connection_name, container_name, command)
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error: {str(e)}")]
     
     @server.call_tool()
     async def docker_compose_up(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """Run docker compose up"""
-        compose_file = arguments.get("compose_file")
+        """Start Docker Compose services"""
         connection_name = arguments.get("connection_name", "vps")
+        compose_file = arguments.get("compose_file", "docker-compose.yml")
         detach = arguments.get("detach", True)
         
-        if not compose_file:
-            return [types.TextContent(type="text", text="Error: Compose file path is required")]
-        
         try:
-            result = await docker_manager.docker_compose_up(compose_file, connection_name, detach)
+            result = await docker_manager.compose_up(connection_name, compose_file, detach)
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error: {str(e)}")]
     
     @server.call_tool()
     async def docker_compose_down(arguments: Dict[str, Any]) -> list[types.TextContent]:
-        """Run docker compose down"""
-        compose_file = arguments.get("compose_file")
+        """Stop Docker Compose services"""
         connection_name = arguments.get("connection_name", "vps")
-        
-        if not compose_file:
-            return [types.TextContent(type="text", text="Error: Compose file path is required")]
+        compose_file = arguments.get("compose_file", "docker-compose.yml")
         
         try:
-            result = await docker_manager.docker_compose_down(compose_file, connection_name)
+            result = await docker_manager.compose_down(connection_name, compose_file)
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error: {str(e)}")]
     
-    # Register all Docker tools with their schemas
+    # Register Docker tools
     docker_tools = [
-        {
-            "name": "docker_install",
-            "description": "Install Docker on remote server",
-            "schema": {
+        types.Tool(
+            name="docker_status",
+            description="Get Docker system status and information",
+            inputSchema={
                 "type": "object",
                 "properties": {
-                    "connection_name": {"type": "string", "description": "SSH connection name"}
+                    "connection_name": {"type": "string", "description": "SSH connection name (default: vps)"}
                 }
             }
-        },
-        {
-            "name": "docker_status",
-            "description": "Get Docker status and comprehensive information",
-            "schema": {
+        ),
+        types.Tool(
+            name="docker_ps",
+            description="List Docker containers",
+            inputSchema={
                 "type": "object",
                 "properties": {
-                    "connection_name": {"type": "string", "description": "SSH connection name"}
+                    "connection_name": {"type": "string", "description": "SSH connection name (default: vps)"},
+                    "all": {"type": "boolean", "description": "Show all containers including stopped ones"}
                 }
             }
-        },
-        {
-            "name": "docker_list_containers",
-            "description": "List Docker containers",
-            "schema": {
+        ),
+        types.Tool(
+            name="docker_logs",
+            description="Get Docker container logs",
+            inputSchema={
                 "type": "object",
                 "properties": {
-                    "connection_name": {"type": "string", "description": "SSH connection name"},
-                    "all": {"type": "boolean", "description": "Show all containers (default: true)"}
+                    "connection_name": {"type": "string", "description": "SSH connection name (default: vps)"},
+                    "container_name": {"type": "string", "description": "Container name or ID"},
+                    "lines": {"type": "integer", "description": "Number of lines to show (default: 50)"},
+                    "follow": {"type": "boolean", "description": "Follow log output"}
+                },
+                "required": ["container_name"]
+            }
+        ),
+        types.Tool(
+            name="docker_start",
+            description="Start Docker container",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "connection_name": {"type": "string", "description": "SSH connection name (default: vps)"},
+                    "container_name": {"type": "string", "description": "Container name or ID"}
+                },
+                "required": ["container_name"]
+            }
+        ),
+        types.Tool(
+            name="docker_stop",
+            description="Stop Docker container",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "connection_name": {"type": "string", "description": "SSH connection name (default: vps)"},
+                    "container_name": {"type": "string", "description": "Container name or ID"}
+                },
+                "required": ["container_name"]
+            }
+        ),
+        types.Tool(
+            name="docker_restart",
+            description="Restart Docker container",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "connection_name": {"type": "string", "description": "SSH connection name (default: vps)"},
+                    "container_name": {"type": "string", "description": "Container name or ID"}
+                },
+                "required": ["container_name"]
+            }
+        ),
+        types.Tool(
+            name="docker_exec",
+            description="Execute command in Docker container",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "connection_name": {"type": "string", "description": "SSH connection name (default: vps)"},
+                    "container_name": {"type": "string", "description": "Container name or ID"},
+                    "command": {"type": "string", "description": "Command to execute"}
+                },
+                "required": ["container_name", "command"]
+            }
+        ),
+        types.Tool(
+            name="docker_compose_up",
+            description="Start Docker Compose services",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "connection_name": {"type": "string", "description": "SSH connection name (default: vps)"},
+                    "compose_file": {"type": "string", "description": "Docker Compose file path (default: docker-compose.yml)"},
+                    "detach": {"type": "boolean", "description": "Run in detached mode (default: true)"}
                 }
             }
-        },
-        {
-            "name": "docker_create_container",
-            "description": "Create a new Docker container",
-            "schema": {
+        ),
+        types.Tool(
+            name="docker_compose_down",
+            description="Stop Docker Compose services",
+            inputSchema={
                 "type": "object",
                 "properties": {
-                    "connection_name": {"type": "string", "description": "SSH connection name"},
-                    "image": {"type": "string", "description": "Docker image name"},
-                    "name": {"type": "string", "description": "Container name"},
-                    "ports": {"type": "object", "description": "Port mappings (host:container)"},
-                    "volumes": {"type": "object", "description": "Volume mappings (host:container)"},
-                    "environment": {"type": "object", "description": "Environment variables"},
-                    "network": {"type": "string", "description": "Network name"},
-                    "restart": {"type": "string", "description": "Restart policy"},
-                    "command": {"type": "string", "description": "Command to run"}
-                },
-                "required": ["image"]
-            }
-        },
-        {
-            "name": "docker_start_container",
-            "description": "Start a Docker container",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "container_id": {"type": "string", "description": "Container ID or name"},
-                    "connection_name": {"type": "string", "description": "SSH connection name"}
-                },
-                "required": ["container_id"]
-            }
-        },
-        {
-            "name": "docker_stop_container",
-            "description": "Stop a Docker container",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "container_id": {"type": "string", "description": "Container ID or name"},
-                    "connection_name": {"type": "string", "description": "SSH connection name"}
-                },
-                "required": ["container_id"]
-            }
-        },
-        {
-            "name": "docker_remove_container",
-            "description": "Remove a Docker container",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "container_id": {"type": "string", "description": "Container ID or name"},
-                    "connection_name": {"type": "string", "description": "SSH connection name"},
-                    "force": {"type": "boolean", "description": "Force removal"}
-                },
-                "required": ["container_id"]
-            }
-        },
-        {
-            "name": "docker_get_logs",
-            "description": "Get Docker container logs",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "container_id": {"type": "string", "description": "Container ID or name"},
-                    "connection_name": {"type": "string", "description": "SSH connection name"},
-                    "lines": {"type": "integer", "description": "Number of lines to retrieve"}
-                },
-                "required": ["container_id"]
-            }
-        },
-        {
-            "name": "docker_list_images",
-            "description": "List Docker images",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "connection_name": {"type": "string", "description": "SSH connection name"}
+                    "connection_name": {"type": "string", "description": "SSH connection name (default: vps)"},
+                    "compose_file": {"type": "string", "description": "Docker Compose file path (default: docker-compose.yml)"}
                 }
             }
-        },
-        {
-            "name": "docker_pull_image",
-            "description": "Pull Docker image from registry",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "image_name": {"type": "string", "description": "Image name to pull"},
-                    "connection_name": {"type": "string", "description": "SSH connection name"}
-                },
-                "required": ["image_name"]
-            }
-        },
-        {
-            "name": "docker_remove_image",
-            "description": "Remove Docker image",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "image_id": {"type": "string", "description": "Image ID or name"},
-                    "connection_name": {"type": "string", "description": "SSH connection name"},
-                    "force": {"type": "boolean", "description": "Force removal"}
-                },
-                "required": ["image_id"]
-            }
-        },
-        {
-            "name": "docker_list_networks",
-            "description": "List Docker networks",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "connection_name": {"type": "string", "description": "SSH connection name"}
-                }
-            }
-        },
-        {
-            "name": "docker_create_network",
-            "description": "Create Docker network",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "network_name": {"type": "string", "description": "Network name"},
-                    "connection_name": {"type": "string", "description": "SSH connection name"},
-                    "driver": {"type": "string", "description": "Network driver (default: bridge)"}
-                },
-                "required": ["network_name"]
-            }
-        },
-        {
-            "name": "docker_remove_network",
-            "description": "Remove Docker network",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "network_name": {"type": "string", "description": "Network name"},
-                    "connection_name": {"type": "string", "description": "SSH connection name"}
-                },
-                "required": ["network_name"]
-            }
-        },
-        {
-            "name": "docker_list_volumes",
-            "description": "List Docker volumes",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "connection_name": {"type": "string", "description": "SSH connection name"}
-                }
-            }
-        },
-        {
-            "name": "docker_create_volume",
-            "description": "Create Docker volume",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "volume_name": {"type": "string", "description": "Volume name"},
-                    "connection_name": {"type": "string", "description": "SSH connection name"}
-                },
-                "required": ["volume_name"]
-            }
-        },
-        {
-            "name": "docker_remove_volume",
-            "description": "Remove Docker volume",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "volume_name": {"type": "string", "description": "Volume name"},
-                    "connection_name": {"type": "string", "description": "SSH connection name"}
-                },
-                "required": ["volume_name"]
-            }
-        },
-        {
-            "name": "docker_compose_up",
-            "description": "Run docker compose up",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "compose_file": {"type": "string", "description": "Path to docker-compose.yml file"},
-                    "connection_name": {"type": "string", "description": "SSH connection name"},
-                    "detach": {"type": "boolean", "description": "Run in detached mode"}
-                },
-                "required": ["compose_file"]
-            }
-        },
-        {
-            "name": "docker_compose_down",
-            "description": "Run docker compose down",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "compose_file": {"type": "string", "description": "Path to docker-compose.yml file"},
-                    "connection_name": {"type": "string", "description": "SSH connection name"}
-                },
-                "required": ["compose_file"]
-            }
-        }
+        )
     ]
     
-    # Add all tools to the server
-    for tool_config in docker_tools:
-        server.list_tools().append(
-            types.Tool(
-                name=tool_config["name"],
-                description=tool_config["description"],
-                inputSchema=tool_config["schema"]
-            )
-        )
+    for tool in docker_tools:
+        server.list_tools().append(tool)

@@ -1,6 +1,7 @@
 "use client"
 import { EnhancedNavigation } from "@/components/layout/navigation-enhanced"
 import { EnhancedFooter } from "@/components/layout/footer-enhanced"
+import { HeroBackground } from "@/components/layout/hero-background"
 import { useEnhancedTranslation } from "@/lib/i18n-enhanced"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"

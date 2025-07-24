@@ -1,0 +1,182 @@
+groups:
+  - name: agentic_alerts
+    rules:
+      # High-level service availability
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} on {{ $labels.instance }} has been down for more than 1 minute."
+
+      # Frontend specific alerts
+      - alert: FrontendHighErrorRate
+        expr: rate(http_requests_total{job="agentic-frontend",status=~"5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate on frontend"
+          description: "Frontend error rate is {{ $value }} errors per second"
+
+      - alert: FrontendHighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="agentic-frontend"}[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time on frontend"
+          description: "95th percentile response time is {{ $value }} seconds"
+
+      # Backend specific alerts
+      - alert: BackendHighErrorRate
+        expr: rate(http_requests_total{job="agentic-backend",status=~"5.."}[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate on backend"
+          description: "Backend error rate is {{ $value }} errors per second"
+
+      - alert: BackendHighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="agentic-backend"}[5m])) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time on backend"
+          description: "95th percentile response time is {{ $value }} seconds"
+
+      # Agent specific alerts
+      - alert: AgentWorkflowFailures
+        expr: rate(agent_workflow_failures_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High agent workflow failure rate"
+          description: "Agent workflow failure rate is {{ $value }} failures per second"
+
+      - alert: AgentMCPConnectionDown
+        expr: agent_mcp_connection_status == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Agent MCP connection is down"
+          description: "Agent cannot connect to MCP server"
+
+      # Infrastructure alerts
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}% on {{ $labels.instance }}"
+
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value }}% on {{ $labels.instance }}"
+
+      - alert: LowDiskSpace
+        expr: (1 - (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"})) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space"
+          description: "Disk usage is {{ $value }}% on {{ $labels.instance }} {{ $labels.mountpoint }}"
+
+      # Database alerts
+      - alert: DatabaseConnectionFailures
+        expr: rate(database_connection_failures_total[5m]) > 0.01
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database connection failures"
+          description: "Database connection failure rate is {{ $value }} failures per second"
+
+      - alert: HighDatabaseResponseTime
+        expr: histogram_quantile(0.95, rate(database_query_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High database response time"
+          description: "95th percentile database query time is {{ $value }} seconds"
+
+      # Container alerts
+      - alert: ContainerHighCPU
+        expr: rate(container_cpu_usage_seconds_total{name!=""}[5m]) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container high CPU usage"
+          description: "Container {{ $labels.name }} CPU usage is {{ $value }}%"
+
+      - alert: ContainerHighMemory
+        expr: (container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""}) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container high memory usage"
+          description: "Container {{ $labels.name }} memory usage is {{ $value }}%"
+
+      - alert: ContainerRestarting
+        expr: rate(container_last_seen{name!=""}[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container restarting"
+          description: "Container {{ $labels.name }} is restarting frequently"
+
+      # SSL certificate alerts
+      - alert: SSLCertificateExpiringSoon
+        expr: (ssl_certificate_expiry_seconds - time()) / 86400 < 30
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "SSL certificate expiring soon"
+          description: "SSL certificate for {{ $labels.instance }} expires in {{ $value }} days"
+
+      - alert: SSLCertificateExpired
+        expr: ssl_certificate_expiry_seconds - time() < 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "SSL certificate expired"
+          description: "SSL certificate for {{ $labels.instance }} has expired"
+
+      # Deployment alerts
+      - alert: DeploymentFailed
+        expr: deployment_status{status="failed"} == 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Deployment failed"
+          description: "Deployment {{ $labels.deployment_id }} in {{ $labels.environment }} has failed"
+
+      - alert: DeploymentStuck
+        expr: deployment_status{status="running"} == 1 and (time() - deployment_started_timestamp) > 1800
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Deployment taking too long"
+          description: "Deployment {{ $labels.deployment_id }} has been running for more than 30 minutes"

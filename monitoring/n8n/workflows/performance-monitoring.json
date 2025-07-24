@@ -1,0 +1,376 @@
+{
+  "name": "Agentic Platform - Performance Monitoring",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "name": "Every 5 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Performance monitoring script\\nconst metrics = {\\n  timestamp: new Date().toISOString(),\\n  checks: []\\n};\\n\\n// Define performance checks\\nconst checks = [\\n  {\\n    name: 'Website Response Time',\\n    url: 'https://consulting.sa',\\n    threshold: 2000 // 2 seconds\\n  },\\n  {\\n    name: 'API Health Check',\\n    url: 'https://consulting.sa/api/health',\\n    threshold: 1000 // 1 second\\n  },\\n  {\\n    name: 'Backend Health Check',\\n    url: 'http://217.79.255.54:8000/health',\\n    threshold: 1000 // 1 second\\n  }\\n];\\n\\nreturn { metrics, checks };"
+      },
+      "name": "Initialize Performance Checks",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "name": "Process Each Check",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$json.checks[$json.index].url}}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "name": "Perform Health Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Process performance check result\\nconst check = $input.first().json.checks[$input.first().json.index];\\nconst response = $input.last().json;\\nconst responseTime = response.response_time || 0;\\n\\n// Determine status\\nconst status = responseTime <= check.threshold ? 'healthy' : 'slow';\\nconst severity = responseTime > check.threshold * 2 ? 'critical' : (responseTime > check.threshold ? 'warning' : 'ok');\\n\\n// Create result\\nconst result = {\\n  name: check.name,\\n  url: check.url,\\n  responseTime: responseTime,\\n  threshold: check.threshold,\\n  status: status,\\n  severity: severity,\\n  statusCode: response.statusCode || 0,\\n  timestamp: new Date().toISOString(),\\n  healthy: status === 'healthy' && (response.statusCode >= 200 && response.statusCode < 300)\\n};\\n\\n// Add to metrics\\nconst metrics = $input.first().json.metrics;\\nmetrics.checks.push(result);\\n\\nreturn { result, metrics, shouldAlert: !result.healthy || severity !== 'ok' };"
+      },
+      "name": "Process Check Result",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.shouldAlert}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Should Alert?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SLACK_WEBHOOK_URL}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "channel",
+              "value": "#performance"
+            },
+            {
+              "name": "username",
+              "value": "Performance Monitor"
+            },
+            {
+              "name": "icon_emoji",
+              "value": "={{$json.result.severity === 'critical' ? ':red_circle:' : ':warning:'}}"
+            },
+            {
+              "name": "text",
+              "value": "🚨 **Performance Alert**\\n\\n**Service:** {{$json.result.name}}\\n**URL:** {{$json.result.url}}\\n**Response Time:** {{$json.result.responseTime}}ms\\n**Threshold:** {{$json.result.threshold}}ms\\n**Status Code:** {{$json.result.statusCode}}\\n**Severity:** {{$json.result.severity}}\\n\\n*Checked at {{$json.result.timestamp}}*"
+            },
+            {
+              "name": "color",
+              "value": "={{$json.result.severity === 'critical' ? 'danger' : 'warning'}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Send Performance Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1560, 100]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://prometheus:9090/api/v1/write",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/x-protobuf"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "metrics",
+              "value": "={{JSON.stringify($json.metrics)}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Store Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.index}}",
+              "operation": "smaller",
+              "value2": "={{$json.checks.length - 1}}"
+            }
+          ]
+        }
+      },
+      "name": "More Checks?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1340, 400]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Generate performance summary\\nconst metrics = $input.all().map(item => item.json.metrics).pop();\\nconst checks = metrics.checks;\\n\\nconst summary = {\\n  timestamp: metrics.timestamp,\\n  totalChecks: checks.length,\\n  healthyChecks: checks.filter(c => c.healthy).length,\\n  unhealthyChecks: checks.filter(c => !c.healthy).length,\\n  averageResponseTime: checks.reduce((sum, c) => sum + c.responseTime, 0) / checks.length,\\n  slowestCheck: checks.reduce((prev, current) => (prev.responseTime > current.responseTime) ? prev : current),\\n  fastestCheck: checks.reduce((prev, current) => (prev.responseTime < current.responseTime) ? prev : current),\\n  criticalIssues: checks.filter(c => c.severity === 'critical').length,\\n  warnings: checks.filter(c => c.severity === 'warning').length\\n};\\n\\nreturn { summary, checks };"
+      },
+      "name": "Generate Summary",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1780, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.summary.unhealthyChecks}}",
+              "operation": "larger",
+              "value2": 0
+            }
+          ]
+        }
+      },
+      "name": "Any Issues?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [2000, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SLACK_WEBHOOK_URL}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "channel",
+              "value": "#performance"
+            },
+            {
+              "name": "username",
+              "value": "Performance Monitor"
+            },
+            {
+              "name": "icon_emoji",
+              "value": ":chart_with_upwards_trend:"
+            },
+            {
+              "name": "text",
+              "value": "📊 **Performance Summary**\\n\\n**Total Checks:** {{$json.summary.totalChecks}}\\n**Healthy:** {{$json.summary.healthyChecks}}\\n**Issues:** {{$json.summary.unhealthyChecks}}\\n**Average Response Time:** {{Math.round($json.summary.averageResponseTime)}}ms\\n**Slowest:** {{$json.summary.slowestCheck.name}} ({{$json.summary.slowestCheck.responseTime}}ms)\\n**Fastest:** {{$json.summary.fastestCheck.name}} ({{$json.summary.fastestCheck.responseTime}}ms)\\n\\n{{$json.summary.criticalIssues > 0 ? '🚨 Critical Issues: ' + $json.summary.criticalIssues : ''}}\\n{{$json.summary.warnings > 0 ? '⚠️ Warnings: ' + $json.summary.warnings : ''}}\\n\\n*Report generated at {{$json.summary.timestamp}}*"
+            },
+            {
+              "name": "color",
+              "value": "={{$json.summary.criticalIssues > 0 ? 'danger' : ($json.summary.warnings > 0 ? 'warning' : 'good')}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Send Summary Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [2220, 100]
+    },
+    {
+      "parameters": {},
+      "name": "Performance Check Complete",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [2220, 300]
+    }
+  ],
+  "connections": {
+    "Every 5 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Initialize Performance Checks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initialize Performance Checks": {
+      "main": [
+        [
+          {
+            "node": "Process Each Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Each Check": {
+      "main": [
+        [
+          {
+            "node": "Perform Health Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Perform Health Check": {
+      "main": [
+        [
+          {
+            "node": "Process Check Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Check Result": {
+      "main": [
+        [
+          {
+            "node": "Should Alert?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Store Metrics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "More Checks?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Alert?": {
+      "true": [
+        [
+          {
+            "node": "Send Performance Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "More Checks?": {
+      "true": [
+        [
+          {
+            "node": "Process Each Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "false": [
+        [
+          {
+            "node": "Generate Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Summary": {
+      "main": [
+        [
+          {
+            "node": "Any Issues?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Performance Check Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Any Issues?": {
+      "true": [
+        [
+          {
+            "node": "Send Summary Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "timezone": "UTC"
+  },
+  "id": "performance-monitoring"
+}

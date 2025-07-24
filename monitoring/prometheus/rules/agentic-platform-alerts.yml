@@ -1,0 +1,287 @@
+groups:
+- name: agentic-platform-infrastructure
+  rules:
+  - alert: InstanceDown
+    expr: up == 0
+    for: 1m
+    labels:
+      severity: critical
+      category: infrastructure
+    annotations:
+      summary: "Instance {{ $labels.instance }} is down"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute."
+      runbook_url: "https://consulting.sa/docs/runbooks/instance-down"
+
+  - alert: HighCPUUsage
+    expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 5m
+    labels:
+      severity: warning
+      category: performance
+    annotations:
+      summary: "High CPU usage detected on {{ $labels.instance }}"
+      description: "CPU usage is above 80% for more than 5 minutes on {{ $labels.instance }}. Current value: {{ $value }}%"
+      runbook_url: "https://consulting.sa/docs/runbooks/high-cpu"
+
+  - alert: CriticalCPUUsage
+    expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 95
+    for: 2m
+    labels:
+      severity: critical
+      category: performance
+    annotations:
+      summary: "Critical CPU usage detected on {{ $labels.instance }}"
+      description: "CPU usage is above 95% for more than 2 minutes on {{ $labels.instance }}. Current value: {{ $value }}%"
+      runbook_url: "https://consulting.sa/docs/runbooks/critical-cpu"
+
+  - alert: HighMemoryUsage
+    expr: 100 * (1 - ((node_memory_MemAvailable_bytes or node_memory_MemFree_bytes) / node_memory_MemTotal_bytes)) > 85
+    for: 5m
+    labels:
+      severity: warning
+      category: performance
+    annotations:
+      summary: "High memory usage detected on {{ $labels.instance }}"
+      description: "Memory usage is above 85% for more than 5 minutes on {{ $labels.instance }}. Current value: {{ $value }}%"
+      runbook_url: "https://consulting.sa/docs/runbooks/high-memory"
+
+  - alert: CriticalMemoryUsage
+    expr: 100 * (1 - ((node_memory_MemAvailable_bytes or node_memory_MemFree_bytes) / node_memory_MemTotal_bytes)) > 95
+    for: 2m
+    labels:
+      severity: critical
+      category: performance
+    annotations:
+      summary: "Critical memory usage detected on {{ $labels.instance }}"
+      description: "Memory usage is above 95% for more than 2 minutes on {{ $labels.instance }}. Current value: {{ $value }}%"
+      runbook_url: "https://consulting.sa/docs/runbooks/critical-memory"
+
+  - alert: HighDiskUsage
+    expr: 100 - ((node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|fuse.lxcfs|squashfs"} * 100) / node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|fuse.lxcfs|squashfs"}) > 85
+    for: 5m
+    labels:
+      severity: warning
+      category: storage
+    annotations:
+      summary: "High disk usage detected on {{ $labels.instance }}"
+      description: "Disk usage is above 85% for more than 5 minutes on {{ $labels.instance }}. Current value: {{ $value }}%"
+      runbook_url: "https://consulting.sa/docs/runbooks/high-disk"
+
+  - alert: CriticalDiskUsage
+    expr: 100 - ((node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|fuse.lxcfs|squashfs"} * 100) / node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|fuse.lxcfs|squashfs"}) > 95
+    for: 2m
+    labels:
+      severity: critical
+      category: storage
+    annotations:
+      summary: "Critical disk usage detected on {{ $labels.instance }}"
+      description: "Disk usage is above 95% for more than 2 minutes on {{ $labels.instance }}. Current value: {{ $value }}%"
+      runbook_url: "https://consulting.sa/docs/runbooks/critical-disk"
+
+- name: agentic-platform-application
+  rules:
+  - alert: HighRequestLatency
+    expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, route, job)) > 2
+    for: 5m
+    labels:
+      severity: warning
+      category: performance
+    annotations:
+      summary: "High request latency detected for {{ $labels.route }}"
+      description: "95th percentile of request latency for route {{ $labels.route }} on {{ $labels.job }} is above 2 seconds for more than 5 minutes. Current value: {{ $value }}s"
+      runbook_url: "https://consulting.sa/docs/runbooks/high-latency"
+
+  - alert: HighErrorRate
+    expr: sum(rate(http_requests_total{code=~"5.."}[5m])) by (job) / sum(rate(http_requests_total[5m])) by (job) > 0.05
+    for: 5m
+    labels:
+      severity: critical
+      category: application
+    annotations:
+      summary: "High error rate detected on {{ $labels.job }}"
+      description: "Error rate is above 5% for more than 5 minutes on {{ $labels.job }}. Current value: {{ $value | humanizePercentage }}"
+      runbook_url: "https://consulting.sa/docs/runbooks/high-error-rate"
+
+  - alert: ServiceDown
+    expr: up{job=~"agentic-frontend|agentic-backend"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      category: application
+    annotations:
+      summary: "Service {{ $labels.job }} is down"
+      description: "Service {{ $labels.job }} has been down for more than 1 minute"
+      runbook_url: "https://consulting.sa/docs/runbooks/service-down"
+
+  - alert: ContainerDown
+    expr: absent(container_last_seen{name=~"agentic-frontend-prod|agentic-backend-prod|agentic-redis-prod"})
+    for: 1m
+    labels:
+      severity: critical
+      category: infrastructure
+    annotations:
+      summary: "Container {{ $labels.name }} is not running"
+      description: "Critical container {{ $labels.name }} is not running or not reporting metrics"
+      runbook_url: "https://consulting.sa/docs/runbooks/container-down"
+
+  - alert: ContainerHighMemoryUsage
+    expr: (container_memory_usage_bytes{name=~"agentic-frontend-prod|agentic-backend-prod"} / container_spec_memory_limit_bytes{name=~"agentic-frontend-prod|agentic-backend-prod"}) * 100 > 80
+    for: 5m
+    labels:
+      severity: warning
+      category: performance
+    annotations:
+      summary: "Container {{ $labels.name }} high memory usage"
+      description: "Container {{ $labels.name }} memory usage is above 80% of limit for more than 5 minutes. Current value: {{ $value }}%"
+      runbook_url: "https://consulting.sa/docs/runbooks/container-memory"
+
+  - alert: ContainerHighCPUUsage
+    expr: (rate(container_cpu_usage_seconds_total{name=~"agentic-frontend-prod|agentic-backend-prod"}[5m]) * 100) > 80
+    for: 5m
+    labels:
+      severity: warning
+      category: performance
+    annotations:
+      summary: "Container {{ $labels.name }} high CPU usage"
+      description: "Container {{ $labels.name }} CPU usage is above 80% for more than 5 minutes. Current value: {{ $value }}%"
+      runbook_url: "https://consulting.sa/docs/runbooks/container-cpu"
+
+- name: agentic-platform-network
+  rules:
+  - alert: WebsiteDown
+    expr: probe_success{job="blackbox-http", instance="https://consulting.sa"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      category: network
+    annotations:
+      summary: "Website https://consulting.sa is down"
+      description: "The main website https://consulting.sa has been down for more than 1 minute"
+      runbook_url: "https://consulting.sa/docs/runbooks/website-down"
+
+  - alert: APIHealthCheckFailed
+    expr: probe_success{job="blackbox-http", instance=~".*api/health.*"} == 0
+    for: 2m
+    labels:
+      severity: critical
+      category: application
+    annotations:
+      summary: "API health check failed for {{ $labels.instance }}"
+      description: "API health check for {{ $labels.instance }} has been failing for more than 2 minutes"
+      runbook_url: "https://consulting.sa/docs/runbooks/api-health-failed"
+
+  - alert: SSLCertificateExpiringSoon
+    expr: probe_ssl_earliest_cert_expiry{job="blackbox-ssl"} - time() < 86400 * 7
+    for: 1h
+    labels:
+      severity: warning
+      category: security
+    annotations:
+      summary: "SSL certificate expiring soon for {{ $labels.instance }}"
+      description: "SSL certificate for {{ $labels.instance }} will expire in less than 7 days. Expiry date: {{ $value | humanizeTimestamp }}"
+      runbook_url: "https://consulting.sa/docs/runbooks/ssl-expiring"
+
+  - alert: SSLCertificateExpired
+    expr: probe_ssl_earliest_cert_expiry{job="blackbox-ssl"} - time() < 0
+    for: 1m
+    labels:
+      severity: critical
+      category: security
+    annotations:
+      summary: "SSL certificate expired for {{ $labels.instance }}"
+      description: "SSL certificate for {{ $labels.instance }} has expired"
+      runbook_url: "https://consulting.sa/docs/runbooks/ssl-expired"
+
+- name: agentic-platform-database
+  rules:
+  - alert: RedisDown
+    expr: redis_up == 0
+    for: 1m
+    labels:
+      severity: critical
+      category: database
+    annotations:
+      summary: "Redis is down"
+      description: "Redis instance has been down for more than 1 minute"
+      runbook_url: "https://consulting.sa/docs/runbooks/redis-down"
+
+  - alert: RedisHighMemoryUsage
+    expr: redis_memory_used_bytes / redis_memory_max_bytes * 100 > 80
+    for: 5m
+    labels:
+      severity: warning
+      category: performance
+    annotations:
+      summary: "Redis high memory usage"
+      description: "Redis memory usage is above 80% for more than 5 minutes. Current value: {{ $value }}%"
+      runbook_url: "https://consulting.sa/docs/runbooks/redis-memory"
+
+  - alert: RedisConnectionsHigh
+    expr: redis_connected_clients > 100
+    for: 5m
+    labels:
+      severity: warning
+      category: performance
+    annotations:
+      summary: "Redis high number of connections"
+      description: "Redis has more than 100 connected clients for more than 5 minutes. Current value: {{ $value }}"
+      runbook_url: "https://consulting.sa/docs/runbooks/redis-connections"
+
+- name: agentic-platform-n8n
+  rules:
+  - alert: N8NDown
+    expr: up{job="n8n"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      category: application
+    annotations:
+      summary: "N8N is down"
+      description: "N8N workflow automation service has been down for more than 1 minute"
+      runbook_url: "https://consulting.sa/docs/runbooks/n8n-down"
+
+  - alert: N8NWorkflowExecutionFailed
+    expr: increase(n8n_workflow_executions_total{status="failed"}[5m]) > 5
+    for: 2m
+    labels:
+      severity: warning
+      category: application
+    annotations:
+      summary: "N8N workflow execution failures"
+      description: "More than 5 N8N workflow executions have failed in the last 5 minutes"
+      runbook_url: "https://consulting.sa/docs/runbooks/n8n-workflow-failures"
+
+- name: agentic-platform-monitoring
+  rules:
+  - alert: PrometheusConfigReloadFailed
+    expr: prometheus_config_last_reload_successful == 0
+    for: 5m
+    labels:
+      severity: warning
+      category: monitoring
+    annotations:
+      summary: "Prometheus configuration reload failed"
+      description: "Prometheus configuration reload has been failing for more than 5 minutes"
+      runbook_url: "https://consulting.sa/docs/runbooks/prometheus-config-failed"
+
+  - alert: AlertmanagerDown
+    expr: up{job="alertmanager"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      category: monitoring
+    annotations:
+      summary: "Alertmanager is down"
+      description: "Alertmanager has been down for more than 1 minute"
+      runbook_url: "https://consulting.sa/docs/runbooks/alertmanager-down"
+
+  - alert: GrafanaDown
+    expr: up{job="grafana"} == 0
+    for: 2m
+    labels:
+      severity: warning
+      category: monitoring
+    annotations:
+      summary: "Grafana is down"
+      description: "Grafana dashboard service has been down for more than 2 minutes"
+      runbook_url: "https://consulting.sa/docs/runbooks/grafana-down"

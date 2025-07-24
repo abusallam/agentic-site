@@ -1,0 +1,212 @@
+---
+- name: Deploy Agentic AI Application
+  hosts: all
+  become: yes
+  vars:
+    app_dir: "/opt/agentic-{{ environment }}"
+    backup_dir: "/opt/backups"
+    
+  tasks:
+    - name: Create backup before deployment
+      block:
+        - name: Run backup script
+          command: /usr/local/bin/backup-agentic
+          become_user: deploy
+          
+        - name: Wait for backup to complete
+          wait_for:
+            timeout: 300
+      tags: [backup]
+
+    - name: Prepare deployment directory
+      block:
+        - name: Ensure app directory exists
+          file:
+            path: "{{ app_dir }}"
+            state: directory
+            owner: deploy
+            group: deploy
+            mode: '0755'
+
+        - name: Create environment file
+          template:
+            src: env.j2
+            dest: "{{ app_dir }}/.env"
+            owner: deploy
+            group: deploy
+            mode: '0600'
+          vars:
+            env_vars: "{{ environment_variables }}"
+      tags: [prepare]
+
+    - name: Download Docker Compose configuration
+      get_url:
+        url: "https://raw.githubusercontent.com/consulting-sa/agentic-platform/main/docker-compose.{{ environment }}.yml"
+        dest: "{{ app_dir }}/docker-compose.yml"
+        owner: deploy
+        group: deploy
+        mode: '0644'
+        force: yes
+      tags: [download]
+
+    - name: Login to container registry
+      docker_login:
+        registry_url: ghcr.io
+        username: "{{ github_username }}"
+        password: "{{ github_token }}"
+      become_user: deploy
+      tags: [docker]
+
+    - name: Pull latest Docker images
+      docker_compose:
+        project_src: "{{ app_dir }}"
+        pull: yes
+      become_user: deploy
+      tags: [docker]
+
+    - name: Stop existing containers gracefully
+      docker_compose:
+        project_src: "{{ app_dir }}"
+        state: absent
+        timeout: 60
+      become_user: deploy
+      ignore_errors: yes
+      tags: [deploy]
+
+    - name: Start new containers
+      docker_compose:
+        project_src: "{{ app_dir }}"
+        state: present
+        recreate: always
+        remove_orphans: yes
+      become_user: deploy
+      tags: [deploy]
+
+    - name: Wait for services to be ready
+      uri:
+        url: "http://localhost:3000/api/health"
+        method: GET
+        status_code: 200
+      retries: 30
+      delay: 10
+      tags: [health-check]
+
+    - name: Verify backend health
+      uri:
+        url: "http://localhost:8000/health"
+        method: GET
+        status_code: 200
+      retries: 15
+      delay: 10
+      tags: [health-check]
+
+    - name: Update nginx configuration
+      block:
+        - name: Copy nginx configuration
+          template:
+            src: "nginx-{{ environment }}.conf.j2"
+            dest: "/etc/nginx/sites-available/agentic-{{ environment }}"
+            owner: root
+            group: root
+            mode: '0644'
+
+        - name: Enable nginx site
+          file:
+            src: "/etc/nginx/sites-available/agentic-{{ environment }}"
+            dest: "/etc/nginx/sites-enabled/agentic-{{ environment }}"
+            state: link
+
+        - name: Remove temporary SSL config
+          file:
+            path: /etc/nginx/sites-enabled/temp-ssl
+            state: absent
+
+        - name: Test nginx configuration
+          command: nginx -t
+          register: nginx_test
+
+        - name: Reload nginx
+          systemd:
+            name: nginx
+            state: reloaded
+          when: nginx_test.rc == 0
+      tags: [nginx]
+
+    - name: Setup monitoring and logging
+      block:
+        - name: Create log monitoring script
+          copy:
+            content: |
+              #!/bin/bash
+              # Monitor application logs
+              docker-compose -f {{ app_dir }}/docker-compose.yml logs --tail=100 -f
+            dest: /usr/local/bin/monitor-agentic
+            mode: '0755'
+
+        - name: Create health check script
+          copy:
+            content: |
+              #!/bin/bash
+              set -e
+              
+              # Check frontend health
+              curl -f http://localhost:3000/api/health || exit 1
+              
+              # Check backend health
+              curl -f http://localhost:8000/health || exit 1
+              
+              # Check nginx
+              curl -f http://localhost/nginx-health || exit 1
+              
+              echo "All services healthy"
+            dest: /usr/local/bin/health-check-agentic
+            mode: '0755'
+
+        - name: Setup health check cron
+          cron:
+            name: "Agentic health check"
+            minute: "*/5"
+            job: "/usr/local/bin/health-check-agentic >> /var/log/agentic/health.log 2>&1 || echo 'Health check failed' | logger"
+            user: deploy
+      tags: [monitoring]
+
+    - name: Cleanup old Docker images
+      docker_prune:
+        images: yes
+        images_filters:
+          dangling: false
+          until: "24h"
+      become_user: deploy
+      tags: [cleanup]
+
+    - name: Final verification
+      block:
+        - name: Check container status
+          command: docker-compose -f {{ app_dir }}/docker-compose.yml ps
+          register: container_status
+          become_user: deploy
+
+        - name: Display container status
+          debug:
+            var: container_status.stdout_lines
+
+        - name: Verify external access
+          uri:
+            url: "https://{{ domain }}/api/health"
+            method: GET
+            status_code: 200
+            validate_certs: yes
+          when: environment == 'production'
+          delegate_to: localhost
+      tags: [verify]
+
+  handlers:
+    - name: restart nginx
+      systemd:
+        name: nginx
+        state: restarted
+
+    - name: reload nginx
+      systemd:
+        name: nginx
+        state: reloaded
