@@ -136,7 +136,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build frontend image for scanning
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile.frontend
@@ -145,7 +145,7 @@ jobs:
           load: true
 
       - name: Build backend image for scanning
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./agent
           file: ./Dockerfile.backend
