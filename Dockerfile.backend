@@ -1,5 +1,5 @@
 # Multi-stage build for Python backend
-FROM python:3.11-slim AS base
+FROM python:3.13-slim AS base
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
 RUN pip install uv
 
 # Production runtime stage
-FROM python:3.11-slim AS runtime
+FROM python:3.13-slim AS runtime
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
