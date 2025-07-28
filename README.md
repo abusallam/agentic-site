@@ -15,8 +15,9 @@ Professional AI consulting services and SaaS solutions website for **consulting.
 ### **🎯 System Status**: ✅ **PRODUCTION READY & OPERATIONAL**
 - **Website**: https://consulting.sa ✅ **LIVE**
 - **VPS**: 217.79.255.54 ✅ **RUNNING**
-- **Last Updated**: July 23, 2025
-- **Current Phase**: CI/CD Pipeline Enhancement Ready
+- **Package Managers**: `uv` (Python), `npm` (Node.js) ✅ **UPDATED**
+- **Last Updated**: January 27, 2025
+- **Current Phase**: Local Testing & Production Enhancement Ready
 
 ### **🔄 CI/CD Pipeline Progress**
 - **Completed**: Tasks 1, 2.1, 2.2, 3.1, 4.1, **4.2** ✅, 5.1, 6.1, 7.1, **7.2** ✅
@@ -48,73 +49,110 @@ Visit our website: **[https://consulting.sa](https://consulting.sa)**
 
 ## 🛠️ Tech Stack
 
-### Core Technologies
+### Frontend Technologies
 - **Framework**: Next.js 15.4.1 with App Router
 - **Language**: TypeScript 5.7.3
 - **Styling**: Tailwind CSS 3.4.17
 - **UI Components**: Radix UI primitives
 - **Icons**: Lucide React
-- **Database**: Supabase
 - **Package Manager**: npm
 
+### Backend Technologies
+- **Framework**: Python ADK (Agent Development Kit)
+- **Language**: Python 3.11+
+- **Package Manager**: uv (modern Python package manager)
+- **Agent System**: CustomerJourneyAgent with service integrations
+- **Services**: Supabase, MCP, Monitoring, CI/CD integrations
+
+### Database & Services
+- **Database**: Supabase (PostgreSQL)
+- **AI Services**: Google Gemini, OpenAI, Anthropic
+- **Payment**: Stripe integration
+- **Communication**: Livekit for real-time features
+- **Workflow**: n8n automation platform
+- **MCP**: Model Context Protocol for agent communication
+
 ### Development Tools
-- **Code Quality**: ESLint, Prettier, Husky
+- **Code Quality**: ESLint, Prettier, Husky (Frontend), Black, isort, mypy (Backend)
 - **Performance**: Bundle Analyzer, Image Optimization
-- **Deployment**: Docker, Vercel
-- **Monitoring**: Health Checks, Error Boundaries
+- **Deployment**: Docker, organized deployment scripts
+- **Monitoring**: Prometheus, Grafana, comprehensive health checks
+- **Testing**: Jest (Frontend), pytest (Backend)
 
 ## 🏗️ Project Structure
 
 ```
-├── app/                    # Next.js app directory (App Router)
-│   ├── about/             # About page
-│   ├── api/               # API routes
-│   │   └── health/        # Health check endpoint
-│   ├── auth/              # Authentication pages
-│   ├── consulting/        # Consulting services page
-│   ├── contact/           # Contact page
-│   ├── docs/              # Documentation pages
-│   ├── documentation/     # API documentation
-│   ├── privacy-policy/    # Privacy policy page
-│   ├── services/          # Services pages
-│   ├── test-auth/         # Authentication testing
-│   ├── globals.css        # Global styles
-│   ├── layout.tsx         # Root layout
-│   ├── loading.tsx        # Global loading UI
-│   ├── error.tsx          # Global error UI
-│   └── page.tsx           # Home page
-├── components/            # Reusable React components
-│   ├── ui/               # Shadcn/ui component library
-│   ├── consulting/       # Consulting-specific components
-│   ├── *-enhanced.tsx    # Enhanced feature components
-│   └── *.tsx             # Other components
-├── lib/                  # Utility functions and configurations
-│   ├── brand.ts          # Brand configuration
-│   ├── i18n-enhanced.tsx # Internationalization
-│   ├── supabase.ts       # Supabase client
-│   └── utils.ts          # Utility functions
-├── hooks/                # Custom React hooks
-├── public/               # Static assets
-│   ├── *.webp           # Optimized images
-│   └── *.svg            # Vector graphics
-├── styles/               # Additional styles
-│   └── animations.css   # Custom animations
-├── docs/                 # Project documentation
-├── scripts/              # Build and deployment scripts
-├── .github/              # GitHub workflows and templates
-└── Docker files          # Container configuration
+├── frontend/              # Next.js application (organized)
+│   ├── app/              # Next.js app directory (App Router)
+│   │   ├── about/        # About page
+│   │   ├── api/          # API routes
+│   │   ├── auth/         # Authentication pages
+│   │   ├── consulting/   # Consulting services page
+│   │   ├── contact/      # Contact page
+│   │   └── ...           # Other pages
+│   ├── components/       # Reusable React components
+│   │   ├── ui/          # Shadcn/ui component library
+│   │   ├── consulting/  # Consulting-specific components
+│   │   └── ...          # Other components
+│   ├── lib/             # Utility functions and configurations
+│   ├── hooks/           # Custom React hooks
+│   ├── styles/          # CSS and styling
+│   ├── public/          # Static assets
+│   ├── package.json     # Frontend dependencies
+│   └── README.md        # Frontend documentation
+├── backend/              # Python ADK agent system
+│   ├── agent/           # Main agent implementation (preserved structure)
+│   │   ├── my_adk_agent/    # CustomerJourneyAgent
+│   │   ├── n8n_mcp_agent/   # N8nMCPAgent
+│   │   └── specialized_agents/ # Domain-specific agents
+│   ├── services/        # External service integrations
+│   ├── tests/           # Backend tests
+│   ├── pyproject.toml   # Python dependencies
+│   └── README.md        # Backend documentation
+├── infrastructure/       # Deployment and infrastructure
+│   ├── docker/          # Docker configurations
+│   ├── scripts/         # Deployment scripts
+│   ├── nginx/           # Nginx configurations
+│   ├── ssl/             # SSL certificates
+│   ├── monitoring/      # Monitoring setup
+│   ├── cleanup/         # Project cleanup tools
+│   └── README.md        # Infrastructure documentation
+├── docs/                # Project documentation
+│   ├── deployment/      # Deployment guides
+│   ├── monitoring/      # Monitoring documentation
+│   └── ...              # Other documentation
+├── tests/               # Integration and E2E tests
+├── tools/               # Development tools and utilities
+├── .github/             # GitHub workflows and templates
+├── workspace.json       # Workspace configuration
+├── package.json         # Root workspace management
+└── .env.example         # Environment variables template
 ```
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
+#### Frontend Requirements
 - **Node.js** 18+ (LTS recommended)
-- **npm** 9+ or **yarn** 1.22+
+- **npm** 9+ (comes with Node.js)
 - **Git** for version control
+
+#### Backend Requirements
+- **Python** 3.11+ (required for backend agent)
+- **uv** (modern Python package manager) - [Install from here](https://docs.astral.sh/uv/)
 - **Docker** (optional, for containerized deployment)
 
-### Quick Start
+#### Install uv (Python Package Manager)
+```bash
+# Install uv (cross-platform)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Verify installation
+uv --version
+```
+
+### Quick Start (Full Stack)
 
 1. **Clone the repository**
    ```bash
@@ -122,60 +160,144 @@ Visit our website: **[https://consulting.sa](https://consulting.sa)**
    cd website
    ```
 
-2. **Install dependencies**
+2. **Set up environment variables**
    ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-   ```bash
-   cp .env.example .env.local
+   cp .env.example .env
    ```
    
    Configure your environment variables:
    ```env
-   # Supabase Configuration
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   # Core Application
+   NODE_ENV=development
+   PYTHONPATH=/app/agent
+   
+   # Supabase Configuration (Required)
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_KEY=your_supabase_service_key
+   
+   # AI Services (Optional)
+   GEMINI_API_KEY=your_gemini_api_key
    
    # Contact Configuration
    NEXT_PUBLIC_CONTACT_EMAIL=asim@consulting.sa
    
-   # Analytics (optional)
-   NEXT_PUBLIC_GA_ID=your_google_analytics_id
+   # Application Ports
+   FRONTEND_PORT=3000
+   BACKEND_PORT=8000
    ```
 
-4. **Run the development server**
+3. **Install Frontend Dependencies**
    ```bash
-   npm run dev
+   cd frontend
+   npm install
+   cd ..
    ```
 
-5. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+4. **Install Backend Dependencies**
+   ```bash
+   cd backend
+   uv sync
+   cd agent
+   uv sync
+   cd ../..
+   ```
+
+5. **Start Development Servers**
+   
+   **Terminal 1 - Frontend:**
+   ```bash
+   cd frontend
+   npm run dev
+   # Frontend will be available at http://localhost:3000
+   ```
+   
+   **Terminal 2 - Backend:**
+   ```bash
+   cd backend/agent
+   uv run python main.py
+   # Backend agent will start and process test inquiries
+   ```
+
+6. **Verify Setup**
+   - **Frontend**: Navigate to [http://localhost:3000](http://localhost:3000)
+   - **Backend**: Check terminal output for successful agent initialization
+   - **Health Check**: Visit [http://localhost:3000/api/health](http://localhost:3000/api/health)
+
+### Frontend-Only Quick Start
+
+If you only want to run the frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Backend-Only Quick Start
+
+If you only want to run the backend agent:
+
+```bash
+cd backend
+uv sync
+cd agent
+uv sync
+uv run python main.py
+```
 
 ## 📜 Available Scripts
 
-### Development
+### Frontend Scripts (from frontend/ directory)
+#### Development
 - `npm run dev` - Start development server with hot reload
 - `npm run build` - Build optimized production bundle
 - `npm run start` - Start production server
 - `npm run clean` - Clean build artifacts and cache
 
-### Code Quality
+#### Code Quality
 - `npm run lint` - Run ESLint with auto-fix
 - `npm run lint:check` - Check linting without fixing
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check code formatting
 - `npm run type-check` - Run TypeScript type checking
 
-### Analysis & Testing
+#### Analysis & Testing
 - `npm run analyze` - Analyze bundle size with webpack-bundle-analyzer
 - `npm run test` - Run tests (placeholder for future implementation)
 
-### Docker Deployment
-- `npm run docker:build` - Build Docker image
-- `npm run docker:run` - Run Docker container
-- `npm run docker:compose` - Run with Docker Compose
+### Backend Scripts (using uv from backend/ directory)
+#### Development
+- `uv sync` - Install/sync Python dependencies
+- `uv run python agent/main.py` - Start CustomerJourneyAgent
+- `uv run python agent/api_server.py` - Start FastAPI server (if available)
+
+#### Code Quality (from backend/ directory)
+- `uv run black .` - Format Python code with Black
+- `uv run isort .` - Sort Python imports
+- `uv run mypy agent/` - Run type checking with mypy
+- `uv run flake8 agent/` - Run linting with flake8
+
+#### Testing (from backend/ directory)
+- `uv run pytest tests/` - Run backend tests
+- `uv run pytest tests/ -v` - Run tests with verbose output
+- `uv run pytest tests/ --cov=agent` - Run tests with coverage
+
+#### Agent-Specific Scripts (from backend/agent/ directory)
+- `uv run python main.py` - Start main CustomerJourneyAgent
+- `uv run python test_agent.py` - Run agent tests
+- `uv run python test_multi_agent_system.py` - Test multi-agent system
+- `uv run python test_n8n_mcp_integration.py` - Test n8n MCP integration
+
+### Full Stack Scripts (from root directory)
+#### Local Testing
+- `./test-organized-structure.sh` - Run comprehensive structure tests
+- `./LOCAL_TESTING_GUIDE.md` - Follow local testing guide
+
+#### Docker Deployment
+- `docker-compose up --build` - Build and run full stack
+- `docker-compose -f infrastructure/docker/docker-compose.production.yml up -d` - Production deployment
+- `./infrastructure/scripts/deploy-organized.sh` - Deploy with organized structure
 
 ## 🌐 Features
 

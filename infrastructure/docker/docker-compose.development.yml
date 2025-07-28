@@ -1,0 +1,203 @@
+version: '3.8'
+
+services:
+  # Frontend Service - Next.js Development
+  frontend-dev:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.frontend
+      args:
+        - NODE_ENV=development
+        - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+        - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+    container_name: agentic-frontend-dev
+    ports:
+      - "3001:3000"  # Different port to avoid conflicts
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      
+      # Supabase Configuration
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      
+      # Contact Configuration
+      - NEXT_PUBLIC_CONTACT_EMAIL=${NEXT_PUBLIC_CONTACT_EMAIL:-asim@consulting.sa}
+      
+      # Analytics (disabled for dev)
+      - NEXT_PUBLIC_GA_ID=
+      
+      # Development Site Configuration
+      - NEXT_PUBLIC_SITE_URL=${DEV_SITE_URL:-https://dev.consulting.sa}
+      - NEXT_PUBLIC_ADMIN_URL=${DEV_ADMIN_URL:-https://dev.consulting.sa/api}
+      - NEXT_PUBLIC_BACKEND_URL=http://backend-dev:8001
+      - FORCE_HTTPS=true
+      
+    depends_on:
+      - backend-dev
+      - redis-dev
+    restart: unless-stopped
+    volumes:
+      # Mount source code for hot reloading
+      - ../../frontend:/app:ro
+      - /app/node_modules
+      - /app/.next
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - agentic-dev-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Backend Service - Python Agent Development
+  backend-dev:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.backend
+    container_name: agentic-backend-dev
+    ports:
+      - "8001:8001"  # Different port to avoid conflicts
+    environment:
+      - NODE_ENV=development
+      - PYTHONPATH=/app/agent
+      - ADK_AGENT_PORT=8001
+      - ADK_LOG_LEVEL=DEBUG  # More verbose logging for dev
+      
+      # Database Configuration (can use same Supabase project with different tables)
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      
+      # AI Services (same keys, but with dev prefixes in logs)
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      
+      # Payment Integration (use Stripe test keys)
+      - STRIPE_SECRET_KEY=${STRIPE_TEST_SECRET_KEY}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_TEST_PUBLISHABLE_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_TEST_WEBHOOK_SECRET}
+      
+      # Communication Services (can use same or separate dev instance)
+      - LIVEKIT_URL=${LIVEKIT_DEV_URL:-${LIVEKIT_URL}}
+      - LIVEKIT_API_KEY=${LIVEKIT_DEV_API_KEY:-${LIVEKIT_API_KEY}}
+      - LIVEKIT_API_SECRET=${LIVEKIT_DEV_API_SECRET:-${LIVEKIT_API_SECRET}}
+      
+      # Workflow Automation (separate dev n8n instance)
+      - N8N_URL=${N8N_DEV_URL:-http://n8n-dev:5678}
+      - N8N_BASE_URL=${N8N_DEV_URL:-http://n8n-dev:5678}
+      - N8N_API_KEY=${N8N_DEV_API_KEY:-${N8N_API_KEY}}
+      
+      # MCP Server Configuration
+      - MCP_SERVER_URL=http://localhost:8001
+      - MCP_SERVER_PORT=8001
+      - N8N_MCP_PORT=8004  # Different port for dev
+      
+      # GitHub Integration
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      
+      # Development Configuration
+      - COMPOSE_PROJECT_NAME=agentic-dev
+      - DOMAIN=dev.consulting.sa
+      
+      # Development flags
+      - DEBUG=true
+      - VERBOSE_LOGGING=true
+      
+    depends_on:
+      - redis-dev
+    restart: unless-stopped
+    volumes:
+      # Mount source code for development
+      - ../../backend:/app:rw
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - agentic-dev-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Redis Cache Development
+  redis-dev:
+    image: redis:7-alpine
+    container_name: agentic-redis-dev
+    ports:
+      - "6380:6379"  # Different port to avoid conflicts
+    volumes:
+      - redis_dev_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - agentic-dev-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  # Development n8n instance (optional)
+  n8n-dev:
+    image: n8nio/n8n:latest
+    container_name: agentic-n8n-dev
+    ports:
+      - "5679:5678"  # Different port for dev
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=devpassword
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=development
+      - WEBHOOK_URL=http://dev.consulting.sa:5679
+    volumes:
+      - n8n_dev_data:/home/node/.n8n
+    restart: unless-stopped
+    networks:
+      - agentic-dev-network
+
+  # Nginx reverse proxy for development
+  nginx-dev:
+    image: nginx:alpine
+    container_name: agentic-nginx-dev
+    ports:
+      - "8080:80"  # Different port for dev
+    volumes:
+      - ../../infrastructure/nginx/development.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend-dev
+      - backend-dev
+    restart: unless-stopped
+    networks:
+      - agentic-dev-network
+
+networks:
+  agentic-dev-network:
+    driver: bridge
+    name: agentic-dev-network
+
+volumes:
+  redis_dev_data:
+    driver: local
+  n8n_dev_data:
+    driver: local

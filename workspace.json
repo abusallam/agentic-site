@@ -1,0 +1,32 @@
+{
+  "name": "agentic-ai-platform",
+  "version": "1.0.0",
+  "description": "AI consulting SaaS platform with dual-agent architecture",
+  "type": "workspace",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "structure": {
+    "frontend": "Next.js application and React components",
+    "backend": "Python ADK agent system",
+    "infrastructure": "Deployment and infrastructure code",
+    "docs": "Documentation and guides",
+    "tests": "Integration and E2E tests",
+    "tools": "Development tools and utilities"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace=frontend",
+    "build": "npm run build --workspace=frontend",
+    "test": "npm run test --workspace=frontend && cd backend && python -m pytest",
+    "lint": "npm run lint --workspace=frontend && cd backend && python -m flake8",
+    "format": "npm run format --workspace=frontend && cd backend && python -m black .",
+    "deploy": "./infrastructure/scripts/deploy.sh",
+    "clean": "npm run clean --workspace=frontend && cd backend && find . -name __pycache__ -exec rm -rf {} +",
+    "analyze": "python infrastructure/cleanup/project_analyzer.py"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3"
+  }
+}

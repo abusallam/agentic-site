@@ -1,0 +1,27 @@
+# Infrastructure specific ignores
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# SSL certificates (keep examples)
+ssl/*.key
+ssl/*.crt
+!ssl/*.example
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Ansible
+*.retry
+
+# Monitoring data
+monitoring/data/
+prometheus_data/
+grafana_data/
+
+# Backup files
+backup_*/
+*.backup

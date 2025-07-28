@@ -7,11 +7,11 @@ Analyzes current project structure and creates backup before cleanup
 import os
 import json
 import shutil
-import hashlib
-from datetime import datetime
+import datetime
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, Optional
-import fnmatch
+import hashlib
+import subprocess
 
 class ProjectAnalyzer:
     def __init__(self, project_root: str = "."):
@@ -19,53 +19,59 @@ class ProjectAnalyzer:
         self.analysis_results = {}
         self.backup_dir = None
         
-        # File categories for organization
-        self.file_categories = {
+        # Define file categories
+        self.categories = {
             'frontend': {
-                'patterns': ['app/**/*', 'components/**/*', 'lib/**/*', 'public/**/*', 
-                           'styles/**/*', 'hooks/**/*', 'next.config.*', 'tailwind.config.*'],
-                'extensions': ['.tsx', '.jsx', '.css', '.scss']
+                'patterns': ['app/', 'components/', 'lib/', 'hooks/', 'styles/', 'public/'],
+                'extensions': ['.tsx', '.ts', '.css', '.scss', '.js', '.jsx'],
+                'configs': ['next.config.mjs', 'tailwind.config.ts', 'postcss.config.mjs']
             },
             'backend': {
-                'patterns': ['agent/**/*', 'pyproject.toml', 'uv.lock'],
-                'extensions': ['.py']
+                'patterns': ['agent/', 'api_server.py', 'main.py'],
+                'extensions': ['.py'],
+                'configs': ['pyproject.toml', 'requirements.txt', 'uv.lock']
             },
             'infrastructure': {
-                'patterns': ['Dockerfile*', 'docker-compose*', 'scripts/**/*', 
-                           'deploy*.sh', '*.sh'],
-                'extensions': ['.sh', '.yml', '.yaml']
+                'patterns': ['scripts/', 'nginx/', 'ssl/', 'monitoring/', 'infrastructure/'],
+                'extensions': ['.sh', '.yml', '.yaml', '.conf'],
+                'configs': ['docker-compose*.yml', 'Dockerfile*', 'deploy.sh']
             },
-            'config': {
-                'patterns': ['.env*', '*.json', '*.config.*', '.eslintrc*', 
-                           '.prettierrc*', 'tsconfig.json', 'package*.json'],
-                'extensions': ['.json', '.env']
+            'documentation': {
+                'patterns': ['docs/', 'README.md', 'CONTRIBUTING.md'],
+                'extensions': ['.md', '.txt'],
+                'configs': []
             },
-            'docs': {
-                'patterns': ['docs/**/*', '*.md', 'README*', 'CONTRIBUTING*', 'LICENSE'],
-                'extensions': ['.md', '.txt']
+            'testing': {
+                'patterns': ['tests/', 'coverage/'],
+                'extensions': ['.test.ts', '.test.js', '.spec.ts', '.spec.js'],
+                'configs': ['jest.config.js', 'jest.setup.js', 'playwright.config.ts']
             },
-            'tests': {
-                'patterns': ['tests/**/*', '**/*.test.*', '**/*.spec.*'],
-                'extensions': ['.py', '.js', '.ts']
+            'configuration': {
+                'patterns': ['.env*', '.git*', '.eslint*', '.prettier*'],
+                'extensions': ['.json', '.config.js', '.config.ts'],
+                'configs': ['package.json', 'tsconfig.json', 'components.json']
             },
-            'temp_cleanup': {
-                'patterns': ['*cleanup*', '*analysis*', '*log*', '*backup*', 
-                           'analyze_*.py', 'execute_*.py', 'fix_*.py', 'setup_*.py',
-                           'test_*.py', 'create_*.py', 'deploy_*.py', 'resolve_*.py',
-                           'organize_*.py', 'comprehensive_*.py', 'connection_*.py'],
-                'extensions': ['.json', '.log']
+            'temporary': {
+                'patterns': ['archive/', '.next/', 'node_modules/', '.venv/', '__pycache__/'],
+                'extensions': ['.log', '.tmp', '.cache'],
+                'configs': []
+            },
+            'external': {
+                'patterns': ['n8n-mcp/', 'tools/'],
+                'extensions': [],
+                'configs': []
             }
         }
         
-        # Directories to ignore during analysis
-        self.ignore_patterns = [
-            '.git', '.next', 'node_modules', '.venv', '__pycache__', 
-            '.pytest_cache', 'dist', 'build', '.cache', '.kiro'
-        ]
+        # Files to ignore during analysis
+        self.ignore_patterns = {
+            '.git/', 'node_modules/', '.next/', '__pycache__/', '.venv/',
+            '*.pyc', '*.pyo', '*.pyd', '.DS_Store', 'Thumbs.db'
+        }
 
     def create_backup(self) -> str:
         """Create a full backup of the project before cleanup"""
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         backup_name = f"project_backup_{timestamp}"
         self.backup_dir = self.project_root.parent / backup_name
         
@@ -75,9 +81,11 @@ class ProjectAnalyzer:
             # Create backup directory
             self.backup_dir.mkdir(exist_ok=True)
             
-            # Copy entire project (excluding large directories)
+            # Copy entire project (excluding some large directories)
+            exclude_dirs = {'.git', 'node_modules', '.next', '__pycache__', '.venv'}
+            
             for item in self.project_root.iterdir():
-                if item.name not in ['.git', 'node_modules', '.next', '.venv', '__pycache__']:
+                if item.name not in exclude_dirs:
                     if item.is_dir():
                         shutil.copytree(item, self.backup_dir / item.name, 
                                       ignore=shutil.ignore_patterns('*.pyc', '__pycache__'))
@@ -86,49 +94,42 @@ class ProjectAnalyzer:
             
             # Create backup manifest
             manifest = {
-                'backup_created': timestamp,
+                'backup_date': timestamp,
                 'original_path': str(self.project_root),
                 'backup_path': str(self.backup_dir),
-                'files_backed_up': self._count_files(self.backup_dir)
+                'excluded_dirs': list(exclude_dirs)
             }
             
             with open(self.backup_dir / 'backup_manifest.json', 'w') as f:
                 json.dump(manifest, f, indent=2)
             
-            print(f"✅ Backup created successfully: {backup_name}")
+            print(f"✅ Backup created successfully: {self.backup_dir}")
             return str(self.backup_dir)
             
         except Exception as e:
             print(f"❌ Backup failed: {e}")
             raise
 
-    def analyze_project_structure(self) -> Dict:
+    def analyze_file_structure(self) -> Dict:
         """Analyze current project structure and categorize files"""
         print("🔍 Analyzing project structure...")
         
         analysis = {
-            'timestamp': datetime.now().isoformat(),
-            'project_root': str(self.project_root),
             'total_files': 0,
             'total_directories': 0,
-            'file_categories': {},
+            'categories': {cat: {'files': [], 'size': 0} for cat in self.categories.keys()},
             'duplicates': [],
-            'large_files': [],
-            'issues': []
+            'issues': [],
+            'recommendations': []
         }
         
-        # Initialize category counters
-        for category in self.file_categories:
-            analysis['file_categories'][category] = {
-                'files': [],
-                'count': 0,
-                'total_size': 0
-            }
+        # Add uncategorized category
+        analysis['categories']['uncategorized'] = {'files': [], 'size': 0}
         
         # Walk through project directory
         for root, dirs, files in os.walk(self.project_root):
             # Skip ignored directories
-            dirs[:] = [d for d in dirs if not any(fnmatch.fnmatch(d, pattern) for pattern in self.ignore_patterns)]
+            dirs[:] = [d for d in dirs if not self._should_ignore(d)]
             
             root_path = Path(root)
             relative_root = root_path.relative_to(self.project_root)
@@ -136,172 +137,281 @@ class ProjectAnalyzer:
             analysis['total_directories'] += 1
             
             for file in files:
+                if self._should_ignore(file):
+                    continue
+                    
                 file_path = root_path / file
                 relative_path = file_path.relative_to(self.project_root)
                 
-                try:
-                    file_size = file_path.stat().st_size
-                    analysis['total_files'] += 1
-                    
-                    # Categorize file
-                    category = self._categorize_file(relative_path)
-                    if category:
-                        analysis['file_categories'][category]['files'].append({
-                            'path': str(relative_path),
-                            'size': file_size,
-                            'modified': file_path.stat().st_mtime
-                        })
-                        analysis['file_categories'][category]['count'] += 1
-                        analysis['file_categories'][category]['total_size'] += file_size
-                    
-                    # Check for large files (>10MB)
-                    if file_size > 10 * 1024 * 1024:
-                        analysis['large_files'].append({
-                            'path': str(relative_path),
-                            'size': file_size,
-                            'size_mb': round(file_size / (1024 * 1024), 2)
-                        })
+                analysis['total_files'] += 1
                 
-                except (OSError, PermissionError) as e:
-                    analysis['issues'].append(f"Cannot access {relative_path}: {e}")
+                # Categorize file
+                category = self._categorize_file(relative_path)
+                file_info = {
+                    'path': str(relative_path),
+                    'size': file_path.stat().st_size if file_path.exists() else 0,
+                    'category': category
+                }
+                
+                analysis['categories'][category]['files'].append(file_info)
+                analysis['categories'][category]['size'] += file_info['size']
         
-        # Identify potential duplicates
+        # Detect duplicates
         analysis['duplicates'] = self._find_duplicates()
         
         # Identify issues
-        analysis['issues'].extend(self._identify_issues())
+        analysis['issues'] = self._identify_issues()
+        
+        # Generate recommendations
+        analysis['recommendations'] = self._generate_recommendations(analysis)
         
         self.analysis_results = analysis
         return analysis
 
-    def _categorize_file(self, file_path: Path) -> Optional[str]:
-        """Categorize a file based on patterns and extensions"""
-        file_str = str(file_path)
-        file_ext = file_path.suffix.lower()
+    def _should_ignore(self, path: str) -> bool:
+        """Check if path should be ignored"""
+        for pattern in self.ignore_patterns:
+            if pattern.endswith('/') and path.startswith(pattern[:-1]):
+                return True
+            if pattern.startswith('*.') and path.endswith(pattern[1:]):
+                return True
+            if pattern == path:
+                return True
+        return False
+
+    def _categorize_file(self, file_path: Path) -> str:
+        """Categorize a file based on its path and extension"""
+        path_str = str(file_path)
+        file_ext = file_path.suffix
+        file_name = file_path.name
         
-        for category, rules in self.file_categories.items():
+        for category, rules in self.categories.items():
             # Check patterns
             for pattern in rules['patterns']:
-                if fnmatch.fnmatch(file_str, pattern) or fnmatch.fnmatch(file_path.name, pattern):
+                if path_str.startswith(pattern) or pattern in path_str:
                     return category
             
             # Check extensions
-            if file_ext in rules.get('extensions', []):
+            if file_ext in rules['extensions']:
                 return category
+                
+            # Check specific config files
+            if file_name in rules['configs']:
+                return category
+                
+            # Check config patterns
+            for config in rules['configs']:
+                if '*' in config and file_name.startswith(config.replace('*', '')):
+                    return category
         
         return 'uncategorized'
 
     def _find_duplicates(self) -> List[Dict]:
-        """Find potential duplicate files"""
+        """Find duplicate files based on content hash"""
+        print("🔍 Detecting duplicate files...")
+        
+        file_hashes = {}
         duplicates = []
         
-        # Look for common duplicate patterns
-        duplicate_patterns = [
-            ('Dockerfile', 'Dockerfile.*'),
-            ('docker-compose.yml', 'docker-compose.*.yml'),
-            ('.env', '.env.*'),
-            ('package.json', 'package-lock.json')
-        ]
-        
-        for base_pattern, variant_pattern in duplicate_patterns:
-            base_files = list(self.project_root.glob(base_pattern))
-            variant_files = list(self.project_root.glob(variant_pattern))
+        for root, dirs, files in os.walk(self.project_root):
+            dirs[:] = [d for d in dirs if not self._should_ignore(d)]
             
-            if len(base_files) > 0 and len(variant_files) > 0:
-                duplicates.append({
-                    'type': 'configuration_variants',
-                    'base_files': [str(f.relative_to(self.project_root)) for f in base_files],
-                    'variant_files': [str(f.relative_to(self.project_root)) for f in variant_files],
-                    'recommendation': 'consolidate_configs'
-                })
+            for file in files:
+                if self._should_ignore(file):
+                    continue
+                    
+                file_path = Path(root) / file
+                
+                try:
+                    # Calculate file hash
+                    with open(file_path, 'rb') as f:
+                        file_hash = hashlib.md5(f.read()).hexdigest()
+                    
+                    if file_hash in file_hashes:
+                        duplicates.append({
+                            'hash': file_hash,
+                            'files': [file_hashes[file_hash], str(file_path.relative_to(self.project_root))],
+                            'size': file_path.stat().st_size
+                        })
+                    else:
+                        file_hashes[file_hash] = str(file_path.relative_to(self.project_root))
+                        
+                except (IOError, OSError):
+                    continue
         
         return duplicates
 
-    def _identify_issues(self) -> List[str]:
+    def _identify_issues(self) -> List[Dict]:
         """Identify structural issues in the project"""
         issues = []
         
-        # Check for root directory clutter
-        root_files = [f for f in self.project_root.iterdir() if f.is_file()]
-        if len(root_files) > 20:
-            issues.append(f"Root directory has {len(root_files)} files - consider organizing into subdirectories")
-        
         # Check for multiple Docker files
-        docker_files = list(self.project_root.glob("Dockerfile*"))
-        if len(docker_files) > 3:
-            issues.append(f"Found {len(docker_files)} Docker files - consider consolidating")
+        docker_files = []
+        for root, dirs, files in os.walk(self.project_root):
+            for file in files:
+                if file.startswith('Dockerfile') or file.startswith('docker-compose'):
+                    docker_files.append(str(Path(root, file).relative_to(self.project_root)))
         
-        # Check for temporary files in root
-        temp_files = [f for f in root_files if any(pattern in f.name.lower() 
-                     for pattern in ['temp', 'backup', 'old', 'test_', 'fix_'])]
-        if temp_files:
-            issues.append(f"Found {len(temp_files)} temporary files in root directory")
+        if len(docker_files) > 3:
+            issues.append({
+                'type': 'multiple_docker_configs',
+                'severity': 'medium',
+                'description': f'Found {len(docker_files)} Docker configuration files',
+                'files': docker_files,
+                'recommendation': 'Consolidate Docker configurations'
+            })
+        
+        # Check for scattered environment files
+        env_files = []
+        for root, dirs, files in os.walk(self.project_root):
+            for file in files:
+                if file.startswith('.env'):
+                    env_files.append(str(Path(root, file).relative_to(self.project_root)))
+        
+        if len(env_files) > 2:
+            issues.append({
+                'type': 'multiple_env_files',
+                'severity': 'low',
+                'description': f'Found {len(env_files)} environment files',
+                'files': env_files,
+                'recommendation': 'Consolidate to .env and .env.example'
+            })
+        
+        # Check for root directory clutter
+        root_files = [f for f in os.listdir(self.project_root) 
+                     if os.path.isfile(os.path.join(self.project_root, f))]
+        
+        if len(root_files) > 20:
+            issues.append({
+                'type': 'root_clutter',
+                'severity': 'high',
+                'description': f'Root directory has {len(root_files)} files',
+                'files': root_files[:10],  # Show first 10
+                'recommendation': 'Move configuration files to appropriate subdirectories'
+            })
         
         return issues
 
-    def _count_files(self, directory: Path) -> int:
-        """Count total files in directory"""
-        count = 0
-        for root, dirs, files in os.walk(directory):
-            count += len(files)
-        return count
+    def _generate_recommendations(self, analysis: Dict) -> List[Dict]:
+        """Generate cleanup recommendations based on analysis"""
+        recommendations = []
+        
+        # Frontend organization
+        frontend_files = len(analysis['categories']['frontend']['files'])
+        if frontend_files > 0:
+            recommendations.append({
+                'category': 'frontend',
+                'action': 'organize',
+                'description': f'Organize {frontend_files} frontend files into frontend/ directory',
+                'priority': 'high'
+            })
+        
+        # Backend organization
+        backend_files = len(analysis['categories']['backend']['files'])
+        if backend_files > 0:
+            recommendations.append({
+                'category': 'backend',
+                'action': 'organize',
+                'description': f'Ensure {backend_files} backend files are properly organized in agent/ directory',
+                'priority': 'high'
+            })
+        
+        # Infrastructure consolidation
+        infra_files = len(analysis['categories']['infrastructure']['files'])
+        if infra_files > 10:
+            recommendations.append({
+                'category': 'infrastructure',
+                'action': 'consolidate',
+                'description': f'Consolidate {infra_files} infrastructure files into infrastructure/ directory',
+                'priority': 'medium'
+            })
+        
+        # Temporary file cleanup
+        temp_files = len(analysis['categories']['temporary']['files'])
+        if temp_files > 0:
+            recommendations.append({
+                'category': 'temporary',
+                'action': 'cleanup',
+                'description': f'Remove or archive {temp_files} temporary files',
+                'priority': 'low'
+            })
+        
+        return recommendations
 
     def generate_report(self, output_file: str = None) -> str:
         """Generate detailed analysis report"""
         if not self.analysis_results:
-            raise ValueError("No analysis results available. Run analyze_project_structure() first.")
+            raise ValueError("No analysis results available. Run analyze_file_structure() first.")
         
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        if not output_file:
-            output_file = f"project_analysis_report_{timestamp}.json"
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
-        # Add summary statistics
-        report = self.analysis_results.copy()
-        report['summary'] = {
-            'total_files': report['total_files'],
-            'total_directories': report['total_directories'],
-            'categories_found': len([cat for cat, data in report['file_categories'].items() if data['count'] > 0]),
-            'issues_found': len(report['issues']),
-            'duplicates_found': len(report['duplicates']),
-            'large_files_found': len(report['large_files'])
-        }
+        report = f"""
+# Project Structure Analysis Report
+Generated: {timestamp}
+Project: {self.project_root}
+
+## Summary
+- Total Files: {self.analysis_results['total_files']}
+- Total Directories: {self.analysis_results['total_directories']}
+- Backup Location: {self.backup_dir}
+
+## File Categories
+"""
         
-        # Save report
-        output_path = self.project_root / output_file
-        with open(output_path, 'w') as f:
-            json.dump(report, f, indent=2)
+        for category, data in self.analysis_results['categories'].items():
+            file_count = len(data['files'])
+            size_mb = data['size'] / (1024 * 1024)
+            report += f"- **{category.title()}**: {file_count} files ({size_mb:.1f} MB)\n"
         
-        print(f"📊 Analysis report saved: {output_file}")
-        return str(output_path)
+        report += "\n## Issues Found\n"
+        for issue in self.analysis_results['issues']:
+            report += f"- **{issue['type']}** ({issue['severity']}): {issue['description']}\n"
+        
+        report += "\n## Recommendations\n"
+        for rec in self.analysis_results['recommendations']:
+            report += f"- **{rec['category'].title()}** ({rec['priority']}): {rec['description']}\n"
+        
+        report += "\n## Duplicates Found\n"
+        for dup in self.analysis_results['duplicates']:
+            report += f"- Files: {', '.join(dup['files'])} (Size: {dup['size']} bytes)\n"
+        
+        if output_file:
+            with open(output_file, 'w') as f:
+                f.write(report)
+            print(f"📄 Report saved to: {output_file}")
+        
+        return report
 
     def create_rollback_script(self) -> str:
-        """Create rollback script to restore original structure"""
+        """Create a rollback script to restore original structure"""
         if not self.backup_dir:
             raise ValueError("No backup created. Run create_backup() first.")
         
         rollback_script = f"""#!/bin/bash
-# Rollback script generated on {datetime.now().isoformat()}
-# This script restores the project to its original state
+# Rollback script to restore original project structure
+# Generated: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 
 set -e
 
 BACKUP_DIR="{self.backup_dir}"
 PROJECT_DIR="{self.project_root}"
 
-echo "🔄 Rolling back project to original state..."
-echo "Backup location: $BACKUP_DIR"
-echo "Project location: $PROJECT_DIR"
+echo "🔄 Rolling back project structure..."
+echo "Backup: $BACKUP_DIR"
+echo "Project: $PROJECT_DIR"
 
-# Verify backup exists
-if [ ! -d "$BACKUP_DIR" ]; then
-    echo "❌ Backup directory not found: $BACKUP_DIR"
+# Confirm rollback
+read -p "Are you sure you want to rollback? This will overwrite current changes. (y/N): " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Rollback cancelled."
     exit 1
 fi
 
-# Create rollback backup of current state
-ROLLBACK_BACKUP="${{PROJECT_DIR}}_rollback_$(date +%Y%m%d_%H%M%S)"
-echo "Creating rollback backup at: $ROLLBACK_BACKUP"
-cp -r "$PROJECT_DIR" "$ROLLBACK_BACKUP"
+# Create temporary backup of current state
+TEMP_BACKUP="$PROJECT_DIR/../temp_backup_$(date +%Y%m%d_%H%M%S)"
+echo "Creating temporary backup of current state: $TEMP_BACKUP"
+cp -r "$PROJECT_DIR" "$TEMP_BACKUP"
 
 # Remove current project files (except .git)
 echo "Removing current project files..."
@@ -311,8 +421,9 @@ find "$PROJECT_DIR" -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {{}} +
 echo "Restoring from backup..."
 cp -r "$BACKUP_DIR"/* "$PROJECT_DIR/"
 
-echo "✅ Rollback completed successfully"
-echo "Current state backed up to: $ROLLBACK_BACKUP"
+echo "✅ Rollback completed successfully!"
+echo "Current state backed up to: $TEMP_BACKUP"
+echo "You can remove it if rollback was successful."
 """
         
         rollback_path = self.project_root / "rollback_cleanup.sh"
@@ -322,12 +433,12 @@ echo "Current state backed up to: $ROLLBACK_BACKUP"
         # Make script executable
         os.chmod(rollback_path, 0o755)
         
-        print(f"🔄 Rollback script created: rollback_cleanup.sh")
+        print(f"📜 Rollback script created: {rollback_path}")
         return str(rollback_path)
 
 def main():
-    """Main execution function"""
-    print("🚀 Starting Project Analysis and Backup System")
+    """Main function to run project analysis"""
+    print("🚀 Starting Project Structure Analysis and Backup")
     print("=" * 50)
     
     analyzer = ProjectAnalyzer()
@@ -335,45 +446,37 @@ def main():
     try:
         # Create backup
         backup_path = analyzer.create_backup()
-        print(f"Backup created at: {backup_path}")
         
-        # Analyze project structure
-        analysis = analyzer.analyze_project_structure()
+        # Analyze structure
+        analysis = analyzer.analyze_file_structure()
         
         # Generate report
-        report_path = analyzer.generate_report()
+        report_path = "infrastructure/cleanup/project_analysis_report.md"
+        os.makedirs(os.path.dirname(report_path), exist_ok=True)
+        analyzer.generate_report(report_path)
         
         # Create rollback script
-        rollback_path = analyzer.create_rollback_script()
+        rollback_script = analyzer.create_rollback_script()
         
-        # Print summary
+        # Save analysis results as JSON
+        analysis_json_path = "infrastructure/cleanup/project_analysis.json"
+        with open(analysis_json_path, 'w') as f:
+            json.dump(analysis, f, indent=2)
+        
         print("\n" + "=" * 50)
-        print("📊 ANALYSIS SUMMARY")
-        print("=" * 50)
-        print(f"Total Files: {analysis['total_files']}")
-        print(f"Total Directories: {analysis['total_directories']}")
-        print(f"Issues Found: {len(analysis['issues'])}")
-        print(f"Duplicates Found: {len(analysis['duplicates'])}")
-        print(f"Large Files: {len(analysis['large_files'])}")
-        
-        print("\n📁 FILE CATEGORIES:")
-        for category, data in analysis['file_categories'].items():
-            if data['count'] > 0:
-                size_mb = round(data['total_size'] / (1024 * 1024), 2)
-                print(f"  {category}: {data['count']} files ({size_mb} MB)")
-        
-        if analysis['issues']:
-            print("\n⚠️  ISSUES IDENTIFIED:")
-            for issue in analysis['issues']:
-                print(f"  - {issue}")
-        
-        print(f"\n✅ Analysis complete!")
+        print("✅ Analysis completed successfully!")
         print(f"📄 Report: {report_path}")
+        print(f"📊 Data: {analysis_json_path}")
         print(f"💾 Backup: {backup_path}")
-        print(f"🔄 Rollback: {rollback_path}")
+        print(f"📜 Rollback: {rollback_script}")
+        print("\nNext steps:")
+        print("1. Review the analysis report")
+        print("2. Plan the cleanup strategy")
+        print("3. Execute cleanup tasks incrementally")
+        print("4. Use rollback script if needed")
         
     except Exception as e:
-        print(f"❌ Error during analysis: {e}")
+        print(f"❌ Analysis failed: {e}")
         raise
 
 if __name__ == "__main__":

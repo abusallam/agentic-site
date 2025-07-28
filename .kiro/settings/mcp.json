@@ -1,46 +1,180 @@
 {
   "mcpServers": {
-    "playwright-tools": {
+    "file-utils": {
       "command": "uv",
-      "args": ["run", "python", "src/playwright_tools/main.py"],
-      "cwd": "/home/asim/Documents/agents-mcp/servers/playwright-tools",
+      "args": [
+        "run",
+        "file-utils"
+      ],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/file-utils",
       "disabled": false,
-      "autoApprove": ["scrape_page"]
-    },
-    "n8n-tools": {
-      "command": "uv",
-      "args": ["run", "python", "src/n8n_tools/main.py"],
-      "cwd": "/home/asim/Documents/agents-mcp/servers/n8n-tools",
-      "env": {
-        "N8N_BASE_URL": "https://n8n.consulting.sa",
-        "N8N_API_KEY": "${N8N_API_KEY}"
-      },
-      "disabled": false,
-      "autoApprove": ["list_workflows", "get_executions"]
+      "autoApprove": [
+        "read_file",
+        "list_directory"
+      ]
     },
     "github-tools": {
       "command": "uv",
-      "args": ["run", "python", "src/github_tools/main.py"],
+      "args": [
+        "run",
+        "github-tools"
+      ],
       "cwd": "/home/asim/Documents/agents-mcp/servers/github-tools",
       "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+        "GITHUB_TOKEN": "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"
       },
       "disabled": false,
-      "autoApprove": ["list_repos", "get_repo_info"]
+      "autoApprove": [
+        "list_repos",
+        "get_repo_info"
+      ]
     },
-    "file-utils": {
+    "playwright-tools": {
       "command": "uv",
-      "args": ["run", "python", "src/file_utils/main.py"],
-      "cwd": "/home/asim/Documents/agents-mcp/servers/file-utils",
+      "args": [
+        "run",
+        "playwright-tools"
+      ],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/playwright-tools",
       "disabled": false,
-      "autoApprove": ["read_file", "list_directory"]
+      "autoApprove": [
+        "scrape_page"
+      ]
     },
-    "ssh-control": {
+    "n8n-tools": {
       "command": "uv",
-      "args": ["run", "python", "src/ssh_control/main.py"],
-      "cwd": "/home/asim/Documents/agents-mcp/servers/ssh-control",
+      "args": [
+        "run",
+        "n8n-tools"
+      ],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/n8n-tools",
+      "env": {
+        "N8N_BASE_URL": "https://n8n.consulting.sa",
+        "N8N_API_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3MDkyNWM4YS03MDlkLTQ4MGItODQ4Zi05MDgzOTAxNzZiZGEiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzUyOTI5NDEwfQ.fXBN7NW2U6QhAyTyh3I8xkj6-pUBWnKDWL_GoC7lLbA"
+      },
       "disabled": false,
-      "autoApprove": ["ssh_get_system_info", "ssh_execute", "ssh_monitor_resources"]
+      "autoApprove": [
+        "list_workflows",
+        "get_executions"
+      ]
+    },
+    "coolify-tools": {
+      "command": "uv",
+      "args": [
+        "run",
+        "coolify-tools"
+      ],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/coolify-tools",
+      "env": {
+        "COOLIFY_BASE_URL": "https://ai.consulting.sa",
+        "COOLIFY_API_TOKEN": "5|zBnbuNjNQBmcMVLsjn1S78cWQjK3Xdh9z8vXi61I2a6231d4"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "list_applications",
+        "list_servers"
+      ]
+    },
+    "mem0-tools": {
+      "command": "uv",
+      "args": [
+        "run",
+        "mem0-tools"
+      ],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/mem0-tools",
+      "env": {
+        "OPENAI_API_KEY": "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",
+        "QDRANT_HOST": "localhost",
+        "QDRANT_PORT": "6333"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "search_memories",
+        "get_all_memories"
+      ]
+    },
+    "filesystem-advanced": {
+      "command": "uv",
+      "args": [
+        "run",
+        "filesystem-advanced"
+      ],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/filesystem-advanced",
+      "disabled": false,
+      "autoApprove": [
+        "get_file_info",
+        "search_files"
+      ]
+    },
+    "supabase-tools": {
+      "command": "uv",
+      "args": [
+        "run",
+        "supabase-tools"
+      ],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/supabase-tools",
+      "env": {
+        "SUPABASE_URL": "https://your-project.supabase.co",
+        "SUPABASE_KEY": "your-anon-key",
+        "SUPABASE_SERVICE_KEY": "your-service-role-key"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "list_tables",
+        "get_table_schema",
+        "list_storage_files"
+      ]
+    },
+    "ssh-docker-tools": {
+      "command": "uv",
+      "args": [
+        "run",
+        "ssh-docker-tools"
+      ],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/ssh-docker-tools",
+      "env": {
+        "SSH_DEFAULT_USER": "root",
+        "SSH_DEFAULT_PORT": "22"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "ssh_connect",
+        "ssh_execute",
+        "system_metrics",
+        "health_checker",
+        "service_manager",
+        "docker_container_list"
+      ]
+    },
+    "security-pentest-tools": {
+      "command": "uv",
+      "args": [
+        "run",
+        "security-pentest-tools"
+      ],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/security-pentest-tools",
+      "disabled": false,
+      "autoApprove": [
+        "security_headers_analysis",
+        "ssl_certificate_analysis",
+        "port_scan"
+      ]
+    },
+    "context7-tools": {
+      "command": "uv",
+      "args": [
+        "run",
+        "context7-tools"
+      ],
+      "cwd": "/home/asim/Documents/agents-mcp/servers/context7-tools",
+      "disabled": false,
+      "autoApprove": [
+        "create_project_context",
+        "get_context_summary",
+        "search_code",
+        "get_file_context",
+        "generate_smart_summary"
+      ]
     }
   }
 }

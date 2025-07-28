@@ -1,0 +1,61 @@
+# Multi-stage build for Python backend
+FROM python:3.11-slim AS base
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv
+RUN pip install uv
+
+# Production runtime stage
+FROM python:3.11-slim AS runtime
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd --gid 1001 appuser && \
+    useradd --uid 1001 --gid appuser --shell /bin/bash --create-home appuser
+
+WORKDIR /app
+
+# Copy application code from backend directory
+COPY backend/ .
+
+# Install Python dependencies
+RUN pip install -r agent/requirements.txt || pip install \
+    fastapi \
+    uvicorn \
+    httpx \
+    pydantic \
+    python-dotenv \
+    supabase \
+    google-generativeai
+
+# Switch to non-root user
+USER appuser
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1
+
+# Default command
+CMD ["python", "-m", "uvicorn", "agent.api_server:app", "--host", "0.0.0.0", "--port", "8000"]

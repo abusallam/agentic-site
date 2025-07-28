@@ -1,8 +1,8 @@
 {
-  "name": "consulting-sa-website",
-  "version": "2.0.0",
+  "name": "agentic-ai-platform",
+  "version": "1.0.0",
   "private": true,
-  "description": "Professional AI consulting services and SaaS solutions by consulting.sa (المستشار.السعودية)",
+  "description": "AI consulting SaaS platform with dual-agent architecture",
   "keywords": [
     "AI consulting",
     "artificial intelligence",
@@ -13,7 +13,7 @@
     "digital transformation",
     "Saudi Arabia",
     "consulting.sa",
-    "المستشار.السعودية"
+    "\u0627\u0644\u0645\u0633\u062a\u0634\u0627\u0631.\u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629"
   ],
   "homepage": "https://consulting.sa",
   "repository": {
@@ -23,33 +23,17 @@
   "license": "MIT",
   "author": "consulting.sa <asim@consulting.sa>",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint --fix",
-    "lint:check": "next lint",
-    "type-check": "tsc --noEmit",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "analyze": "cross-env ANALYZE=true next build",
-    "clean": "rm -rf .next out node_modules/.cache",
-    "test": "jest",
-    "test:ci": "jest --ci --coverage --watchAll=false",
-    "test:watch": "jest --watch",
-    "test:e2e": "playwright test",
-    "test:e2e:staging": "playwright test --config=playwright.staging.config.ts",
-    "test:python": "python tests/run_all_tests.py",
-    "test:unit:python": "cd tests/unit && python -m pytest .",
-    "test:integration:python": "cd tests/integration && python -m pytest .",
-    "test:e2e:python": "cd tests/e2e && python -m pytest .",
-    "test:agent": "cd tests/integration/agent && python -m pytest .",
-    "cache:clear": "rm -rf .next/cache && npm run clean",
-    "docker:build": "docker build -t main-consulting-website .",
-    "docker:run": "docker run -p 3000:3000 main-consulting-website",
-    "docker:compose": "docker-compose up --build",
-    "deploy:vps": "./scripts/deploy-to-vps.sh",
-    "health:check": "./scripts/health-check.sh",
-    "prepare": "husky install || true"
+    "dev": "npm run dev --workspace=frontend",
+    "build": "npm run build --workspace=frontend",
+    "start": "npm run start --workspace=frontend",
+    "test": "npm run test --workspace=frontend",
+    "lint": "npm run lint --workspace=frontend",
+    "format": "npm run format --workspace=frontend",
+    "type-check": "npm run type-check --workspace=frontend",
+    "clean": "npm run clean --workspace=frontend",
+    "deploy": "./infrastructure/scripts/deploy.sh",
+    "analyze": "python infrastructure/cleanup/project_analyzer.py",
+    "validate": "./infrastructure/scripts/validate-deployment.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
@@ -108,26 +92,14 @@
     "zod": "^4.0.5"
   },
   "devDependencies": {
-    "@playwright/test": "^1.40.0",
-    "@testing-library/jest-dom": "^6.1.5",
-    "@testing-library/react": "^16.0.0",
-    "@testing-library/user-event": "^14.5.1",
-    "@types/jest": "^29.5.14",
-    "@types/node": "^24.0.14",
-    "@types/react": "^19.0.7",
-    "@types/react-dom": "^19.0.2",
-    "@typescript-eslint/eslint-plugin": "^8.20.0",
-    "@typescript-eslint/parser": "^8.20.0",
-    "cross-env": "^7.0.3",
-    "dotenv": "^17.2.0",
-    "eslint": "^9.31.0",
-    "eslint-config-next": "^15.4.1",
-    "husky": "^9.0.11",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
-    "prettier": "^3.2.5",
-    "prettier-plugin-tailwindcss": "^0.6.14",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.7.3"
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3"
+  },
+  "workspaces": [
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }
