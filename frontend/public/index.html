@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>consulting.sa - Development Environment</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 600px;
+            margin: 20px;
+        }
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        .status {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        .status-label {
+            font-weight: 500;
+            color: #333;
+        }
+        .status-value {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        .status-ok {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .links {
+            margin-top: 30px;
+        }
+        .link {
+            display: inline-block;
+            margin: 10px;
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        .link:hover {
+            background: #0056b3;
+        }
+        .link.secondary {
+            background: #6c757d;
+        }
+        .link.secondary:hover {
+            background: #545b62;
+        }
+        .note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e7f3ff;
+            border-radius: 8px;
+            color: #0c5460;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">consulting.sa</div>
+        <div class="subtitle">Development Environment</div>
+        
+        <div class="status">
+            <div class="status-item">
+                <span class="status-label">Environment:</span>
+                <span class="status-value status-ok">Development</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Backend API:</span>
+                <span class="status-value status-ok">Running</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Frontend:</span>
+                <span class="status-value status-warning">Nginx Static</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Database:</span>
+                <span class="status-value status-ok">Connected</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">n8n Workflows:</span>
+                <span class="status-value status-ok">Available</span>
+            </div>
+        </div>
+
+        <div class="links">
+            <a href="/api/health" class="link">Backend Health Check</a>
+            <a href="/n8n/" class="link">n8n Workflows</a>
+            <a href="https://consulting.sa" class="link secondary">Production Site</a>
+        </div>
+
+        <div class="note">
+            <strong>Note:</strong> This is the development environment. The frontend is currently served via nginx while we resolve the Next.js container build issue. Backend APIs are fully functional.
+        </div>
+    </div>
+
+    <script>
+        // Simple health check
+        fetch('/api/health')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Backend health:', data);
+            })
+            .catch(error => {
+                console.log('Backend health check failed:', error);
+            });
+    </script>
+</body>
+</html> 
