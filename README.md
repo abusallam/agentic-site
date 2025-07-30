@@ -13,11 +13,19 @@ Professional AI consulting services and SaaS solutions website for **consulting.
 **⚠️ PRODUCTION SYSTEM LIVE - DO NOT DISRUPT ⚠️**
 
 ### **🎯 System Status**: ✅ **PRODUCTION READY & OPERATIONAL**
-- **Website**: https://consulting.sa ✅ **LIVE**
-- **VPS**: 217.79.255.54 ✅ **RUNNING**
+- **Production**: https://consulting.sa ✅ **LIVE** (main branch)
+- **Development**: https://dev.consulting.sa ✅ **CONFIGURED** (develop branch)
+- **VPS**: 217.79.255.54 ✅ **RUNNING** (both environments)
 - **Package Managers**: `uv` (Python), `npm` (Node.js) ✅ **UPDATED**
 - **Last Updated**: January 27, 2025
-- **Current Phase**: Local Testing & Production Enhancement Ready
+- **Current Phase**: ✅ **Node.js/Next.js Upgrade Complete** - Ready for Agentic Frontend Development
+
+### **🌍 Development Environments**
+- **Production (main)**: https://consulting.sa - Live system with real users
+- **Development (develop)**: https://dev.consulting.sa - Safe development environment
+- **Local (feature/*)**: http://localhost:3000 - Local development setup
+
+**🔄 DEVELOPMENT WORKFLOW**: See [Development Lifecycle](docs/development/DEVELOPMENT_LIFECYCLE.md) for complete workflow documentation.
 
 ### **🔄 CI/CD Pipeline Progress**
 - **Completed**: Tasks 1, 2.1, 2.2, 3.1, 4.1, **4.2** ✅, 5.1, 6.1, 7.1, **7.2** ✅
@@ -28,8 +36,16 @@ Professional AI consulting services and SaaS solutions website for **consulting.
 Before making ANY changes:
 1. **Check Status**: Run `./scripts/validate-deployment.sh`
 2. **Read Context**: Check `.kiro/PROJECT_STATUS.md` for full details
-3. **Never Restart**: Production services without explicit permission
-4. **Ask First**: Before any production changes
+3. **Choose Environment**: Ask which environment to work on (production/development/local)
+4. **Never Restart**: Production services without explicit permission
+5. **Ask First**: Before any production changes
+
+### **🤖 FOR AI AGENTS & CODING ASSISTANTS**
+If you're an AI agent working on this project:
+1. **MANDATORY**: Read `docs/ai-agents/AI_AGENT_PROMPT.md` first
+2. **SAFETY**: Always ask which environment to work on
+3. **WORKFLOW**: Follow the development lifecycle in `docs/development/DEVELOPMENT_LIFECYCLE.md`
+4. **CONTEXT**: Understand the full project architecture before making changes
 
 ---
 

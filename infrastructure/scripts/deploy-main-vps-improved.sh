@@ -20,7 +20,7 @@ fi
 # Configuration
 VPS_HOST=${VPS_HOST:-"217.79.255.54"}
 VPS_USER=${VPS_USER:-"root"}
-VPS_PASSWORD=${VPS_PASSWORD:-"gt5qXy22aJ"}
+VPS_PASSWORD=${VPS_PASSWORD:-"xxXNCpx9Cz"}
 DOMAIN=${DOMAIN:-"consulting.sa"}
 
 echo -e "${PURPLE}🚀 Agentic AI Platform - Systematic Deployment${NC}"

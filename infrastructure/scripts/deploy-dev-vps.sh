@@ -19,7 +19,7 @@ fi
 # Configuration
 VPS_HOST=${VPS_HOST:-"217.79.255.54"}
 VPS_USER=${VPS_USER:-"root"}
-VPS_PASSWORD=${VPS_PASSWORD:-"gt5qXy22aJ"}
+VPS_PASSWORD=${VPS_PASSWORD:-"xxXNCpx9Cz"}
 DOMAIN=${DOMAIN:-"consulting.sa"}
 DEV_BRANCH=${DEV_BRANCH:-"develop"}
 
@@ -75,33 +75,69 @@ run_on_vps "cd /opt/agentic-platform-dev && docker-compose -f infrastructure/doc
 echo -e "${BLUE}Step 3: Copying application files...${NC}"
 sshpass -p "$VPS_PASSWORD" rsync -avz --delete --exclude='.venv' --exclude='node_modules' --exclude='.git' --exclude='.next' --exclude='__pycache__' --exclude='*.pyc' -e "ssh -o StrictHostKeyChecking=no" . "$VPS_USER@$VPS_HOST:/opt/agentic-platform-dev/"
 
-# Step 4: Copy development environment file
+# Step 4: Setup development environment (inherits from production .env)
 echo -e "${BLUE}Step 4: Setting up development environment variables...${NC}"
 copy_to_vps ".env" "/opt/agentic-platform-dev/.env.dev"
 
-# Add development-specific environment variables
+# Add development-specific overrides to existing .env
 run_on_vps "cat >> /opt/agentic-platform-dev/.env.dev << 'EOF'
 
-# Development-specific variables
+# =============================================================================
+# DEVELOPMENT ENVIRONMENT OVERRIDES
+# =============================================================================
+# These override the production values for development
+
+# Development Environment
 NODE_ENV=development
-DEV_SITE_URL=https://dev.consulting.sa
-DEV_ADMIN_URL=https://dev.consulting.sa/api
 DEBUG=true
 VERBOSE_LOGGING=true
 ADK_LOG_LEVEL=DEBUG
 FORCE_HTTPS=true
 
-# Development ports (to avoid conflicts with production)
+# Development URLs (using wildcard SSL subdomain)
+DEV_SITE_URL=https://dev.consulting.sa
+DEV_ADMIN_URL=https://dev.consulting.sa/api
+NEXT_PUBLIC_SITE_URL=https://dev.consulting.sa
+NEXT_PUBLIC_ADMIN_URL=https://dev.consulting.sa/api
+
+# Development Database Settings (same Supabase, different tables)
+DEV_TABLE_PREFIX=dev_
+DEV_SCHEMA=development
+
+# Development Ports (to avoid conflicts with production)
 FRONTEND_DEV_PORT=3001
 BACKEND_DEV_PORT=8001
 REDIS_DEV_PORT=6380
 N8N_DEV_PORT=5679
 NGINX_DEV_PORT=8080
 
-# Stripe test keys (if different from production)
-# STRIPE_TEST_SECRET_KEY=sk_test_...
-# STRIPE_TEST_PUBLISHABLE_KEY=pk_test_...
-# STRIPE_TEST_WEBHOOK_SECRET=whsec_test_...
+# Development-specific ADK configuration
+ADK_AGENT_PORT=8001
+
+# Development Contact Email
+NEXT_PUBLIC_CONTACT_EMAIL=dev@consulting.sa
+
+# Disable Analytics for Development
+NEXT_PUBLIC_GA_ID=
+
+# Development Docker Configuration
+COMPOSE_PROJECT_NAME=agentic-dev
+DOMAIN=dev.consulting.sa
+
+# Development Debugging
+NEXT_TELEMETRY_DISABLED=1
+ANALYZE=false
+
+# Development MCP Configuration
+MCP_SERVER_URL=http://localhost:8001
+MCP_SERVER_PORT=8001
+N8N_MCP_PORT=8004
+
+# Development n8n Configuration
+N8N_DEV_URL=http://n8n-dev:5678
+
+# Note: Most API keys (Supabase, Gemini, etc.) are inherited from production .env
+# Only Stripe should use test keys - add them manually if different from production
 
 EOF"
 

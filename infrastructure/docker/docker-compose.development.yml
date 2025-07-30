@@ -45,7 +45,7 @@ services:
       - /app/node_modules
       - /app/.next
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -176,20 +176,19 @@ services:
     networks:
       - agentic-dev-network
 
-  # Nginx reverse proxy for development
-  nginx-dev:
-    image: nginx:alpine
-    container_name: agentic-nginx-dev
-    ports:
-      - "8080:80"  # Different port for dev
-    volumes:
-      - ../../infrastructure/nginx/development.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - frontend-dev
-      - backend-dev
-    restart: unless-stopped
-    networks:
-      - agentic-dev-network
+  # Nginx reverse proxy for development (TEMPORARILY DISABLED - Frontend disabled)
+  # nginx-dev:
+  #   image: nginx:alpine
+  #   container_name: agentic-nginx-dev
+  #   ports:
+  #     - "8080:80"  # Different port for dev
+  #   volumes:
+  #     - ../../infrastructure/nginx/development.conf:/etc/nginx/conf.d/default.conf:ro
+  #   depends_on:
+  #     - backend-dev
+  #   restart: unless-stopped
+  #   networks:
+  #     - agentic-dev-network
 
 networks:
   agentic-dev-network:

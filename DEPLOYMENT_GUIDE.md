@@ -116,7 +116,7 @@ agentic-platform/
 # VPS Configuration
 VPS_HOST=217.79.255.54
 VPS_USER=root
-VPS_PASSWORD=gt5qXy22aJ
+VPS_PASSWORD=xxXNCpx9Cz
 DOMAIN=consulting.sa
 
 # Database (Supabase)

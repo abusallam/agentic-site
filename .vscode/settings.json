@@ -1,2 +1,17 @@
 {
+    "kiroAgent.trustedCommands": [
+        "sshpass -p \"xxXNCpx9Cz\" ssh -o StrictHostKeyChecking=no root@217.79.255.54 \"cd /opt/agentic-platform-dev && docker-compose -f infrastructure/docker/docker-compose.development.yml --env-file .env.dev up -d --build frontend-dev\"",
+        "sshpass -p \"xxXNCpx9Cz\" scp -o StrictHostKeyChecking=no frontend/package-lock.json root@217.79.255.54:/opt/agentic-platform-dev/frontend/",
+        "sshpass *",
+        "npm install",
+        "npm install",
+        "rm *",
+        "rm -rf node_modules && npm install",
+        "npm install --package-lock-only",
+        "npm *",
+        "tar *",
+        "sshpass -p \"xxXNCpx9Cz\" ssh -o StrictHostKeyChecking=no root@217.79.255.54 \"cd /opt && rm -rf agentic-platform-dev && mkdir -p agentic-platform-dev && tar -xzf deployment-fixed.tar.gz -C agentic-platform-dev && rm -f deployment-fixed.tar.gz\"",
+        "sshpass -p \"xxXNCpx9Cz\" ssh -o StrictHostKeyChecking=no root@217.79.255.54 \"cd /opt && rm -rf agentic-platform-dev && mkdir -p agentic-platform-dev && tar -xzf deployment-final.tar.gz -C agentic-platform-dev && rm -f deployment-final.tar.gz\"",
+        "git *"
+    ]
 }

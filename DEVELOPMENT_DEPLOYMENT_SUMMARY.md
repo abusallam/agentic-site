@@ -42,12 +42,11 @@ git push origin main
 
 ## 🚀 Quick Start Guide
 
-### Step 1: Configure Environment
-```bash
-# Copy and edit development environment
-cp .env.development .env.dev
-# Edit .env.dev with your actual API keys and values
-```
+### Step 1: No Environment Configuration Needed! 
+The development environment automatically inherits your production `.env` file and adds development-specific overrides. You don't need to copy API keys - it uses the same Supabase, Gemini, and other services as production, but with:
+- Separate database tables (prefixed with `dev_`)
+- Different ports to avoid conflicts
+- Debug logging enabled
 
 ### Step 2: Deploy Development Environment
 ```bash

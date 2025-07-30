@@ -7,7 +7,7 @@
   - _Requirements: 1.1, 1.2, 2.1, 2.2_
 
 - [ ] 2. Implement Core Build and Test Automation
-  - [x] 2.1 Create frontend build and test pipeline
+  - [ ] 2.1 Create frontend build and test pipeline
     - Write GitHub Actions job for Next.js application building and testing
     - Configure Jest test runner with coverage reporting
     - Implement TypeScript compilation and linting checks
@@ -32,7 +32,7 @@
     - Implement container health checks and startup validation
     - _Requirements: 4.1, 4.2, 4.3_
 
-  - [ ] 3.2 Implement container registry integration
+  - [x] 3.2 Implement container registry integration
     - Configure GitHub Container Registry for image storage
     - Create automated image tagging and versioning system
     - Implement image security scanning in build pipeline
@@ -84,7 +84,7 @@
     - Integrate with existing ADK web UI monitoring capabilities
     - _Requirements: 7.1, 7.3, 7.6_
 
-  - [x] 7.2 Create alerting and notification system
+  - [ ] 7.2 Create alerting and notification system
     - Implement Slack integration for deployment notifications
     - Configure email alerts for critical system issues
     - Set up automated recovery procedures for common failures
