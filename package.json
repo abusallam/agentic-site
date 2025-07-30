@@ -73,12 +73,12 @@
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.525.0",
-    "next": "^15.4.1",
+    "next": "^15.4.4",
     "next-themes": "^0.4.6",
     "postcss": "^8.5.1",
-    "react": "^19.1.0",
+    "react": "^19.1.1",
     "react-day-picker": "^9.8.0",
-    "react-dom": "^19.1.0",
+    "react-dom": "^19.1.1",
     "react-hook-form": "^7.60.0",
     "react-resizable-panels": "^3.0.3",
     "recharts": "^3.1.0",
@@ -99,7 +99,7 @@
     "frontend"
   ],
   "engines": {
-    "node": ">=18.0.0",
+    "node": ">=20.0.0",
     "npm": ">=9.0.0"
   }
 }
