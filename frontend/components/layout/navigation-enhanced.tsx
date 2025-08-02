@@ -43,16 +43,16 @@ export function EnhancedNavigation() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
+          <Link href="/" className="flex items-center gap-2 group">
             <Image
               src={brandConfig.logo.image || "/placeholder.svg"}
               alt={brandConfig.name}
               width={brandConfig.logo.width}
               height={brandConfig.logo.height}
-              className="transition-transform duration-300 group-hover:scale-110"
-              style={{ width: "auto", height: "auto" }}
+              className="transition-transform duration-300 group-hover:scale-110 flex-shrink-0"
+              style={{ width: `${brandConfig.logo.width}px`, height: `${brandConfig.logo.height}px` }}
             />
-            <span className="text-xl font-bold font-heading bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <span className="text-lg font-bold font-heading bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent whitespace-nowrap">
               {locale === "ar" ? brandConfig.nameArabic : brandConfig.name}
             </span>
           </Link>

@@ -346,7 +346,7 @@ export default function ChatbotWidget({
       {/* Chat Window */}
       {isOpen && (
         <div className={`fixed ${position === 'bottom-right' ? 'bottom-6 right-6' : 'bottom-6 left-6'} z-50`}>
-          <Card className={`w-80 ${isMinimized ? 'h-14' : 'h-96'} shadow-xl transition-all duration-300`}>
+          <Card className={`w-96 ${isMinimized ? 'h-14' : 'h-[500px]'} shadow-xl transition-all duration-300`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="flex items-center space-x-2 text-sm">
                 <Bot className="h-4 w-4 text-blue-600" />
@@ -376,7 +376,7 @@ export default function ChatbotWidget({
             </CardHeader>
             
             {!isMinimized && (
-              <CardContent className="flex flex-col h-80 p-0">
+              <CardContent className="flex flex-col h-[440px] p-0">
                 <div className="flex-1 overflow-y-auto p-3 space-y-3">
                   {messages.map((message) => (
                     <div
@@ -384,7 +384,7 @@ export default function ChatbotWidget({
                       className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-[85%] rounded-lg p-2 text-sm ${
+                        className={`max-w-[85%] rounded-lg p-3 ${
                           message.sender === 'user'
                             ? 'bg-blue-600 text-white'
                             : 'bg-gray-100 text-gray-900'
@@ -395,7 +395,7 @@ export default function ChatbotWidget({
                             <Bot className="h-3 w-3 mt-0.5 flex-shrink-0" />
                           )}
                           <div className="flex-1">
-                            <p className="text-xs">{message.content}</p>
+                            <p className="text-sm">{message.content}</p>
                             <p className={`text-xs mt-1 ${
                               message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
                             }`}>

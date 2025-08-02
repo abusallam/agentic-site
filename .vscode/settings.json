@@ -15,6 +15,12 @@
         "git *",
         "sshpass -p \"xxXNCpx9Cz\" ssh -o StrictHostKeyChecking=no root@217.79.255.54 \"cd /opt && rm -rf agentic-platform-dev\"",
         "sshpass -p \"xxXNCpx9Cz\" ssh -o StrictHostKeyChecking=no root@217.79.255.54 \"cd /opt && rm -rf agentic-platform-dev && git clone https://github.com/abusallam/agentic-site.git agentic-platform-dev\"",
-        "sshpass -p \"xxXNCpx9Cz\" ssh -o StrictHostKeyChecking=no root@217.79.255.54 \"echo 'https://abusallam:ghp_your_token@github.com' > ~/.git-credentials\""
+        "sshpass -p \"xxXNCpx9Cz\" ssh -o StrictHostKeyChecking=no root@217.79.255.54 \"echo 'https://abusallam:ghp_your_token@github.com' > ~/.git-credentials\"",
+        "echo *",
+        "bash *",
+        "chmod *",
+        "curl *",
+        "./infrastructure/scripts/comprehensive-dev-deployment.sh *",
+        "./infrastructure/scripts/fix-dev-environment.sh *"
     ]
 }

@@ -1,8 +1,9 @@
 #!/bin/bash
-set -e
 
 # Fix Development Environment Script
-# This script fixes the directory structure and starts containers properly
+# This script will properly deploy the development environment with correct container naming
+
+set -e
 
 # Colors for output
 RED='\033[0;31m'
@@ -12,123 +13,277 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-VPS_HOST=${VPS_HOST:-"217.79.255.54"}
-VPS_USER=${VPS_USER:-"root"}
-VPS_PASSWORD=${VPS_PASSWORD:-"xxXNCpx9Cz"}
+VPS_HOST="217.79.255.54"
+DEPLOY_PATH="/opt/docker-apps/development/agentic-site"
 
 echo -e "${BLUE}🔧 Fixing Development Environment${NC}"
+echo "Target VPS: $VPS_HOST"
+echo "Deploy Path: $DEPLOY_PATH"
+echo "Timestamp: $(date)"
+echo
 
-# Function to run commands on VPS using sshpass
+# Function to run commands on VPS
 run_on_vps() {
-    local command="$1"
-    echo -e "${YELLOW}Running on VPS: $command${NC}"
-    sshpass -p "$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no "$VPS_USER@$VPS_HOST" "$command"
+    ssh root@$VPS_HOST "$1"
 }
 
-# Function to copy files to VPS
-copy_to_vps() {
-    local local_path="$1"
-    local remote_path="$2"
-    echo -e "${YELLOW}Copying $local_path to VPS:$remote_path${NC}"
-    sshpass -p "$VPS_PASSWORD" scp -o StrictHostKeyChecking=no -r "$local_path" "$VPS_USER@$VPS_HOST:$remote_path"
+echo -e "${YELLOW}Step 1: Stopping and removing conflicting containers...${NC}"
+
+# Stop and remove any conflicting containers
+run_on_vps "
+    # Stop containers that might conflict
+    docker stop agentic-frontend-development 2>/dev/null || true
+    docker rm agentic-frontend-development 2>/dev/null || true
+    
+    # Stop any other development containers that might be running
+    docker stop agentic-frontend-dev 2>/dev/null || true
+    docker stop agentic-backend-dev 2>/dev/null || true
+    docker rm agentic-frontend-dev 2>/dev/null || true
+    docker rm agentic-backend-dev 2>/dev/null || true
+    
+    echo '✓ Conflicting containers removed'
+"
+
+echo -e "${YELLOW}Step 2: Ensuring deployment directory exists...${NC}"
+
+run_on_vps "
+    mkdir -p $DEPLOY_PATH
+    cd $DEPLOY_PATH
+    echo '✓ Deployment directory ready'
+"
+
+echo -e "${YELLOW}Step 3: Deploying development docker-compose configuration...${NC}"
+
+# Copy the development docker-compose file to the server
+scp infrastructure/docker/docker-compose.development.yml root@$VPS_HOST:$DEPLOY_PATH/docker-compose.yml
+
+echo -e "${YELLOW}Step 4: Copying environment configuration...${NC}"
+
+# Copy environment file if it exists
+if [ -f ".env.development" ]; then
+    scp .env.development root@$VPS_HOST:$DEPLOY_PATH/.env
+    echo "✓ Environment file copied"
+else
+    echo "⚠ No .env.development file found, using default environment"
+    run_on_vps "
+        cd $DEPLOY_PATH
+        cat > .env << 'EOF'
+# Development Environment Configuration
+NODE_ENV=development
+COMPOSE_PROJECT_NAME=agentic-dev
+
+# Frontend Configuration
+FRONTEND_IMAGE=ghcr.io/consulting-sa/agentic-frontend:development
+
+# Backend Configuration  
+BACKEND_IMAGE=ghcr.io/consulting-sa/agentic-backend:development
+
+# Database Configuration (use your actual values)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_KEY=your_service_key
+
+# AI Services (optional for development)
+GEMINI_API_KEY=your_gemini_key
+
+# n8n Configuration
+N8N_USER=admin
+N8N_PASSWORD=admin123
+
+# Logging
+ADK_LOG_LEVEL=DEBUG
+EOF
+        echo '✓ Default environment file created'
+    "
+fi
+
+echo -e "${YELLOW}Step 5: Building and starting development containers...${NC}"
+
+run_on_vps "
+    cd $DEPLOY_PATH
+    
+    # Pull latest images
+    echo 'Pulling latest development images...'
+    docker-compose pull || echo 'Pull failed, will build locally'
+    
+    # Start the development environment
+    echo 'Starting development environment...'
+    docker-compose up -d
+    
+    echo '✓ Development containers started'
+"
+
+echo -e "${YELLOW}Step 6: Waiting for containers to be healthy...${NC}"
+
+run_on_vps "
+    cd $DEPLOY_PATH
+    
+    # Wait for containers to start
+    sleep 10
+    
+    # Check container status
+    echo 'Container Status:'
+    docker-compose ps
+    
+    # Wait for health checks
+    echo 'Waiting for health checks...'
+    for i in {1..30}; do
+        if docker-compose ps | grep -q 'healthy'; then
+            echo '✓ Containers are healthy'
+            break
+        fi
+        echo 'Waiting for containers to become healthy... (\$i/30)'
+        sleep 5
+    done
+"
+
+echo -e "${YELLOW}Step 7: Updating nginx configuration...${NC}"
+
+run_on_vps "
+    # Create the correct nginx configuration
+    cat > /etc/nginx/sites-available/agentic-platform-dev-fixed << 'EOF'
+upstream frontend_dev {
+    server 127.0.0.1:3001;
 }
 
-# Step 1: Stop existing containers
-echo -e "${BLUE}Step 1: Stopping existing development containers...${NC}"
-run_on_vps "docker stop agentic-frontend-dev agentic-backend-dev agentic-redis-dev agentic-n8n-dev 2>/dev/null || true"
-run_on_vps "docker rm agentic-frontend-dev agentic-backend-dev agentic-redis-dev agentic-n8n-dev 2>/dev/null || true"
+upstream backend_dev {
+    server 127.0.0.1:8001;
+}
 
-# Step 2: Clean and recreate directory structure
-echo -e "${BLUE}Step 2: Recreating proper directory structure...${NC}"
-run_on_vps "rm -rf /opt/agentic-platform-dev"
-run_on_vps "mkdir -p /opt/agentic-platform-dev/{frontend,backend,infrastructure}"
+server {
+    listen 80;
+    server_name dev.consulting.sa;
+    
+    # Security headers
+    add_header X-Frame-Options DENY;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection \"1; mode=block\";
+    
+    # Main application - proxy to Next.js
+    location / {
+        proxy_pass http://frontend_dev;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
+        proxy_read_timeout 86400;
+    }
+    
+    # API routes - proxy to Python backend
+    location /api/ {
+        proxy_pass http://backend_dev/;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_read_timeout 86400;
+    }
+    
+    # Backend admin interface
+    location /backend/ {
+        proxy_pass http://backend_dev/;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+    
+    # n8n interface
+    location /n8n/ {
+        proxy_pass http://127.0.0.1:5679/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
+    }
+    
+    # Health check endpoint
+    location /health {
+        proxy_pass http://backend_dev/health;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}
+EOF
 
-# Step 3: Copy files with proper structure
-echo -e "${BLUE}Step 3: Copying files with correct structure...${NC}"
-copy_to_vps "frontend/" "/opt/agentic-platform-dev/"
+    # Remove old symlink and create new one
+    rm -f /etc/nginx/sites-enabled/agentic-platform-dev*
+    ln -sf /etc/nginx/sites-available/agentic-platform-dev-fixed /etc/nginx/sites-enabled/agentic-platform-dev-fixed
+    
+    # Test and reload nginx
+    nginx -t && systemctl reload nginx
+    
+    echo '✓ Nginx configuration updated'
+"
 
-# Copy backend excluding .venv directory
-echo -e "${YELLOW}Copying backend (excluding .venv)...${NC}"
-sshpass -p "$VPS_PASSWORD" rsync -avz --exclude='.venv' --exclude='__pycache__' --exclude='*.pyc' -e "ssh -o StrictHostKeyChecking=no" backend/ "$VPS_USER@$VPS_HOST:/opt/agentic-platform-dev/backend/"
+echo -e "${YELLOW}Step 8: Final verification...${NC}"
 
-copy_to_vps "infrastructure/" "/opt/agentic-platform-dev/"
-copy_to_vps ".env.dev" "/opt/agentic-platform-dev/"
-copy_to_vps "package.json" "/opt/agentic-platform-dev/"
+run_on_vps "
+    cd $DEPLOY_PATH
+    
+    echo 'Final Container Status:'
+    docker-compose ps
+    
+    echo
+    echo 'Port Status:'
+    netstat -tlnp | grep -E ':(3001|8001|5679|6380)' || echo 'No development ports found'
+    
+    echo
+    echo 'Testing endpoints:'
+    
+    # Test backend
+    if curl -s -f http://localhost:8001/health > /dev/null; then
+        echo '✓ Backend responding on port 8001'
+    else
+        echo '❌ Backend not responding on port 8001'
+    fi
+    
+    # Test frontend
+    if curl -s -f http://localhost:3001/ > /dev/null; then
+        echo '✓ Frontend responding on port 3001'
+    else
+        echo '❌ Frontend not responding on port 3001'
+    fi
+    
+    # Test nginx proxy
+    if curl -s -f -H 'Host: dev.consulting.sa' http://localhost/ > /dev/null; then
+        echo '✓ Nginx proxy working'
+    else
+        echo '❌ Nginx proxy not working'
+    fi
+"
 
-# Step 4: Verify directory structure
-echo -e "${BLUE}Step 4: Verifying directory structure...${NC}"
-run_on_vps "ls -la /opt/agentic-platform-dev/"
-run_on_vps "ls -la /opt/agentic-platform-dev/infrastructure/docker/"
-
-# Step 5: Start containers one by one
-echo -e "${BLUE}Step 5: Starting development containers...${NC}"
-
-# Start Redis first
-echo -e "${YELLOW}Starting Redis...${NC}"
-run_on_vps "cd /opt/agentic-platform-dev && docker-compose -f infrastructure/docker/docker-compose.development.yml --env-file .env.dev up -d redis-dev"
-
-# Start n8n
-echo -e "${YELLOW}Starting n8n...${NC}"
-run_on_vps "cd /opt/agentic-platform-dev && docker-compose -f infrastructure/docker/docker-compose.development.yml --env-file .env.dev up -d n8n-dev"
-
-# Build and start backend
-echo -e "${YELLOW}Building and starting backend...${NC}"
-run_on_vps "cd /opt/agentic-platform-dev && docker-compose -f infrastructure/docker/docker-compose.development.yml --env-file .env.dev up -d --build backend-dev"
-
-# Build and start frontend
-echo -e "${YELLOW}Building and starting frontend...${NC}"
-run_on_vps "cd /opt/agentic-platform-dev && docker-compose -f infrastructure/docker/docker-compose.development.yml --env-file .env.dev up -d --build frontend-dev"
-
-# Step 6: Wait for services to start
-echo -e "${BLUE}Step 6: Waiting for services to start...${NC}"
-sleep 30
-
-# Step 7: Check container status
-echo -e "${BLUE}Step 7: Checking container status...${NC}"
-run_on_vps "cd /opt/agentic-platform-dev && docker-compose -f infrastructure/docker/docker-compose.development.yml ps"
-
-# Step 8: Run health checks
-echo -e "${BLUE}Step 8: Running health checks...${NC}"
-
-# Check frontend
-if run_on_vps "curl -f http://localhost:3001/"; then
-    echo -e "${GREEN}✓ Frontend is running${NC}"
-else
-    echo -e "${YELLOW}⚠ Frontend health check failed${NC}"
-    run_on_vps "docker logs --tail 10 agentic-frontend-dev" || echo "Could not get frontend logs"
-fi
-
-# Check backend
-if run_on_vps "curl -f http://localhost:8001/health"; then
-    echo -e "${GREEN}✓ Backend is running${NC}"
-else
-    echo -e "${YELLOW}⚠ Backend health check failed${NC}"
-    run_on_vps "docker logs --tail 10 agentic-backend-dev" || echo "Could not get backend logs"
-fi
-
-# Step 9: Update nginx to use frontend container (FIXED)
-echo -e "${BLUE}Step 9: Updating nginx configuration...${NC}"
-copy_to_vps "infrastructure/nginx/development-fixed.conf" "/etc/nginx/sites-available/agentic-platform-dev-full"
-run_on_vps "ln -sf /etc/nginx/sites-available/agentic-platform-dev-full /etc/nginx/sites-enabled/agentic-platform-dev"
-run_on_vps "nginx -t && systemctl reload nginx"
-
-# Step 10: Final test
-echo -e "${BLUE}Step 10: Final development site test...${NC}"
-sleep 10
-
-if run_on_vps "curl -f https://dev.consulting.sa/"; then
-    echo -e "${GREEN}🎉 Development environment is working!${NC}"
-    echo ""
-    echo -e "${BLUE}=== DEVELOPMENT ENVIRONMENT READY ====${NC}"
-    echo "🌐 Development Site: https://dev.consulting.sa"
-    echo "🔧 Backend API: https://dev.consulting.sa/api/"
-    echo "📊 n8n Workflows: https://dev.consulting.sa/n8n/"
-    echo "🏥 Health Check: https://dev.consulting.sa/health"
-    echo ""
-    echo -e "${GREEN}✅ Ready for functionality testing and comparison with production!${NC}"
-else
-    echo -e "${YELLOW}⚠ Development site still not fully working${NC}"
-    echo "Check container logs and nginx configuration"
-fi
-
-echo -e "${BLUE}🔧 Development environment fix completed!${NC}"
+echo
+echo -e "${GREEN}🎉 Development Environment Fix Complete!${NC}"
+echo
+echo -e "${BLUE}=== ACCESS INFORMATION ===${NC}"
+echo "🌐 Development Site: https://dev.consulting.sa"
+echo "🔧 API Health Check: https://dev.consulting.sa/health"  
+echo "🛠️ n8n Interface: https://dev.consulting.sa/n8n/"
+echo "💾 Backend Admin: https://dev.consulting.sa/backend/"
+echo
+echo -e "${BLUE}=== DIRECT ACCESS (for debugging) ===${NC}"
+echo "Frontend: http://217.79.255.54:3001"
+echo "Backend: http://217.79.255.54:8001"
+echo "n8n: http://217.79.255.54:5679"
+echo "Redis: 217.79.255.54:6380"
+echo
+echo -e "${BLUE}=== MANAGEMENT COMMANDS ===${NC}"
+echo "Check status: ssh root@217.79.255.54 'cd $DEPLOY_PATH && docker-compose ps'"
+echo "View logs: ssh root@217.79.255.54 'cd $DEPLOY_PATH && docker-compose logs -f'"
+echo "Restart: ssh root@217.79.255.54 'cd $DEPLOY_PATH && docker-compose restart'"
+echo
+echo -e "${GREEN}Development environment is now properly configured!${NC}"
