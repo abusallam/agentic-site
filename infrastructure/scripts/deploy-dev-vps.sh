@@ -149,7 +149,7 @@ run_on_vps "cd /opt/agentic-platform-dev && docker-compose -f infrastructure/doc
 # Step 6: Configure development subdomain with SSL
 echo -e "${BLUE}Step 6: Setting up development subdomain (dev.consulting.sa)...${NC}"
 run_on_vps "mkdir -p /etc/nginx/sites-available"
-copy_to_vps "infrastructure/nginx/development.conf" "/etc/nginx/sites-available/agentic-platform-dev"
+copy_to_vps "infrastructure/nginx/development-fixed.conf" "/etc/nginx/sites-available/agentic-platform-dev"
 
 # Enable the development site
 run_on_vps "ln -sf /etc/nginx/sites-available/agentic-platform-dev /etc/nginx/sites-enabled/agentic-platform-dev"

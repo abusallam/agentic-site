@@ -106,9 +106,9 @@ else
     run_on_vps "docker logs --tail 10 agentic-backend-dev" || echo "Could not get backend logs"
 fi
 
-# Step 9: Update nginx to use frontend container
+# Step 9: Update nginx to use frontend container (FIXED)
 echo -e "${BLUE}Step 9: Updating nginx configuration...${NC}"
-copy_to_vps "infrastructure/nginx/development.conf" "/etc/nginx/sites-available/agentic-platform-dev-full"
+copy_to_vps "infrastructure/nginx/development-fixed.conf" "/etc/nginx/sites-available/agentic-platform-dev-full"
 run_on_vps "ln -sf /etc/nginx/sites-available/agentic-platform-dev-full /etc/nginx/sites-enabled/agentic-platform-dev"
 run_on_vps "nginx -t && systemctl reload nginx"
 

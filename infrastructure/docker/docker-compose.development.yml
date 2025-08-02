@@ -1,33 +1,36 @@
 version: '3.8'
 
 services:
-  # Frontend Service - Nginx-based for development
-  frontend:
+  # Frontend Service - Next.js for development
+  frontend-dev:
     image: ${FRONTEND_IMAGE:-ghcr.io/consulting-sa/agentic-frontend:development}
-    container_name: agentic-frontend-development
+    container_name: agentic-frontend-dev
     ports:
-      - "3000:80"
+      - "3001:3000"  # Map to port 3001 for development separation
     environment:
       - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=https://dev.consulting.sa/api
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
       
     depends_on:
-      - backend
+      - backend-dev
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     networks:
-      - agentic-network
+      - agentic-dev-network
 
   # Backend Service - Python Agent Development
-  backend:
+  backend-dev:
     image: ${BACKEND_IMAGE:-ghcr.io/consulting-sa/agentic-backend:development}
-    container_name: agentic-backend-development
+    container_name: agentic-backend-dev
     ports:
-      - "8000:8000"
+      - "8001:8000"  # Map to port 8001 for development separation
     environment:
       - NODE_ENV=development
       - PYTHONPATH=/app/agent
@@ -75,14 +78,14 @@ services:
       retries: 3
       start_period: 40s
     networks:
-      - agentic-network
+      - agentic-dev-network
 
   # Redis Cache for Development
-  redis:
+  redis-dev:
     image: redis:7-alpine
-    container_name: agentic-redis-development
+    container_name: agentic-redis-dev
     ports:
-      - "6379:6379"
+      - "6380:6379"  # Map to port 6380 for development separation
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -90,14 +93,14 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - agentic-network
+      - agentic-dev-network
 
   # n8n Workflow Automation for Development
-  n8n:
+  n8n-dev:
     image: n8nio/n8n:latest
-    container_name: agentic-n8n-development
+    container_name: agentic-n8n-dev
     ports:
-      - "5678:5678"
+      - "5679:5678"  # Map to port 5679 for development separation
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
@@ -111,30 +114,12 @@ services:
       - n8n_data:/home/node/.n8n
     restart: unless-stopped
     networks:
-      - agentic-network
-
-  # Nginx reverse proxy for development
-  nginx:
-    image: nginx:alpine
-    container_name: agentic-nginx-development
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ../../nginx/development.conf:/etc/nginx/conf.d/default.conf:ro
-      - ../../ssl:/etc/nginx/ssl:ro
-    depends_on:
-      - frontend
-      - backend
-      - n8n
-    restart: unless-stopped
-    networks:
-      - agentic-network
+      - agentic-dev-network
 
 networks:
-  agentic-network:
+  agentic-dev-network:
     driver: bridge
-    name: agentic-development-network
+    name: agentic-dev-network
 
 volumes:
   redis_data:

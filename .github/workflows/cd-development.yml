@@ -76,50 +76,84 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Alternative frontend deployment - build locally and copy
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install frontend dependencies
-        run: |
-          cd frontend
-          npm ci
-
-      - name: Build frontend locally
-        run: |
-          cd frontend
-          npm run build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.DEV_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.DEV_SUPABASE_ANON_KEY }}
-          NODE_ENV: production
-
-      - name: Create frontend image from built files
-        run: |
-          # Create a simple nginx-based image for the built frontend
-          cat > Dockerfile.frontend-dev << 'EOF'
-          FROM nginx:alpine
-          COPY frontend/.next /usr/share/nginx/html/.next
-          COPY frontend/public /usr/share/nginx/html/public
-          COPY infrastructure/nginx/development.conf /etc/nginx/conf.d/default.conf
-          EXPOSE 80
-          CMD ["nginx", "-g", "daemon off;"]
-          EOF
-
-      - name: Build and push frontend image (nginx-based)
+      # Build and push frontend image (Next.js container)
+      - name: Build and push frontend image
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile.frontend-dev
+          file: ./infrastructure/docker/Dockerfile.frontend
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:development
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            NEXT_PUBLIC_SUPABASE_URL=${{ secrets.DEV_SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.DEV_SUPABASE_ANON_KEY }}
+            NODE_ENV=development
+
+      - name: Check server status and cleanup
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          script: |
+            echo "=== PRE-DEPLOYMENT SERVER STATUS CHECK ==="
+            
+            # Check system resources
+            echo "System Resources:"
+            echo "CPU Usage:" && top -bn1 | grep 'Cpu(s)' | head -1
+            echo "Memory Usage:" && free -h
+            echo "Disk Usage:" && df -h /
+            
+            # Check running containers
+            echo "Currently Running Containers:"
+            docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}' || echo "No containers running"
+            
+            # Check port usage for development ports
+            echo "Development Port Status:"
+            for port in 3001 8001 5679 6380; do
+              if netstat -tuln | grep :$port >/dev/null 2>&1; then
+                echo "Port $port: IN USE"
+              else
+                echo "Port $port: AVAILABLE"
+              fi
+            done
+            
+            # Stop and remove ALL development containers
+            echo "=== CLEANING UP DEVELOPMENT CONTAINERS ==="
+            DEV_CONTAINERS="agentic-frontend-dev agentic-backend-dev agentic-redis-dev agentic-n8n-dev"
+            for container in $DEV_CONTAINERS; do
+              if docker ps -q -f name=$container | grep -q .; then
+                echo "Stopping and removing $container..."
+                docker stop $container || true
+                docker rm $container || true
+              fi
+            done
+            
+            # Clean up old/orphaned agentic containers
+            echo "Cleaning up old agentic containers..."
+            docker ps -a --filter 'name=agentic' --format '{{.Names}}' | while read container; do
+              if [ -n "$container" ] && [[ ! "$container" =~ (agentic-frontend-dev|agentic-backend-dev|agentic-redis-dev|agentic-n8n-dev)$ ]]; then
+                echo "Removing old container: $container"
+                docker stop $container 2>/dev/null || true
+                docker rm $container 2>/dev/null || true
+              fi
+            done
+            
+            # Clean up docker resources
+            echo "Cleaning up docker resources..."
+            docker system prune -f
+            docker volume prune -f
+            docker network prune -f
+            
+            # Remove old deployment directories
+            rm -rf /opt/agentic-platform-dev-old /opt/agentic-development-old || true
+            
+            echo "=== CLEANUP COMPLETED ==="
+            echo "Final container status:"
+            docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}' || echo "No containers running"
 
       - name: Deploy to development VPS
         uses: appleboy/ssh-action@v1.0.0
@@ -128,14 +162,19 @@ jobs:
           username: ${{ secrets.DEV_USER }}
           key: ${{ secrets.DEV_SSH_KEY }}
           script: |
-            # Create deployment directory
-            mkdir -p /opt/agentic-development
-            cd /opt/agentic-development
+            echo "=== STARTING DEVELOPMENT DEPLOYMENT ==="
             
-            # Download docker-compose file
+            # Create deployment directory
+            mkdir -p /opt/agentic-platform-dev
+            cd /opt/agentic-platform-dev
+            
+            # Download docker-compose file and nginx config
+            echo "Downloading configuration files..."
             curl -o docker-compose.development.yml https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/infrastructure/docker/docker-compose.development.yml
+            curl -o development-fixed.conf https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/infrastructure/nginx/development-fixed.conf
             
             # Create environment file
+            echo "Creating environment configuration..."
             cat > .env << EOF
             ENVIRONMENT=development
             FRONTEND_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:development
@@ -143,25 +182,92 @@ jobs:
             DATABASE_URL=${{ secrets.DEV_DATABASE_URL }}
             NEXT_PUBLIC_SUPABASE_URL=${{ secrets.DEV_SUPABASE_URL }}
             NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.DEV_SUPABASE_ANON_KEY }}
+            SUPABASE_SERVICE_KEY=${{ secrets.DEV_SUPABASE_SERVICE_KEY }}
             GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}
+            STRIPE_SECRET_KEY=${{ secrets.DEV_STRIPE_SECRET_KEY }}
+            STRIPE_PUBLISHABLE_KEY=${{ secrets.DEV_STRIPE_PUBLISHABLE_KEY }}
+            STRIPE_WEBHOOK_SECRET=${{ secrets.DEV_STRIPE_WEBHOOK_SECRET }}
+            LIVEKIT_URL=${{ secrets.DEV_LIVEKIT_URL }}
+            LIVEKIT_API_KEY=${{ secrets.DEV_LIVEKIT_API_KEY }}
+            LIVEKIT_API_SECRET=${{ secrets.DEV_LIVEKIT_API_SECRET }}
             N8N_URL=${{ secrets.DEV_N8N_URL }}
+            N8N_BASE_URL=${{ secrets.DEV_N8N_BASE_URL }}
+            N8N_API_KEY=${{ secrets.DEV_N8N_API_KEY }}
+            N8N_USER=${{ secrets.DEV_N8N_USER }}
+            N8N_PASSWORD=${{ secrets.DEV_N8N_PASSWORD }}
             MCP_SERVER_URL=${{ secrets.DEV_MCP_SERVER_URL }}
+            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            ADK_LOG_LEVEL=DEBUG
             EOF
             
+            # Update nginx configuration
+            echo "Updating nginx configuration..."
+            sudo cp development-fixed.conf /etc/nginx/sites-available/agentic-platform-dev-full
+            sudo ln -sf /etc/nginx/sites-available/agentic-platform-dev-full /etc/nginx/sites-enabled/agentic-platform-dev
+            
+            # Test and reload nginx
+            echo "Testing nginx configuration..."
+            sudo nginx -t && sudo systemctl reload nginx
+            
             # Login to container registry
+            echo "Logging into container registry..."
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
             
             # Pull latest images
+            echo "Pulling latest images..."
             docker-compose -f docker-compose.development.yml pull
             
-            # Deploy with zero downtime
+            # Deploy with proper startup order
+            echo "Starting services..."
             docker-compose -f docker-compose.development.yml up -d --remove-orphans
             
-            # Wait for health checks
-            sleep 30
+            # Wait for services to start
+            echo "Waiting for services to start..."
+            sleep 45
             
-            # Verify deployment
-            curl -f http://localhost:8000/health || exit 1
+            # Check container status
+            echo "Container status:"
+            docker-compose -f docker-compose.development.yml ps
+            
+            # Verify backend deployment
+            echo "Verifying backend deployment..."
+            for i in {1..10}; do
+              if curl -f http://localhost:8001/health; then
+                echo "Backend health check passed"
+                break
+              else
+                echo "Backend health check attempt $i failed, retrying..."
+                sleep 10
+              fi
+            done
+            
+            # Verify frontend deployment
+            echo "Verifying frontend deployment..."
+            for i in {1..10}; do
+              if curl -f http://localhost:3001/; then
+                echo "Frontend health check passed"
+                break
+              else
+                echo "Frontend health check attempt $i failed, retrying..."
+                sleep 10
+              fi
+            done
+            
+            # Verify nginx proxy
+            echo "Verifying nginx proxy..."
+            for i in {1..5}; do
+              if curl -f https://dev.consulting.sa/health; then
+                echo "Nginx proxy health check passed"
+                break
+              else
+                echo "Nginx proxy health check attempt $i failed, retrying..."
+                sleep 10
+              fi
+            done
+            
+            echo "=== DEPLOYMENT COMPLETED ==="
 
       - name: Run post-deployment tests
         uses: appleboy/ssh-action@v1.0.0
@@ -170,10 +276,10 @@ jobs:
           username: ${{ secrets.DEV_USER }}
           key: ${{ secrets.DEV_SSH_KEY }}
           script: |
-            cd /opt/agentic-development
+            cd /opt/agentic-platform-dev
             
             # Run health checks
-            docker-compose -f docker-compose.development.yml exec -T backend uv run pytest tests/smoke/ -v || true
+            docker-compose -f docker-compose.development.yml exec -T backend-dev uv run pytest tests/smoke/ -v || true
 
       - name: Notify deployment status
         uses: 8398a7/action-slack@v3

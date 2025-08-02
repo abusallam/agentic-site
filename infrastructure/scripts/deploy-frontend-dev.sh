@@ -147,9 +147,9 @@ else
     run_on_vps "docker ps -a | grep frontend-dev" || echo "Could not get container status"
 fi
 
-# Step 10: Update nginx configuration if needed
+# Step 10: Update nginx configuration if needed (FIXED)
 echo -e "${BLUE}Step 10: Ensuring nginx configuration is up to date...${NC}"
-copy_to_vps "infrastructure/nginx/development.conf" "/etc/nginx/sites-available/agentic-platform-dev-full"
+copy_to_vps "infrastructure/nginx/development-fixed.conf" "/etc/nginx/sites-available/agentic-platform-dev-full"
 
 # Enable the development site
 run_on_vps "ln -sf /etc/nginx/sites-available/agentic-platform-dev-full /etc/nginx/sites-enabled/agentic-platform-dev"

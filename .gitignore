@@ -1,37 +1,106 @@
 # Dependencies
 node_modules/
+*/node_modules/
 .pnp
 .pnp.js
 
 # Testing
-/coverage
+coverage/
+*.lcov
+.nyc_output
+.pytest_cache/
+htmlcov/
 
 # Next.js
-/.next/
-/out/
+.next/
+out/
+dist/
+*.tsbuildinfo
 
 # Production
-/build
+build/
+dist/
 
-# Misc
-.DS_Store
-*.pem
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Local env files
-.env*.local
-.env
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
 
-# Vercel
-.vercel
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
 
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+public
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
 
 # Python
 __pycache__/
@@ -56,108 +125,102 @@ wheels/
 *.egg
 MANIFEST
 
-# Virtual environments
-.venv/
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
 venv/
 ENV/
-env/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# Logs
-*.log
-logs/
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Backup files (exclude large backups)
-backups/
-*.tar.gz
-*.zip
+# Docker
+.dockerignore
 
-# Temporary files
-*.tmp
-*.temp
-
-# Analysis and cleanup files
-project_analysis.json
-conflict_analysis.json
-mcp_transfer_log.json
-cleanup_log_*.json
-cleanup_analysis_*.json
-deployment_log_*.json
-*_test_report.json
-*_analysis_report.md
-
-# Temporary deployment scripts (auto-generated or temporary)
-*_deployment.py
-deploy_*.py
-fix_*.py
-*_fix.py
-*_deploy.py
-docker_fix*.py
-docker_installation*.py
-vps_*.py
-manual_*.py
-fresh_*.py
-update_vps*.py
-setup_*.py
-test_deployment.py
-test_deployed_*.py
-system_update.py
-ssh_service_restart.py
-check_and_install_*.py
-create_missing_*.py
-create_monitoring_*.py
-organize_*.py
-resolve_*.py
-
-# Keep essential deployment scripts
-!deploy-to-vps.sh
-!direct_vps_deploy.sh
-!push-to-github.sh
-
-# Test and monitoring files
-test_report_*.json
-ui_test_*.json
-playwright_*.json
-connection_test_*.json
-monitoring_*.json
-
-# Backup and archive files
-backups/
-*.backup
-*.bak
-project_backup_*.tar.gz
-*_backup_*.tar.gz
-*_snapshot_*.tar.gz
-
-# Development and debugging files
-debug_*.py
-test_*.log
-*.debug
-development_*.json
-
-# Additional temporary patterns
-analyze_*.py
-backup_*.py
-comprehensive_*.py
-execute_*.py
-file_comparison_*.py
-*_admin_session.py
-*_security_hardening.py
-*_environment.py
-*_workflow.py
-*_wildcard_*.py
-
-# Cleanup and analysis files
-cleanup_analysis_*.json
-cleanup_analysis_*.md
-conflict_*.json
-conflict_*.md
-*_transfer_log.json
-
-# External repositories (should be submodules if needed)
-n8n-mcp/
+# Deployment
+deployment*.tar.gz
