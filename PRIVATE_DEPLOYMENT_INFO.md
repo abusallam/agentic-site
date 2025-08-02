@@ -9,7 +9,7 @@ This file contains sensitive deployment information including passwords, API key
 ### Development Server
 - **IP Address**: 217.79.255.54
 - **Username**: root
-- **Password**: gt5qXy22aJ
+- **Password**: xxXNCpx9Cz
 - **Domain**: dev.consulting.sa
 - **Environment**: development
 - **SSH Alias**: agentic-217-79-255-54
