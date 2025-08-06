@@ -159,7 +159,7 @@ jobs:
     
     steps:
     - name: Download test results
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v5
       with:
         pattern: integration-test-results-*
         merge-multiple: true
