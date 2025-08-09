@@ -22,8 +22,8 @@ const nextConfig = {
     unoptimized: true,
   },
   
-  // Output configuration - simplified for development
-  output: 'standalone',
+  // Output configuration - only for production
+  ...(process.env.NODE_ENV === 'production' && { output: 'standalone' }),
 }
 
 export default nextConfig
