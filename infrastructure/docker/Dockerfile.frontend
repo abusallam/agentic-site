@@ -26,14 +26,21 @@ ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NODE_ENV=$NODE_ENV
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build the application
-RUN npm run build
+# Build the application (skip for development)
+RUN if [ "$NODE_ENV" = "development" ]; then \
+      echo "Skipping build for development mode" && \
+      mkdir -p .next && \
+      echo '{"version": 3}' > .next/build-manifest.json; \
+    else \
+      npm run build; \
+    fi
 
 # Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV=production
+ARG NODE_ENV=production
+ENV NODE_ENV=$NODE_ENV
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Install curl for health checks
@@ -64,4 +71,5 @@ ENV HOSTNAME="0.0.0.0"
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3000/ || exit 1
 
-CMD ["npm", "start"]
+# Use dev server for development, start for production
+CMD if [ "$NODE_ENV" = "development" ]; then npm run dev; else npm start; fi
