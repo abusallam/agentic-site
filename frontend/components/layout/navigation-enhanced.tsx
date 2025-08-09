@@ -2,12 +2,11 @@
 
 import * as React from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useEnhancedTranslation } from "@/lib/i18n-enhanced"
-import { brandConfig } from "@/lib/brand"
+import { EnhancedLogo } from "./enhanced-logo"
 import { ThemeToggle } from "../theme-provider-enhanced"
 import { Menu, Globe, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -25,12 +24,12 @@ export function EnhancedNavigation() {
   }, [])
 
   const navItems = [
-    { href: "/", label: "Home" },
-    { href: "/services", label: "Services" },
-    { href: "/consulting", label: "Consulting" },
-    { href: "/about", label: "About" },
-    { href: "/docs", label: "Documentation" },
-    { href: "/contact", label: "Contact" },
+    { href: "/", label: t("nav.home") },
+    { href: "/services", label: t("nav.services") },
+    { href: "/consulting", label: t("nav.consulting") },
+    { href: "/about", label: t("nav.about") },
+    { href: "/docs", label: t("nav.documentation") },
+    { href: "/contact", label: t("nav.contact") },
   ]
 
   return (
@@ -43,19 +42,7 @@ export function EnhancedNavigation() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <Image
-              src={brandConfig.logo.image || "/placeholder.svg"}
-              alt={brandConfig.name}
-              width={brandConfig.logo.width}
-              height={brandConfig.logo.height}
-              className="transition-transform duration-300 group-hover:scale-110 flex-shrink-0"
-              style={{ width: `${brandConfig.logo.width}px`, height: `${brandConfig.logo.height}px` }}
-            />
-            <span className="text-lg font-bold font-heading bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent whitespace-nowrap">
-              {locale === "ar" ? brandConfig.nameArabic : brandConfig.name}
-            </span>
-          </Link>
+          <EnhancedLogo variant="vertical" size="md" />
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-6">

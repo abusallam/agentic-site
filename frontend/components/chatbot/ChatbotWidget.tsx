@@ -228,10 +228,10 @@ export default function ChatbotWidget({
                 className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-lg p-3 ${
+                  className={`max-w-[80%] rounded-lg p-3 shadow-sm ${
                     message.sender === 'user'
                       ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-900'
+                      : 'bg-white text-gray-800 border border-gray-200'
                   }`}
                 >
                   <div className="flex items-start space-x-2">
@@ -281,13 +281,13 @@ export default function ChatbotWidget({
             
             {isTyping && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 rounded-lg p-3 max-w-[80%]">
+                <div className="bg-white border border-gray-200 rounded-lg p-3 max-w-[80%] shadow-sm">
                   <div className="flex items-center space-x-2">
-                    <Bot className="h-4 w-4" />
+                    <Bot className="h-4 w-4 text-blue-600" />
                     <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                     </div>
                   </div>
                 </div>
@@ -335,10 +335,10 @@ export default function ChatbotWidget({
         <div className={`fixed ${position === 'bottom-right' ? 'bottom-6 right-6' : 'bottom-6 left-6'} z-50`}>
           <Button
             onClick={handleToggleOpen}
-            className="rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-shadow"
+            className="rounded-full w-16 h-16 shadow-lg hover:shadow-xl transition-shadow text-lg"
             size="lg"
           >
-            <MessageCircle className="h-6 w-6" />
+            <MessageCircle className="h-8 w-8" />
           </Button>
         </div>
       )}
@@ -384,10 +384,10 @@ export default function ChatbotWidget({
                       className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-[85%] rounded-lg p-3 ${
+                        className={`max-w-[85%] rounded-lg p-3 shadow-sm ${
                           message.sender === 'user'
                             ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 text-gray-900'
+                            : 'bg-white text-gray-800 border border-gray-200'
                         }`}
                       >
                         <div className="flex items-start space-x-1">
@@ -423,13 +423,13 @@ export default function ChatbotWidget({
                   
                   {isTyping && (
                     <div className="flex justify-start">
-                      <div className="bg-gray-100 rounded-lg p-2 max-w-[85%]">
+                      <div className="bg-white border border-gray-200 rounded-lg p-2 max-w-[85%] shadow-sm">
                         <div className="flex items-center space-x-1">
-                          <Bot className="h-3 w-3" />
+                          <Bot className="h-3 w-3 text-blue-600" />
                           <div className="flex space-x-1">
-                            <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce"></div>
-                            <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                            <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                            <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"></div>
+                            <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                            <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                           </div>
                         </div>
                       </div>

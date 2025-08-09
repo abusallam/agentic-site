@@ -1,0 +1,102 @@
+name: "React Component Test Generator"
+description: "Automatically generate comprehensive test files for React components when they are saved"
+version: "1.0.0"
+
+trigger:
+  type: "file_save"
+  pattern: "frontend/components/**/*.tsx"
+  exclude: 
+    - "frontend/components/**/*.test.tsx"
+    - "frontend/components/**/*.stories.tsx"
+    - "frontend/components/ui/**/*.tsx"  # Skip shadcn/ui components
+
+conditions:
+  - "file_contains: 'export function' OR 'export const' OR 'export default'"
+  - "not_exists: corresponding test file"
+  - "file_size_mb < 1"  # Skip very large files
+
+actions:
+  - type: "generate"
+    name: "Generate Test File"
+    prompt: |
+      Analyze this React component and generate a comprehensive test file.
+      
+      Component file: {file_path}
+      Component content: {file_content}
+      
+      Generate tests that include:
+      
+      1. **Basic Rendering Tests**:
+         - Component renders without crashing
+         - Renders with default props
+         - Renders with all required props
+      
+      2. **Props Testing**:
+         - Test all prop variations
+         - Test prop validation and TypeScript interfaces
+         - Test optional vs required props
+      
+      3. **User Interaction Tests**:
+         - Click handlers and event callbacks
+         - Form input interactions
+         - Keyboard navigation
+      
+      4. **State Management Tests**:
+         - Component state changes
+         - Effect hooks behavior
+         - Context consumption if applicable
+      
+      5. **Accessibility Tests**:
+         - ARIA attributes
+         - Keyboard navigation
+         - Screen reader compatibility
+      
+      6. **Integration Tests**:
+         - API calls or service integrations
+         - Router interactions if applicable
+      
+      Use these testing standards:
+      - @testing-library/react for component testing
+      - Jest for test runner and assertions
+      - user-event for user interactions
+      - MSW for API mocking if needed
+      - Follow AAA pattern (Arrange, Act, Assert)
+      
+      File structure:
+      ```typescript
+      import { render, screen, fireEvent } from '@testing-library/react';
+      import userEvent from '@testing-library/user-event';
+      import { ComponentName } from './ComponentName';
+      
+      describe('ComponentName', () => {
+        // Test cases here
+      });
+      ```
+      
+      Make tests specific to this component's functionality.
+      Include edge cases and error scenarios.
+      Use descriptive test names that explain the expected behavior.
+    
+    output: "{file_directory}/{file_name_without_extension}.test.tsx"
+    
+  - type: "notify"
+    name: "Notify Test Generation"
+    prompt: "Test file generated for {file_name}. Review and run tests to ensure quality."
+    output: "console"
+
+settings:
+  auto_apply: false  # Require manual confirmation
+  require_confirmation: true
+  timeout_seconds: 60
+  retry_attempts: 2
+  
+validation:
+  - "output_file_exists"
+  - "output_file_compiles"
+  - "contains_test_cases"
+
+metadata:
+  author: "Kiro Development Team"
+  category: "testing"
+  tags: ["react", "testing", "automation", "frontend"]
+  last_updated: "2025-01-08"

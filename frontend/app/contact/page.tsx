@@ -1,13 +1,18 @@
+"use client"
+
 import { EnhancedNavigation } from "@/components/layout/navigation-enhanced"
 import { EnhancedFooter } from "@/components/layout/footer-enhanced"
+import { UniversalHero } from "@/components/layout/universal-hero"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Mail, Phone, MapPin, Clock, Send } from "lucide-react"
+import { useEnhancedTranslation } from "@/lib/i18n-enhanced"
+import { Mail, Phone, MapPin, Clock, Send, ArrowRight, MessageCircle, Calendar, Users } from "lucide-react"
 
 export default function ContactPage() {
+  const { t } = useEnhancedTranslation()
   const contactInfo = [
     {
       icon: Mail,
@@ -35,22 +40,49 @@ export default function ContactPage() {
     }
   ]
 
+  const heroActions = [
+    {
+      label: "Send Message",
+      href: "#contact-form",
+      variant: "default" as const,
+      icon: Send,
+    },
+    {
+      label: "Schedule Call",
+      href: "#quick-actions",
+      variant: "outline" as const,
+      icon: Calendar,
+    },
+  ]
+
+  const heroStats = [
+    {
+      icon: MessageCircle,
+      value: "24h",
+      label: "Response Time",
+    },
+    {
+      icon: Users,
+      value: "500+",
+      label: "Happy Clients",
+    },
+    {
+      icon: Clock,
+      value: "24/7",
+      label: "Support",
+    },
+  ]
+
   return (
     <div className="flex flex-col min-h-screen">
       <EnhancedNavigation />
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-br from-background to-muted py-20">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Get in Touch
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-              Ready to transform your business with AI? We'd love to hear from you. 
-              Let's discuss how we can help you achieve your goals.
-            </p>
-          </div>
-        </section>
+        <UniversalHero
+          title={t("nav.contact")}
+          subtitle="Ready to transform your business with AI? We'd love to hear from you. Let's discuss how we can help you achieve your goals."
+          actions={heroActions}
+          stats={heroStats}
+        />
 
         {/* Contact Form & Info Section */}
         <section className="py-16">

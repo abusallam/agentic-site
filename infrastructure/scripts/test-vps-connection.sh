@@ -6,7 +6,7 @@
 set -e
 
 VPS_IP="217.79.255.54"
-VPS_PASSWORD="xxXNCpx9Cz"
+VPS_PASSWORD="gnqLG7FDd4"
 
 echo "🔍 Testing VPS Connection Methods"
 echo "================================="

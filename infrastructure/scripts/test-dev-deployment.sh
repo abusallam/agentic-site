@@ -1,146 +1,105 @@
 #!/bin/bash
 
-# Test Development Deployment Script
-# Quick script to test if the development environment is working correctly
+# 🔍 Quick Development Deployment Test Script
+# Run this to quickly diagnose deployment issues
 
-set -e
+SERVER_ALIAS="agentic-fixed-217-79-255-54-development"
+SERVER_PATH="/opt/docker-apps/development/agentic-site/agentic-site"
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+echo "🔍 Quick Deployment Diagnostic Test"
+echo "📅 $(date)"
+echo "🎯 Target: https://dev.consulting.sa"
+echo ""
 
-VPS_HOST="217.79.255.54"
-DEPLOY_PATH="/opt/docker-apps/development/agentic-site"
-
-echo -e "${BLUE}🧪 Testing Development Deployment${NC}"
-echo "Target VPS: $VPS_HOST"
-echo "Timestamp: $(date)"
-echo
-
-# Function to run commands on VPS
-run_on_vps() {
-    ssh root@$VPS_HOST "$1"
-}
-
-echo -e "${YELLOW}Testing container status...${NC}"
-
-run_on_vps "
-    cd $DEPLOY_PATH 2>/dev/null || { echo '❌ Deployment directory not found'; exit 1; }
-    
-    echo 'Container Status:'
-    docker-compose ps
-    
-    echo
-    echo 'Expected containers:'
-    echo '- agentic-frontend-dev (port 3001)'
-    echo '- agentic-backend-dev (port 8001)'  
-    echo '- agentic-redis-dev (port 6380)'
-    echo '- agentic-n8n-dev (port 5679)'
-"
-
-echo -e "${YELLOW}Testing port accessibility...${NC}"
-
-run_on_vps "
-    echo 'Port Status:'
-    
-    # Test each expected port
-    for port in 3001 8001 5679 6380; do
-        if netstat -tlnp | grep -q \":$port \"; then
-            echo \"✓ Port $port is in use\"
-        else
-            echo \"❌ Port $port is not in use\"
-        fi
-    done
-"
-
-echo -e "${YELLOW}Testing service endpoints...${NC}"
-
-run_on_vps "
-    echo 'Service Health Checks:'
-    
-    # Test backend health
-    if curl -s -f --max-time 5 http://localhost:8001/health > /dev/null 2>&1; then
-        echo '✓ Backend health check passed'
-    else
-        echo '❌ Backend health check failed'
-    fi
-    
-    # Test frontend
-    if curl -s -f --max-time 5 http://localhost:3001/ > /dev/null 2>&1; then
-        echo '✓ Frontend responding'
-    else
-        echo '❌ Frontend not responding'
-    fi
-    
-    # Test Redis
-    if docker exec agentic-redis-dev redis-cli ping > /dev/null 2>&1; then
-        echo '✓ Redis responding'
-    else
-        echo '❌ Redis not responding'
-    fi
-    
-    # Test n8n
-    if curl -s -f --max-time 5 http://localhost:5679/ > /dev/null 2>&1; then
-        echo '✓ n8n responding'
-    else
-        echo '❌ n8n not responding'
-    fi
-"
-
-echo -e "${YELLOW}Testing nginx proxy...${NC}"
-
-run_on_vps "
-    echo 'Nginx Proxy Tests:'
-    
-    # Test main site
-    if curl -s -f --max-time 5 -H 'Host: dev.consulting.sa' http://localhost/ > /dev/null 2>&1; then
-        echo '✓ Main site proxy working'
-    else
-        echo '❌ Main site proxy failed'
-    fi
-    
-    # Test API endpoint
-    if curl -s -f --max-time 5 -H 'Host: dev.consulting.sa' http://localhost/api/health > /dev/null 2>&1; then
-        echo '✓ API proxy working'
-    else
-        echo '❌ API proxy failed'
-    fi
-    
-    # Test backend admin
-    if curl -s -f --max-time 5 -H 'Host: dev.consulting.sa' http://localhost/backend/ > /dev/null 2>&1; then
-        echo '✓ Backend admin proxy working'
-    else
-        echo '❌ Backend admin proxy failed'
-    fi
-"
-
-echo -e "${YELLOW}Testing external access...${NC}"
-
-echo "External Access Tests:"
-
-# Test main site
-if curl -s -f --max-time 10 https://dev.consulting.sa/ > /dev/null 2>&1; then
-    echo "✓ https://dev.consulting.sa/ accessible"
+# Test 1: Server Connection
+echo "1️⃣ Testing server connection..."
+if ssh $SERVER_ALIAS 'echo "Connected"' > /dev/null 2>&1; then
+    echo "✅ Server connection: OK"
 else
-    echo "❌ https://dev.consulting.sa/ not accessible"
+    echo "❌ Server connection: FAILED"
+    exit 1
 fi
 
-# Test API health
-if curl -s -f --max-time 10 https://dev.consulting.sa/health > /dev/null 2>&1; then
-    echo "✓ https://dev.consulting.sa/health accessible"
+# Test 2: Container Status
+echo ""
+echo "2️⃣ Checking container status..."
+CONTAINER_STATUS=$(ssh $SERVER_ALIAS "cd $SERVER_PATH && docker-compose ps frontend --format '{{.Status}}'")
+echo "📊 Container status: $CONTAINER_STATUS"
+
+if [[ $CONTAINER_STATUS == *"healthy"* ]]; then
+    echo "✅ Container: HEALTHY"
+elif [[ $CONTAINER_STATUS == *"unhealthy"* ]]; then
+    echo "❌ Container: UNHEALTHY"
+    echo "📋 Recent logs:"
+    ssh $SERVER_ALIAS "cd $SERVER_PATH && docker-compose logs frontend --tail=10"
 else
-    echo "❌ https://dev.consulting.sa/health not accessible"
+    echo "⚠️ Container: UNKNOWN STATUS"
 fi
 
-echo
-echo -e "${BLUE}=== QUICK ACCESS LINKS ===${NC}"
-echo "🌐 Main Site: https://dev.consulting.sa/"
-echo "🔧 Health Check: https://dev.consulting.sa/health"
-echo "🛠️ n8n: https://dev.consulting.sa/n8n/"
-echo "💾 Backend: https://dev.consulting.sa/backend/"
+# Test 3: Critical Files
+echo ""
+echo "3️⃣ Checking critical files..."
+FILES_TO_CHECK=(
+    "lib/i18n-enhanced.tsx"
+    "tailwind.config.ts"
+    "app/globals.css"
+    "package.json"
+)
 
-echo
-echo -e "${GREEN}🎯 Development deployment test complete!${NC}"
+for file in "${FILES_TO_CHECK[@]}"; do
+    if ssh $SERVER_ALIAS "ls $SERVER_PATH/frontend/$file" > /dev/null 2>&1; then
+        echo "✅ $file: EXISTS"
+    else
+        echo "❌ $file: MISSING"
+    fi
+done
+
+# Test 4: HTTP Response
+echo ""
+echo "4️⃣ Testing HTTP response..."
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://dev.consulting.sa)
+echo "🌐 HTTP Status: $HTTP_CODE"
+
+if [ "$HTTP_CODE" = "200" ]; then
+    echo "✅ Site: RESPONDING"
+else
+    echo "❌ Site: NOT RESPONDING"
+fi
+
+# Test 5: Content Check
+echo ""
+echo "5️⃣ Testing site content..."
+RESPONSE=$(curl -s https://dev.consulting.sa)
+if echo "$RESPONSE" | grep -q "Next.js"; then
+    echo "✅ Next.js: DETECTED"
+else
+    echo "❌ Next.js: NOT DETECTED"
+fi
+
+if echo "$RESPONSE" | grep -q "development environment"; then
+    echo "✅ Development environment: DETECTED"
+else
+    echo "⚠️ Development environment: NOT DETECTED"
+fi
+
+# Test 6: Recent Logs
+echo ""
+echo "6️⃣ Recent container logs..."
+echo "📋 Last 5 log entries:"
+ssh $SERVER_ALIAS "cd $SERVER_PATH && docker-compose logs frontend --tail=5"
+
+# Summary
+echo ""
+echo "📊 DIAGNOSTIC SUMMARY"
+echo "===================="
+echo "🌐 Site URL: https://dev.consulting.sa"
+echo "🐳 Container: $CONTAINER_STATUS"
+echo "🔗 HTTP: $HTTP_CODE"
+echo "📅 Checked: $(date)"
+
+if [ "$HTTP_CODE" = "200" ] && [[ $CONTAINER_STATUS == *"healthy"* ]]; then
+    echo "🎉 STATUS: ALL GOOD!"
+else
+    echo "🚨 STATUS: ISSUES DETECTED"
+    echo "📖 Check: DEPLOYMENT_TROUBLESHOOTING_GUIDE.md"
+fi

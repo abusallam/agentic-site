@@ -1,22 +1,58 @@
+"use client"
+
 import { EnhancedNavigation } from "@/components/layout/navigation-enhanced"
 import { EnhancedFooter } from "@/components/layout/footer-enhanced"
+import { UniversalHero } from "@/components/layout/universal-hero"
 import { EnhancedServicesSection } from "@/components/features/services-section-enhanced"
 import { useEnhancedTranslation } from "@/lib/i18n-enhanced"
+import { ArrowRight, Zap, Bot, Brain } from "lucide-react"
 
 export default function ServicesPage() {
+  const { t } = useEnhancedTranslation()
+
+  const heroActions = [
+    {
+      label: t("services.consulting.cta"),
+      href: "/contact",
+      variant: "default" as const,
+      icon: ArrowRight,
+    },
+    {
+      label: t("ui.learnMore"),
+      href: "/consulting",
+      variant: "outline" as const,
+    },
+  ]
+
+  const heroStats = [
+    {
+      icon: Zap,
+      value: "50+",
+      label: t("services.aiAgents.title"),
+    },
+    {
+      icon: Bot,
+      value: "100+",
+      label: t("services.chatbots.title"),
+    },
+    {
+      icon: Brain,
+      value: "200+",
+      label: "AI Solutions",
+    },
+  ]
+
   return (
     <div className="flex flex-col min-h-screen">
       <EnhancedNavigation />
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-16">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">Our AI Services</h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive AI solutions to transform your business and accelerate digital innovation
-            </p>
-          </div>
-          <EnhancedServicesSection />
-        </div>
+        <UniversalHero
+          title={t("services.title")}
+          subtitle={t("services.subtitle")}
+          actions={heroActions}
+          stats={heroStats}
+        />
+        <EnhancedServicesSection />
       </main>
       <EnhancedFooter />
     </div>

@@ -1,0 +1,128 @@
+name: "Agent Documentation Updater"
+description: "Automatically update API documentation when agent service files are modified"
+version: "1.0.0"
+
+trigger:
+  type: "file_save"
+  pattern: "agent/my_adk_agent/services/**/*.py"
+  exclude:
+    - "**/__pycache__/**"
+    - "**/*.pyc"
+    - "**/test_*.py"
+
+conditions:
+  - "file_contains: 'class.*Service' OR 'def.*async' OR '@tool'"
+  - "file_modified_within: 5 minutes"
+
+actions:
+  - type: "update"
+    name: "Update Service Documentation"
+    prompt: |
+      Analyze this Python service file and update its documentation.
+      
+      Service file: {file_path}
+      Service content: {file_content}
+      
+      Generate comprehensive documentation that includes:
+      
+      1. **Service Overview**:
+         - Purpose and responsibility
+         - Integration points
+         - Dependencies
+      
+      2. **Class Documentation**:
+         - Class description and purpose
+         - Constructor parameters
+         - Configuration requirements
+      
+      3. **Method Documentation**:
+         - Method signatures with type hints
+         - Parameter descriptions
+         - Return value descriptions
+         - Usage examples
+         - Error handling
+      
+      4. **Integration Patterns**:
+         - How to use this service in agents
+         - Common usage patterns
+         - Best practices
+      
+      5. **Configuration**:
+         - Required environment variables
+         - Configuration options
+         - Default values
+      
+      6. **Examples**:
+         - Code examples for common use cases
+         - Integration with ADK framework
+         - Error handling examples
+      
+      Follow these standards:
+      - Use clear, technical language
+      - Include type information
+      - Provide practical examples
+      - Document error scenarios
+      - Reference related services
+      
+      Format as Markdown with proper headings and code blocks.
+      Include links to related documentation.
+    
+    output: "docs/api/services/{service_name}.md"
+  
+  - type: "update"
+    name: "Update Main API Reference"
+    prompt: |
+      Update the main API reference document to reflect changes in {file_name}.
+      
+      Current API reference: {read_file:docs/api-reference.md}
+      Modified service: {file_path}
+      
+      Update the API reference to include:
+      - New or modified service methods
+      - Updated service descriptions
+      - New integration patterns
+      - Updated examples
+      
+      Maintain the existing structure and format.
+      Only update sections related to the modified service.
+    
+    output: "docs/api-reference.md"
+  
+  - type: "generate"
+    name: "Update Service Tests Documentation"
+    prompt: |
+      Generate or update testing documentation for this service.
+      
+      Service: {file_path}
+      
+      Create documentation that covers:
+      - How to test this service
+      - Mock implementations
+      - Test data requirements
+      - Integration test patterns
+      
+      Output as a testing guide for developers.
+    
+    output: "docs/testing/services/{service_name}-testing.md"
+
+settings:
+  auto_apply: true  # Auto-apply documentation updates
+  require_confirmation: false
+  timeout_seconds: 120
+  retry_attempts: 3
+  
+validation:
+  - "output_files_exist"
+  - "markdown_syntax_valid"
+  - "contains_service_info"
+
+post_actions:
+  - type: "notify"
+    message: "Documentation updated for {service_name} service"
+    channels: ["console", "log"]
+
+metadata:
+  author: "Kiro Development Team"
+  category: "documentation"
+  tags: ["python", "adk", "services", "documentation", "api"]
+  last_updated: "2025-01-08"

@@ -1,12 +1,16 @@
+"use client"
+
 import { EnhancedNavigation } from "@/components/layout/navigation-enhanced"
 import { EnhancedFooter } from "@/components/layout/footer-enhanced"
+import { UniversalHero } from "@/components/layout/universal-hero"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Users, Target, Award, Globe } from "lucide-react"
-import Image from "next/image"
+import { useEnhancedTranslation } from "@/lib/i18n-enhanced"
+import { Users, Target, Award, Globe, ArrowRight, Heart, Lightbulb, Shield } from "lucide-react"
 
 export default function AboutPage() {
+  const { t } = useEnhancedTranslation()
   const values = [
     {
       icon: Target,
@@ -37,22 +41,48 @@ export default function AboutPage() {
     { number: "98%", label: "Client Satisfaction" }
   ]
 
+  const heroActions = [
+    {
+      label: "Get Started",
+      href: "/contact",
+      variant: "default" as const,
+      icon: ArrowRight,
+    },
+    {
+      label: "Learn More",
+      href: "/services",
+      variant: "outline" as const,
+    },
+  ]
+
+  const heroStats = [
+    {
+      icon: Heart,
+      value: "500+",
+      label: "Happy Clients",
+    },
+    {
+      icon: Lightbulb,
+      value: "1000+",
+      label: "Projects",
+    },
+    {
+      icon: Shield,
+      value: "10+",
+      label: "Years Experience",
+    },
+  ]
+
   return (
     <div className="flex flex-col min-h-screen">
       <EnhancedNavigation />
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-br from-background to-muted py-20">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              About consulting.sa
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-              We are passionate about helping businesses harness the power of artificial intelligence 
-              to transform their operations and achieve unprecedented growth.
-            </p>
-          </div>
-        </section>
+        <UniversalHero
+          title={`About ${t("contact.name")}`}
+          subtitle="We are passionate about helping businesses harness the power of artificial intelligence to transform their operations and achieve unprecedented growth."
+          actions={heroActions}
+          stats={heroStats}
+        />
 
         {/* Mission Section */}
         <section className="py-16">

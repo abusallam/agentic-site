@@ -1,10 +1,15 @@
+"use client"
+
 import { EnhancedNavigation } from "@/components/layout/navigation-enhanced"
 import { EnhancedFooter } from "@/components/layout/footer-enhanced"
+import { UniversalHero } from "@/components/layout/universal-hero"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle, Users, TrendingUp, Shield } from "lucide-react"
+import { useEnhancedTranslation } from "@/lib/i18n-enhanced"
+import { CheckCircle, Users, TrendingUp, Shield, ArrowRight, Target, Award, Clock } from "lucide-react"
 
 export default function ConsultingPage() {
+  const { t } = useEnhancedTranslation()
   const services = [
     {
       icon: TrendingUp,
@@ -46,25 +51,48 @@ export default function ConsultingPage() {
     }
   ]
 
+  const heroActions = [
+    {
+      label: t("consultingPage.contact.cta"),
+      href: "/contact",
+      variant: "default" as const,
+      icon: ArrowRight,
+    },
+    {
+      label: t("ui.learnMore"),
+      href: "/services",
+      variant: "outline" as const,
+    },
+  ]
+
+  const heroStats = [
+    {
+      icon: Target,
+      value: "95%",
+      label: "Success Rate",
+    },
+    {
+      icon: Award,
+      value: "50+",
+      label: "Projects",
+    },
+    {
+      icon: Clock,
+      value: "10+",
+      label: "Years Experience",
+    },
+  ]
+
   return (
     <div className="flex flex-col min-h-screen">
       <EnhancedNavigation />
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-br from-background to-muted py-20">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              AI Consulting Services
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-              Transform your business with expert AI consulting. We help you navigate the AI landscape 
-              and implement solutions that drive real results.
-            </p>
-            <Button size="lg" className="btn-primary">
-              Schedule Consultation
-            </Button>
-          </div>
-        </section>
+        <UniversalHero
+          title={t("services.consulting.title")}
+          subtitle={t("consultingPage.about.paragraph1")}
+          actions={heroActions}
+          stats={heroStats}
+        />
 
         {/* About Section */}
         <section className="py-16">

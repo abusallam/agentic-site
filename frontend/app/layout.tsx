@@ -9,19 +9,23 @@ import { TranslationProvider } from "@/lib/i18n-enhanced"
 import { Toaster } from "@/components/ui/toaster"
 import { ErrorBoundary } from "@/components/error-boundary"
 import PerformanceMonitor from "@/components/performance-monitor"
-import ChatbotWidget from "@/components/chatbot/ChatbotWidget"
 import { brandConfig } from "@/lib/brand"
+
+// Import client-side chatbot wrapper
+import ChatbotWrapper from "@/components/chatbot/ChatbotWrapper"
 
 const bitter = Bitter({
   subsets: ["latin"],
   variable: "--font-bitter",
   weight: ["300", "400", "500", "600", "700"],
+  display: 'swap',
 })
 
 const notoSansArabic = Noto_Sans_Arabic({
   subsets: ["arabic"],
   variable: "--font-noto-arabic",
   weight: ["300", "400", "500", "600", "700"],
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -90,7 +94,7 @@ export default function RootLayout({
               {children}
               <Toaster />
               <PerformanceMonitor />
-              <ChatbotWidget 
+              <ChatbotWrapper 
                 position="bottom-right"
               />
             </TranslationProvider>

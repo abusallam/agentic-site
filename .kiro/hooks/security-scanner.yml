@@ -1,0 +1,158 @@
+name: "Security Scanner"
+description: "Manual security scanning and vulnerability assessment for the codebase"
+version: "1.0.0"
+
+trigger:
+  type: "manual"
+  command: "security-scan"
+  aliases: ["sec-scan", "security", "vuln-check"]
+
+conditions:
+  - "git_status: clean OR user_confirmed"
+  - "not_running: other_security_scans"
+
+actions:
+  - type: "validate"
+    name: "Code Security Analysis"
+    prompt: |
+      Perform a comprehensive security analysis of the agentic AI platform codebase.
+      
+      Focus areas for analysis:
+      
+      1. **Secrets and Credentials**:
+         - Scan for hardcoded API keys, passwords, tokens
+         - Check environment variable usage
+         - Validate secrets management patterns
+         - Look for exposed credentials in logs
+      
+      2. **Input Validation and Sanitization**:
+         - Check user input handling in frontend forms
+         - Validate API endpoint input sanitization
+         - Review SQL injection prevention
+         - Check XSS prevention measures
+      
+      3. **Authentication and Authorization**:
+         - Review Supabase Auth implementation
+         - Check JWT token handling
+         - Validate session management
+         - Review role-based access control
+      
+      4. **API Security**:
+         - Check CORS configuration
+         - Validate rate limiting
+         - Review API endpoint security
+         - Check for information disclosure
+      
+      5. **Container and Infrastructure Security**:
+         - Review Docker configurations
+         - Check for privileged containers
+         - Validate network security
+         - Review SSL/TLS configurations
+      
+      6. **Dependencies and Vulnerabilities**:
+         - Check for known vulnerable dependencies
+         - Review package.json and requirements.txt
+         - Validate dependency update practices
+      
+      7. **Data Protection**:
+         - Review GDPR compliance measures
+         - Check data encryption at rest
+         - Validate data transmission security
+         - Review data retention policies
+      
+      8. **Agent-Specific Security**:
+         - Review ADK agent security patterns
+         - Check service integration security
+         - Validate MCP communication security
+         - Review workflow automation security
+      
+      Generate a detailed security report with:
+      - Severity levels (Critical, High, Medium, Low)
+      - Specific file locations and line numbers
+      - Remediation recommendations
+      - Best practice suggestions
+      
+      Format as structured Markdown with clear sections.
+    
+    output: "security-reports/security-scan-{timestamp}.md"
+  
+  - type: "validate"
+    name: "Dependency Vulnerability Check"
+    prompt: |
+      Analyze all project dependencies for known vulnerabilities.
+      
+      Check these files:
+      - frontend/package.json
+      - agent/pyproject.toml
+      - agent/requirements.txt
+      - n8n-mcp/package.json
+      
+      For each dependency:
+      - Check against CVE databases
+      - Identify outdated packages
+      - Suggest update strategies
+      - Assess impact of vulnerabilities
+      
+      Generate a dependency security report.
+    
+    output: "security-reports/dependency-scan-{timestamp}.md"
+  
+  - type: "generate"
+    name: "Security Checklist"
+    prompt: |
+      Generate a security checklist based on the scan results.
+      
+      Create actionable items for:
+      - Immediate fixes required
+      - Medium-term improvements
+      - Long-term security enhancements
+      - Monitoring and alerting setup
+      
+      Prioritize by risk level and implementation effort.
+    
+    output: "security-reports/security-checklist-{timestamp}.md"
+  
+  - type: "notify"
+    name: "Security Scan Notification"
+    prompt: |
+      Security scan completed. Summary:
+      - Critical issues: {count_critical}
+      - High priority issues: {count_high}
+      - Medium priority issues: {count_medium}
+      - Low priority issues: {count_low}
+      
+      Review the detailed report at: security-reports/security-scan-{timestamp}.md
+    
+    output: "console"
+
+settings:
+  auto_apply: false
+  require_confirmation: true
+  timeout_seconds: 300  # 5 minutes for comprehensive scan
+  retry_attempts: 1
+  
+validation:
+  - "security_report_generated"
+  - "contains_vulnerability_assessment"
+  - "includes_remediation_steps"
+
+post_actions:
+  - type: "archive"
+    source: "security-reports/security-scan-{timestamp}.md"
+    destination: "docs/security/scans/"
+  
+  - type: "update"
+    name: "Update Security Dashboard"
+    prompt: "Update the security dashboard with latest scan results"
+    output: "docs/security/dashboard.md"
+
+metadata:
+  author: "Kiro Security Team"
+  category: "security"
+  tags: ["security", "vulnerability", "scanning", "compliance"]
+  last_updated: "2025-01-08"
+  
+schedule:
+  # Optional: Run weekly security scans
+  cron: "0 2 * * 1"  # Every Monday at 2 AM
+  auto_run: false

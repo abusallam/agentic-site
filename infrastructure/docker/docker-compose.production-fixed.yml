@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  frontend-prod:
+    image: node:20-alpine
+    container_name: agentic-frontend-prod
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    command: sh -c "npm install && npm run build && npm start"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backend-prod:
+    image: python:3.11-slim
+    container_name: agentic-backend-prod
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    working_dir: /app
+    command: >
+      sh -c "pip install fastapi uvicorn && 
+      echo 'from fastapi import FastAPI
+      app = FastAPI()
+      @app.get(\"/\")
+      def read_root():
+          return {\"message\": \"Production Backend is running\"}' > main.py && 
+      uvicorn main:app --host 0.0.0.0 --port 8000"
+    restart: unless-stopped
+
+  redis-prod:
+    image: redis:7-alpine
+    container_name: agentic-redis-prod
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  n8n-prod:
+    image: n8nio/n8n:latest
+    container_name: agentic-n8n-prod
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=agentic2025
+      - WEBHOOK_URL=https://consulting.sa/
+      - GENERIC_TIMEZONE=Asia/Riyadh
+    restart: unless-stopped

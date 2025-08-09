@@ -1,0 +1,20 @@
+name: "Container Health Validator"
+description: "Validate container health after deployment"
+trigger: "post_deploy"
+conditions:
+  - "deployment_successful"
+  - "containers_running"
+action: "validate_container_health"
+parameters:
+  timeout: 300
+  retry_count: 3
+  retry_delay: 10
+  health_endpoints:
+    - "http://localhost:3000/api/health"
+    - "http://localhost:8000/health"
+    - "http://localhost:6379"  # Redis health check
+  alert_on_failure: true
+  slack_webhook: "${SLACK_WEBHOOK_URL}"
+enabled: true
+priority: "high"
+timeout: 600
