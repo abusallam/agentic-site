@@ -3,8 +3,8 @@ version: '3.8'
 services:
   frontend-dev:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.frontend
       args:
         NODE_ENV: development
     container_name: agentic-frontend-dev
@@ -29,8 +29,8 @@ services:
 
   backend-dev:
     build:
-      context: ./agent
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
     container_name: agentic-backend-dev
     ports:
       - "8001:8000"
