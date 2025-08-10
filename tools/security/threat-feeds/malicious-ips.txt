@@ -1,0 +1,41 @@
+# Known malicious IP addresses
+# Updated: 2025-01-09
+# Sources: Multiple threat intelligence feeds
+
+# Known botnet IPs
+185.220.100.240
+185.220.100.241
+185.220.100.242
+185.220.100.243
+185.220.100.244
+185.220.100.245
+185.220.100.246
+185.220.100.247
+185.220.100.248
+185.220.100.249
+
+# Tor exit nodes (suspicious for direct connections)
+199.87.154.255
+162.247.74.27
+185.220.101.182
+199.87.154.251
+185.220.102.8
+
+# Known scanning IPs
+104.248.144.120
+167.99.83.205
+134.209.24.42
+178.128.83.165
+159.89.49.60
+
+# Cryptocurrency mining pools (suspicious on servers)
+pool.supportxmr.com
+xmr-usa-east1.nanopool.org
+xmr-eu1.nanopool.org
+xmr-asia1.nanopool.org
+
+# Known C&C servers
+23.129.64.214
+185.159.158.69
+91.219.236.166
+185.159.159.131

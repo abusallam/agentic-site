@@ -7,7 +7,7 @@ SERVER_IP="217.79.255.54"
 SERVER_USER="root"
 SERVER_PASS="gnqLG7FDd4"
 REPO_URL="git@github.com:abusallam/agentic-site.git"
-BRANCH="development"
+BRANCH="develop"
 
 echo "🚀 DEPLOYING DEVELOPMENT STACK"
 echo "📅 $(date)"
@@ -44,15 +44,17 @@ ssh_run "cd /opt/apps/development/agentic-site && git checkout -b $BRANCH origin
 echo ""
 echo "🔍 Step 3: Creating development Docker Compose configuration..."
 
-# Create development-specific docker-compose file
-cat > /tmp/docker-compose.development-separated.yml << 'EOF'
+# Update the existing docker-compose.development.yml to use consulting naming
+cat > /tmp/docker-compose.development.yml << 'EOF'
 version: '3.8'
 
 services:
   frontend-dev:
     build:
-      context: ./frontend
-      dockerfile: ../infrastructure/docker/Dockerfile.frontend
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.frontend
+      args:
+        NODE_ENV: development
     container_name: consulting-frontend-dev
     ports:
       - "3001:3000"
@@ -61,44 +63,48 @@ services:
       - NEXT_PUBLIC_SITE_URL=https://dev.consulting.sa
       - NEXT_PUBLIC_API_URL=https://dev.consulting.sa/api
     env_file:
-      - .env
-    networks:
-      - consulting-development
+      - .env.development
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
+    depends_on:
+      - backend-dev
+      - redis-dev
 
   backend-dev:
     build:
-      context: ./agent
-      dockerfile: ../infrastructure/docker/Dockerfile.backend
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
     container_name: consulting-backend-dev
     ports:
       - "8001:8000"
     environment:
       - ENVIRONMENT=development
-      - DEBUG=true
+      - PORT=8000
     env_file:
-      - .env
-    networks:
-      - consulting-development
+      - .env.development
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
+    depends_on:
+      - redis-dev
 
   redis-dev:
     image: redis:7-alpine
     container_name: consulting-redis-dev
     ports:
       - "6380:6379"
-    networks:
-      - consulting-development
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_dev_data:/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -113,25 +119,35 @@ services:
       - "5679:5678"
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=admin
-      - N8N_BASIC_AUTH_PASSWORD=dev_n8n_password
-      - WEBHOOK_URL=https://dev.consulting.sa/
+      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD:-dev_n8n_password}
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=https://dev.consulting.sa/n8n/
     volumes:
       - n8n_dev_data:/home/node/.n8n
-    networks:
-      - consulting-development
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
+  redis_dev_data:
+    driver: local
   n8n_dev_data:
+    driver: local
 
 networks:
-  consulting-development:
+  default:
+    name: consulting-development
     driver: bridge
 EOF
 
-# Copy development docker-compose to server
-sshpass -p "$SERVER_PASS" scp -o StrictHostKeyChecking=no /tmp/docker-compose.development-separated.yml "$SERVER_USER@$SERVER_IP:/opt/apps/development/agentic-site/"
+# Copy updated development docker-compose to server
+sshpass -p "$SERVER_PASS" scp -o StrictHostKeyChecking=no /tmp/docker-compose.development.yml "$SERVER_USER@$SERVER_IP:/opt/apps/development/agentic-site/"
 
 echo ""
 echo "🔍 Step 4: Creating development environment file..."
@@ -185,10 +201,10 @@ echo ""
 echo "🔍 Step 5: Deploying development containers..."
 
 # Stop any existing development containers
-ssh_run "cd /opt/apps/development/agentic-site && docker compose -f docker-compose.development-separated.yml down || true"
+ssh_run "cd /opt/apps/development/agentic-site && docker compose -f docker-compose.development.yml down || true"
 
 # Build and start development containers
-ssh_run "cd /opt/apps/development/agentic-site && docker compose -f docker-compose.development-separated.yml up -d --build"
+ssh_run "cd /opt/apps/development/agentic-site && docker compose -f docker-compose.development.yml up -d --build"
 
 echo ""
 echo "🔍 Step 6: Waiting for containers to be healthy..."
@@ -298,7 +314,7 @@ echo "Testing URLs:"
 ssh_run "curl -I https://dev.consulting.sa/health || echo 'Development site not accessible yet'"
 
 # Cleanup temporary files
-rm -f /tmp/docker-compose.development-separated.yml /tmp/.env.development /tmp/nginx-dev.conf
+rm -f /tmp/docker-compose.development.yml /tmp/.env.development /tmp/nginx-dev.conf
 
 echo ""
 echo "🎉 DEVELOPMENT STACK DEPLOYMENT COMPLETED!"
@@ -320,7 +336,7 @@ echo ""
 echo "🔧 Management Commands:"
 echo "   View dev containers: docker ps | grep dev"
 echo "   View dev logs: docker logs consulting-frontend-dev"
-echo "   Restart dev stack: cd /opt/apps/development/agentic-site && docker compose -f docker-compose.development-separated.yml restart"
+echo "   Restart dev stack: cd /opt/apps/development/agentic-site && docker compose -f docker-compose.development.yml restart"
 echo "   Update from GitHub: cd /opt/apps/development/agentic-site && git pull origin $BRANCH"
 echo ""
 echo "📝 Your deployment strategy is now ready:"

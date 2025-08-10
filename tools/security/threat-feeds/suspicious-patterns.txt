@@ -1,0 +1,125 @@
+# Suspicious patterns for log analysis
+# Updated: 2025-01-09
+
+# SQL Injection patterns
+union.*select
+select.*from.*information_schema
+select.*from.*mysql
+select.*from.*pg_
+drop.*table
+insert.*into
+update.*set.*where
+delete.*from.*where
+exec.*xp_
+sp_executesql
+
+# XSS patterns
+<script
+javascript:
+onload=
+onerror=
+onclick=
+onmouseover=
+eval\(
+document\.cookie
+document\.write
+
+# Directory traversal
+\.\./
+\.\.\\
+/etc/passwd
+/etc/shadow
+/proc/version
+/windows/system32
+boot\.ini
+
+# Command injection
+;.*cat
+;.*ls
+;.*pwd
+;.*whoami
+;.*id
+;.*uname
+\|.*cat
+\|.*ls
+\|.*pwd
+&&.*cat
+&&.*ls
+
+# File inclusion
+php://
+file://
+data://
+expect://
+zip://
+
+# Web shells
+c99\.php
+r57\.php
+webshell
+backdoor
+shell_exec
+system\(
+passthru\(
+exec\(
+
+# Vulnerability scanners
+nikto
+nmap
+sqlmap
+burpsuite
+acunetix
+nessus
+openvas
+w3af
+
+# Brute force indicators
+admin/admin
+root/root
+admin/password
+test/test
+guest/guest
+user/user
+
+# Suspicious user agents
+sqlmap
+nikto
+nmap
+masscan
+zmap
+curl/7
+wget/
+python-requests
+Go-http-client
+
+# Cryptocurrency mining
+stratum\+tcp
+mining\.pool
+cryptonight
+monero
+bitcoin
+ethereum
+zcash
+
+# Suspicious file extensions
+\.php\?
+\.asp\?
+\.jsp\?
+\.cgi\?
+\.pl\?
+\.py\?
+\.sh\?
+\.exe
+\.bat
+\.cmd
+
+# Network reconnaissance
+/robots\.txt
+/sitemap\.xml
+/\.well-known/
+/\.git/
+/\.svn/
+/admin/
+/administrator/
+/wp-admin/
+/phpmyadmin/

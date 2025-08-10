@@ -66,6 +66,9 @@
         "./infrastructure/scripts/restore-professional-website.sh *",
         "./infrastructure/scripts/deploy-manual-fix.sh *",
         "./infrastructure/scripts/fix-separated-stacks.sh *",
-        "./infrastructure/scripts/setup-private-github-access.sh"
+        "./infrastructure/scripts/setup-private-github-access.sh",
+        "./infrastructure/scripts/deploy-development-stack.sh *",
+        "./infrastructure/scripts/deploy-dev-stack-simple.sh *",
+        "python3 *"
     ]
 }

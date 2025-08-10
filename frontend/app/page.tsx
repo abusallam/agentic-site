@@ -5,6 +5,7 @@ import { UniversalHero } from "@/components/layout/universal-hero"
 import { EnhancedServicesSection } from "@/components/features/services-section-enhanced"
 import { EnhancedTestimonialsSection } from "@/components/features/testimonials-section-enhanced"
 import { EnhancedFooter } from "@/components/layout/footer-enhanced"
+import { EnhancedChatWidget } from "@/components/chatbot/enhanced-chat-widget"
 import { useEnhancedTranslation } from "@/lib/i18n-enhanced"
 import { ArrowRight, Users, CheckCircle, Clock, Star } from "lucide-react"
 
@@ -68,6 +69,12 @@ export default function HomePage() {
         <EnhancedTestimonialsSection />
       </main>
       <EnhancedFooter />
+      
+      {/* Enhanced AI Chat Widget */}
+      <EnhancedChatWidget 
+        position="bottom-right"
+        theme="auto"
+      />
     </div>
   )
 }

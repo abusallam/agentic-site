@@ -329,7 +329,7 @@ export function useEnhancedTranslation() {
 }
 
 export function TranslationProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocale] = useState<Locale>("en")
+  const [locale, setLocale] = useState<Locale>("ar")
   const [mounted, setMounted] = useState(false)
   const isRTL = locale === "ar"
 
