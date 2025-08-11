@@ -44,14 +44,14 @@ export function EnhancedHeroSection() {
         <div className="space-y-6 animate-fade-in-up">
           <h1
             className={cn(
-              "hero-title text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight",
+              "hero-title",
               "bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent",
             )}
           >
             {t("hero.title")}
           </h1>
 
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="hero-subtitle text-muted-foreground max-w-2xl mx-auto">
             {t("hero.subtitle")}
           </p>
         </div>

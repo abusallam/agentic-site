@@ -92,7 +92,7 @@ export function EnhancedChatWidget({
 
     try {
       // Send to our enhanced agentic backend
-      const response = await fetch('/api/v1/agents/welcome', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -114,28 +114,28 @@ export function EnhancedChatWidget({
 
       const data = await response.json()
       
-      // Poll for task result
-      if (data.task_id) {
-        const result = await pollTaskResult(data.task_id)
-        
-        if (result && result.result) {
-          const assistantMessage: ChatMessage = {
-            id: `assistant_${Date.now()}`,
-            role: "assistant",
-            content: result.result.response?.message || "I'm here to help! How can I assist you?",
-            timestamp: new Date(),
-            confidence: result.result.response?.confidence,
-            next_action: result.result.response?.next_action,
-            agent_type: result.result.agent_type
-          }
-
-          setMessages(prev => [...prev, assistantMessage])
-          
-          // Update current agent if routing occurred
-          if (result.result.response?.transfer_to) {
-            setCurrentAgent(result.result.response.transfer_to)
-          }
+      // Handle direct response from our chat API
+      if (data.success && data.response) {
+        const assistantMessage: ChatMessage = {
+          id: `assistant_${Date.now()}`,
+          role: "assistant",
+          content: data.response.message || "I'm here to help! How can I assist you?",
+          timestamp: new Date(),
+          confidence: data.response.confidence,
+          next_action: data.response.next_action,
+          agent_type: data.response.agent_type
         }
+
+        setMessages(prev => [...prev, assistantMessage])
+        
+        // Update current agent if routing occurred
+        if (data.response.transfer_to) {
+          setCurrentAgent(data.response.transfer_to)
+        } else if (data.response.agent_type) {
+          setCurrentAgent(data.response.agent_type)
+        }
+      } else {
+        throw new Error(data.error || 'Failed to get response')
       }
     } catch (error) {
       console.error('Chat error:', error)

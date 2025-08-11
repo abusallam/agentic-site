@@ -36,7 +36,7 @@ export function EnhancedNavigation() {
     <header
       className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? "nav-blur shadow-sm" : "bg-transparent",
+        isScrolled ? "nav-scrolled shadow-sm" : "nav-transparent",
       )}
     >
       <div className="container mx-auto px-4">
