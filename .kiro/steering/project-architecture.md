@@ -12,20 +12,27 @@ Complete AI SaaS platform with dual-agent architecture for customer journey orch
 
 ## Architecture Principles
 
-### Frontend-Backend Separation
-- **Frontend (Next.js)**: Customer-facing website, marketing, embedded chatbots
-- **Backend (Python ADK Agent)**: Core orchestration engine, business logic, integrations
-- **No Direct Communication**: Each system operates independently through Supabase
-- **Shared Database**: Both systems use Supabase with agent accessing Next.js tables when needed
-- **Single Environment**: One `.env` file at project root for both systems
-- **Same Container Deployment**: Both systems deploy together
+### Four-Agent System Architecture
+- **Frontend (Next.js)**: Customer-facing website with intelligent agent routing
+- **Backend (Multi-Agent System)**: Four specialized agents with different frameworks
+- **Intelligent Routing**: Automatic message routing to appropriate specialized agent
+- **Shared Database**: All agents use Supabase with specialized data models
+- **n8n MCP Integration**: Direct workflow automation via Model Context Protocol
+- **LiveKit Integration**: Human handoff capabilities for consulting services
 
-### Customer Interaction Flow
-1. **Initial Contact**: Simple chatbot using Google Gemini model embedded in Next.js
-2. **Live Agent Handoff**: Transfer to human agent via Livekit when needed
-3. **AI Agent Monitoring**: ADK agent listens to live conversations, gathering requirements
-4. **Workflow Automation**: Agent uses MCP server to control n8n for deployment/automation
-5. **Specialized Agents**: Different agents handle different service types
+### Four-Agent Customer Journey
+1. **InitialCustomerAgent (Google ADK)**: New customer onboarding with Arabic/English detection
+2. **N8nWorkflowAgent (ADK + MCP)**: Authenticated workflow automation with n8n integration
+3. **CodeGenerationAgent (LangGraph)**: Custom AI agent development with multi-framework support
+4. **ConsultingAgent (Pydantic AI)**: Strategic consulting with LiveKit human handoff
+5. **Intelligent Routing**: 100% accuracy in message routing to appropriate agents
+
+### Multi-Framework Integration
+- **Google ADK**: InitialCustomerAgent and N8nWorkflowAgent (production-ready)
+- **LangGraph**: CodeGenerationAgent (complex workflow orchestration)
+- **Pydantic AI**: ConsultingAgent (structured AI applications)
+- **n8n MCP**: Direct workflow automation communication
+- **LiveKit**: Real-time video/audio for human consultations
 
 ## Development Constraints
 

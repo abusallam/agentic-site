@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Bitter, Noto_Sans_Arabic } from "next/font/google"
+import { Bitter, Cairo, Amiri } from "next/font/google"
 import "./globals.css"
 import "./css-fix.css"
 import "../styles/animations.css"
@@ -21,10 +21,17 @@ const bitter = Bitter({
   display: 'swap',
 })
 
-const notoSansArabic = Noto_Sans_Arabic({
+const cairo = Cairo({
   subsets: ["arabic"],
-  variable: "--font-noto-arabic",
-  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-cairo",
+  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
+  display: 'swap',
+})
+
+const amiri = Amiri({
+  subsets: ["arabic"],
+  variable: "--font-amiri",
+  weight: ["400", "700"],
   display: 'swap',
 })
 
@@ -87,7 +94,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${bitter.variable} ${notoSansArabic.variable} font-sans antialiased`}>
+      <body className={`${bitter.variable} ${cairo.variable} ${amiri.variable} font-sans antialiased`}>
         <ErrorBoundary>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <TranslationProvider>

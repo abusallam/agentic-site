@@ -1,0 +1,155 @@
+# Consolidated Dockerfile: Next.js Frontend + n8n Platform + n8n MCP
+FROM node:20-alpine AS base
+
+# Install system dependencies
+RUN apk add --no-cache \
+    libc6-compat \
+    curl \
+    python3 \
+    py3-pip \
+    git \
+    bash \
+    supervisor
+
+# Install pnpm for n8n platform
+RUN npm install -g pnpm@10.12.1
+
+# ================================
+# Stage 1: Build Frontend
+# ================================
+FROM base AS frontend-deps
+WORKDIR /app/frontend
+COPY frontend/package.json ./
+RUN npm install
+
+FROM base AS frontend-builder
+WORKDIR /app/frontend
+COPY --from=frontend-deps /app/frontend/node_modules ./node_modules
+COPY frontend/. .
+
+# Set build-time environment variables
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NODE_ENV=development
+
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NODE_ENV=$NODE_ENV
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Build for production only
+RUN if [ "$NODE_ENV" = "production" ]; then \
+      npm run build; \
+    else \
+      echo "Skipping build for development mode" && \
+      mkdir -p .next && \
+      echo '{"version": 3}' > .next/build-manifest.json; \
+    fi
+
+# ================================
+# Stage 2: Build n8n Platform
+# ================================
+FROM base AS n8n-platform-builder
+WORKDIR /app/n8n-platform
+
+# Copy n8n platform source
+COPY n8n-platform/package.json n8n-platform/pnpm-lock.yaml n8n-platform/pnpm-workspace.yaml ./
+COPY n8n-platform/packages ./packages
+COPY n8n-platform/scripts ./scripts
+COPY n8n-platform/turbo.json ./
+
+# Install dependencies and build n8n
+RUN pnpm install --frozen-lockfile
+RUN pnpm build:n8n
+
+# ================================
+# Stage 3: Build n8n MCP
+# ================================
+FROM base AS n8n-mcp-builder
+WORKDIR /app/n8n-mcp
+
+COPY n8n-mcp/package.json n8n-mcp/package-lock.json ./
+RUN npm install
+
+COPY n8n-mcp/. .
+RUN npm run build
+
+# ================================
+# Stage 4: Runtime - Consolidated Container
+# ================================
+FROM base AS runtime
+WORKDIR /app
+
+ARG NODE_ENV=development
+ENV NODE_ENV=$NODE_ENV
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Create application user
+RUN addgroup --system --gid 1001 appuser
+RUN adduser --system --uid 1001 appuser
+
+# ================================
+# Copy Frontend
+# ================================
+WORKDIR /app/frontend
+COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/.next ./.next
+COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/node_modules ./node_modules
+COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/package.json ./package.json
+
+# Copy frontend source files for development
+COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/app ./app
+COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/components ./components
+COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/lib ./lib
+COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/hooks ./hooks
+COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/styles ./styles
+COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/next.config.mjs ./next.config.mjs
+COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/tailwind.config.ts ./tailwind.config.ts
+COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/tsconfig.json ./tsconfig.json
+COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/postcss.config.mjs ./postcss.config.mjs
+
+# ================================
+# Copy n8n Platform
+# ================================
+WORKDIR /app/n8n-platform
+COPY --from=n8n-platform-builder --chown=appuser:appuser /app/n8n-platform/packages ./packages
+COPY --from=n8n-platform-builder --chown=appuser:appuser /app/n8n-platform/node_modules ./node_modules
+COPY --from=n8n-platform-builder --chown=appuser:appuser /app/n8n-platform/package.json ./package.json
+
+# ================================
+# Copy n8n MCP
+# ================================
+WORKDIR /app/n8n-mcp
+COPY --from=n8n-mcp-builder --chown=appuser:appuser /app/n8n-mcp/dist ./dist
+COPY --from=n8n-mcp-builder --chown=appuser:appuser /app/n8n-mcp/node_modules ./node_modules
+COPY --from=n8n-mcp-builder --chown=appuser:appuser /app/n8n-mcp/package.json ./package.json
+
+# ================================
+# Setup Supervisor Configuration
+# ================================
+WORKDIR /app
+COPY infrastructure/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Create necessary directories
+RUN mkdir -p /var/log/supervisor /home/node/.n8n
+RUN chown -R appuser:appuser /app /var/log/supervisor /home/node/.n8n
+
+# Expose ports
+EXPOSE 3000 5678 3001
+
+# Environment variables
+ENV FRONTEND_PORT=3000
+ENV N8N_PORT=5678
+ENV N8N_MCP_PORT=3001
+ENV HOSTNAME="0.0.0.0"
+
+# Health check for all services
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:3000/api/health && \
+      curl -f http://localhost:5678/healthz && \
+      curl -f http://localhost:3001/health || exit 1
+
+# Switch to app user
+USER appuser
+
+# Start all services with supervisor
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

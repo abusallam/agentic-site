@@ -175,6 +175,30 @@
         "get_file_context",
         "generate_smart_summary"
       ]
+    },
+    "n8n-mcp": {
+      "command": "npx",
+      "args": [
+        "n8n-mcp"
+      ],
+      "cwd": "/home/asim/Documents/agentic-site-prod/agentic-site/n8n-mcp",
+      "env": {
+        "MCP_MODE": "stdio",
+        "LOG_LEVEL": "error",
+        "DISABLE_CONSOLE_OUTPUT": "true",
+        "N8N_API_URL": "http://localhost:5679",
+        "N8N_API_KEY": "dummy_n8n_development_key"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "list_nodes",
+        "get_node_info",
+        "get_node_essentials",
+        "search_nodes",
+        "validate_node_operation",
+        "get_node_for_task",
+        "list_workflow_templates"
+      ]
     }
   }
 }

@@ -1,0 +1,39 @@
+name: "Multi-Agent System Monitor"
+description: "Monitor and test the four-agent system health and performance"
+trigger:
+  type: "manual"
+  icon: "🤖"
+  label: "Test Multi-Agent System"
+
+steps:
+  - name: "Run Multi-Agent System Tests"
+    type: "command"
+    command: "uv run agent/test_multi_agent_system.py"
+    description: "Execute comprehensive tests for all four agents"
+    
+  - name: "Check Agent Routing Accuracy"
+    type: "command" 
+    command: "curl -X POST http://localhost:3000/api/chat -H 'Content-Type: application/json' -d '{\"message\": \"مرحباً، أريد معرفة خدماتكم\", \"sessionId\": \"test_routing\"}'"
+    description: "Test Arabic message routing to InitialCustomerAgent"
+    
+  - name: "Test n8n MCP Integration"
+    type: "command"
+    command: "curl -X GET http://localhost:3002/health"
+    description: "Verify n8n MCP server is operational"
+    
+  - name: "Validate Demo Data"
+    type: "command"
+    command: "ls -la agent/demo_data.json && wc -l agent/demo_data.json"
+    description: "Check demo data file exists and contains data"
+    
+  - name: "Check Arabic Font Loading"
+    type: "command"
+    command: "grep -n 'Cairo\\|Amiri' frontend/app/layout.tsx"
+    description: "Verify professional Arabic fonts are configured"
+
+outputs:
+  - "Multi-agent system test results"
+  - "Agent routing accuracy metrics"
+  - "n8n MCP server health status"
+  - "Demo data validation"
+  - "Arabic font configuration status"

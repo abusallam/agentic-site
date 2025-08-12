@@ -5,7 +5,7 @@
 /* Font Variables */
 :root {
   --font-bitter: 'Bitter', serif;
-  --font-noto-arabic: 'Noto Sans Arabic', sans-serif;
+  --font-arabic: var(--font-cairo), var(--font-amiri), 'Cairo', 'Amiri', sans-serif;
 }
 
 /* Improved Typography */
@@ -26,13 +26,13 @@
 /* Arabic Font Improvements */
 [dir="rtl"] .hero-title,
 [lang="ar"] .hero-title {
-  font-family: var(--font-noto-arabic) !important;
-  font-weight: 500 !important;
+  font-family: var(--font-arabic) !important;
+  font-weight: 600 !important;
 }
 
 [dir="rtl"] .hero-subtitle,
 [lang="ar"] .hero-subtitle {
-  font-family: var(--font-noto-arabic) !important;
+  font-family: var(--font-arabic) !important;
   font-weight: 400 !important;
 }
 
@@ -173,17 +173,17 @@
 }
 
 [dir="rtl"] .font-heading {
-  font-family: var(--font-noto-arabic), system-ui, sans-serif;
+  font-family: var(--font-arabic), system-ui, sans-serif;
   font-weight: 600;
 }
 
 [dir="rtl"] .font-body {
-  font-family: var(--font-noto-arabic), system-ui, sans-serif;
+  font-family: var(--font-arabic), system-ui, sans-serif;
   font-weight: 400;
 }
 
 [dir="rtl"] * {
-  font-family: var(--font-noto-arabic), system-ui, sans-serif;
+  font-family: var(--font-arabic), system-ui, sans-serif;
 }
 
 /* Custom Animations */

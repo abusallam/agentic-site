@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { llmService } from '@/lib/llm-integration'
 
 interface ChatRequest {
   message: string
@@ -37,8 +38,75 @@ export async function POST(request: NextRequest) {
     const messageLower = message.toLowerCase()
     const arabicMessage = message
 
-    // Check for billing-related queries
+    // Enhanced agent routing with four specialized agents
+    
+    // Check for consulting queries FIRST (high-level strategic) - HIGHEST PRIORITY
     if (
+      messageLower.includes('consult') || 
+      messageLower.includes('strategy') ||
+      messageLower.includes('strategic') ||
+      messageLower.includes('expert') ||
+      messageLower.includes('meeting') || 
+      messageLower.includes('schedule') ||
+      messageLower.includes('feasibility') ||
+      messageLower.includes('brainstorm') ||
+      messageLower.includes('market research') ||
+      messageLower.includes('business plan') ||
+      messageLower.includes('video consultation') ||
+      arabicMessage.includes('استشارة') ||
+      arabicMessage.includes('استراتيجية') ||
+      arabicMessage.includes('خبير') ||
+      arabicMessage.includes('موعد') ||
+      arabicMessage.includes('جدولة') ||
+      arabicMessage.includes('جدوى') ||
+      arabicMessage.includes('شركتي') ||
+      arabicMessage.includes('شركة') ||
+      arabicMessage.includes('مؤسسة') ||
+      arabicMessage.includes('تطبيق الذكاء الاصطناعي') ||
+      arabicMessage.includes('عصف ذهني') ||
+      arabicMessage.includes('تحليل السوق') ||
+      arabicMessage.includes('خطة العمل') ||
+      arabicMessage.includes('خطة التنفيذ')
+    ) {
+      agentType = 'consulting'
+      response = await handleConsultingAgent(message, customer_id, language, context)
+    }
+    // Check for n8n workflow automation queries (authenticated customers) - SPECIFIC WORKFLOW TERMS ONLY
+    else if (
+      messageLower.includes('workflow') || 
+      messageLower.includes('n8n') || 
+      (messageLower.includes('automat') && !arabicMessage.includes('استشارة')) ||
+      messageLower.includes('template') ||
+      (messageLower.includes('execute') && !arabicMessage.includes('استشارة')) ||
+      arabicMessage.includes('سير العمل') ||
+      (arabicMessage.includes('أتمتة') && !arabicMessage.includes('استشارة')) ||
+      arabicMessage.includes('قالب') ||
+      (arabicMessage.includes('تنفيذ') && arabicMessage.includes('سير العمل')) ||
+      arabicMessage.includes('تشغيل')
+    ) {
+      agentType = 'n8n_workflow'
+      response = await handleN8nWorkflowAgent(message, customer_id, language, context)
+    }
+    // Check for code generation queries (medium complexity)
+    else if (
+      messageLower.includes('code') || 
+      messageLower.includes('develop') || 
+      messageLower.includes('build') ||
+      messageLower.includes('project') ||
+      messageLower.includes('application') ||
+      messageLower.includes('system') ||
+      arabicMessage.includes('كود') ||
+      arabicMessage.includes('برمجة') ||
+      arabicMessage.includes('تطوير') ||
+      arabicMessage.includes('مشروع') ||
+      (arabicMessage.includes('تطبيق') && !arabicMessage.includes('تطبيق الذكاء الاصطناعي')) ||
+      arabicMessage.includes('نظام')
+    ) {
+      agentType = 'code_generation'
+      response = await handleCodeGenerationAgent(message, customer_id, language, context)
+    }
+    // Check for billing-related queries
+    else if (
       messageLower.includes('bill') || 
       messageLower.includes('invoice') || 
       messageLower.includes('cost') || 
@@ -52,32 +120,10 @@ export async function POST(request: NextRequest) {
       agentType = 'billing'
       response = await handleBillingAgent(message, customer_id, language)
     }
-    // Check for consulting queries
-    else if (
-      messageLower.includes('consult') || 
-      messageLower.includes('meeting') || 
-      messageLower.includes('schedule') ||
-      arabicMessage.includes('استشارة') ||
-      arabicMessage.includes('موعد') ||
-      arabicMessage.includes('جدولة')
-    ) {
-      agentType = 'consulting'
-      response = await handleConsultingAgent(message, customer_id, language)
-    }
-    // Check for workflow/automation queries
-    else if (
-      messageLower.includes('automat') || 
-      messageLower.includes('workflow') || 
-      messageLower.includes('n8n') ||
-      arabicMessage.includes('أتمتة') ||
-      arabicMessage.includes('سير العمل')
-    ) {
-      agentType = 'workflow'
-      response = await handleWorkflowAgent(message, customer_id, language)
-    }
-    // Default to welcoming agent
+    // Default to initial customer agent (new customers)
     else {
-      response = await handleWelcomingAgent(message, customer_id, language)
+      agentType = 'initial_customer'
+      response = await handleInitialCustomerAgent(message, customer_id, language, context)
     }
 
     return NextResponse.json({
@@ -161,52 +207,228 @@ async function handleBillingAgent(message: string, customerId?: string, language
   }
 }
 
-async function handleConsultingAgent(message: string, customerId?: string, language = 'en'): Promise<ChatResponse> {
+
+
+// New specialized agent handlers for our four-agent system
+
+async function handleInitialCustomerAgent(message: string, customerId?: string, language = 'en', context?: any): Promise<ChatResponse> {
+  try {
+    // Try to use real LLM first
+    const llmResponse = await llmService.generateResponse({
+      message,
+      agent_type: 'initial_customer',
+      customer_id: customerId,
+      context,
+      language
+    })
+
+    if (llmResponse.success && llmResponse.response) {
+      return {
+        message: llmResponse.response,
+        confidence: 0.9,
+        next_action: 'collect_customer_info',
+        agent_type: 'initial_customer',
+        model: llmResponse.model,
+        usage: llmResponse.usage
+      }
+    }
+  } catch (error) {
+    console.error('LLM service error for initial customer agent:', error)
+  }
+
+  // Fallback to mock responses
   const responses = {
     en: {
-      schedule: "I'd be happy to help you schedule a consultation! Our AI consulting sessions include:\n\n• Strategy Development\n• Technical Implementation\n• Performance Optimization\n• Custom AI Solutions\n\nWould you prefer a video call or in-person meeting? What time works best for you?",
-      services: "Our consulting services include:\n\n• AI Strategy & Planning\n• Technical Feasibility Studies\n• Implementation Support\n• AI Ethics & Governance\n• Performance Optimization\n\nWhich area interests you most?",
-      default: "I'm here to help with AI consulting services. I can schedule consultations, explain our services, or connect you with our specialists. How can I assist you today?"
+      greeting: "Hello! Welcome to consulting.sa! I'm your AI assistant and I'm here to help you get started. I can collect your information and connect you with the right specialist. How can I assist you today?",
+      info_collection: "To better assist you, I'd like to collect some basic information:\n\n• Your name\n• Email address\n• Phone number\n• How you'd like us to help you\n\nWhat's your name?",
+      services_overview: "We offer comprehensive AI solutions:\n\n• AI Consulting & Strategy\n• Custom AI Agent Development\n• Workflow Automation with n8n\n• Chatbot Development\n\nI can also connect you with a human specialist if needed. What interests you most?",
+      human_handoff: "I'd be happy to connect you with one of our human specialists for a more detailed discussion. Would you like to schedule a live consultation via video call?",
+      default: "Thank you for contacting consulting.sa! I'm here to help you with our AI services. I can collect your information, explain our services, or connect you with a specialist. What would you like to do first?"
     },
     ar: {
-      schedule: "سأكون سعيداً لمساعدتك في جدولة استشارة! جلسات استشارات الذكاء الاصطناعي تشمل:\n\n• تطوير الاستراتيجية\n• التنفيذ التقني\n• تحسين الأداء\n• حلول الذكاء الاصطناعي المخصصة\n\nهل تفضل مكالمة فيديو أم اجتماع شخصي؟ ما هو الوقت الأنسب لك؟",
-      services: "خدماتنا الاستشارية تشمل:\n\n• استراتيجية وتخطيط الذكاء الاصطناعي\n• دراسات الجدوى التقنية\n• دعم التنفيذ\n• أخلاقيات وحوكمة الذكاء الاصطناعي\n• تحسين الأداء\n\nأي مجال يهمك أكثر؟",
-      default: "أنا هنا للمساعدة في خدمات استشارات الذكاء الاصطناعي. يمكنني جدولة الاستشارات، أو شرح خدماتنا، أو ربطك بمتخصصينا. كيف يمكنني مساعدتك اليوم؟"
+      greeting: "مرحباً! أهلاً بك في consulting.sa! أنا مساعدك الذكي وأنا هنا لمساعدتك في البدء. يمكنني جمع معلوماتك وربطك بالمختص المناسب. كيف يمكنني مساعدتك اليوم؟",
+      info_collection: "لمساعدتك بشكل أفضل، أود جمع بعض المعلومات الأساسية:\n\n• اسمك\n• عنوان البريد الإلكتروني\n• رقم الهاتف\n• كيف تود أن نساعدك\n\nما اسمك؟",
+      services_overview: "نحن نقدم حلول ذكاء اصطناعي شاملة:\n\n• استشارات واستراتيجية الذكاء الاصطناعي\n• تطوير وكلاء ذكاء اصطناعي مخصصة\n• أتمتة سير العمل باستخدام n8n\n• تطوير روبوتات المحادثة\n\nيمكنني أيضاً ربطك بمختص بشري عند الحاجة. ما الذي يهمك أكثر؟",
+      human_handoff: "سأكون سعيداً لربطك بأحد المختصين البشريين لمناقشة أكثر تفصيلاً. هل تود جدولة استشارة مباشرة عبر مكالمة فيديو؟",
+      default: "شكراً لتواصلك مع consulting.sa! أنا هنا لمساعدتك في خدمات الذكاء الاصطناعي. يمكنني جمع معلوماتك، أو شرح خدماتنا، أو ربطك بمختص. ماذا تود أن تفعل أولاً؟"
     }
   }
 
-  const messageType = message.toLowerCase().includes('schedule') || message.includes('جدولة') ? 'schedule' :
-                     message.toLowerCase().includes('service') || message.includes('خدمة') ? 'services' : 'default'
+  const messageType = message.toLowerCase().includes('hello') || message.includes('مرحبا') || message.includes('السلام') ? 'greeting' :
+                     message.toLowerCase().includes('info') || message.includes('معلومات') ? 'info_collection' :
+                     message.toLowerCase().includes('service') || message.includes('خدمة') ? 'services_overview' :
+                     message.toLowerCase().includes('human') || message.includes('شخص') || message.includes('إنسان') ? 'human_handoff' : 'default'
 
   return {
     message: responses[language as keyof typeof responses][messageType as keyof typeof responses.en],
     confidence: 0.9,
-    next_action: 'schedule_consultation',
-    agent_type: 'consulting'
+    next_action: 'collect_customer_info',
+    agent_type: 'initial_customer'
   }
 }
 
-async function handleWorkflowAgent(message: string, customerId?: string, language = 'en'): Promise<ChatResponse> {
+async function handleN8nWorkflowAgent(message: string, customerId?: string, language = 'en', context?: any): Promise<ChatResponse> {
+  try {
+    // Try to use real LLM first
+    const llmResponse = await llmService.generateResponse({
+      message,
+      agent_type: 'n8n_workflow',
+      customer_id: customerId,
+      context,
+      language
+    })
+
+    if (llmResponse.success && llmResponse.response) {
+      return {
+        message: llmResponse.response,
+        confidence: 0.95,
+        next_action: 'workflow_assistance',
+        agent_type: 'n8n_workflow',
+        model: llmResponse.model,
+        usage: llmResponse.usage
+      }
+    }
+  } catch (error) {
+    console.error('LLM service error for n8n workflow agent:', error)
+  }
+
+  // Fallback to mock responses
   const responses = {
     en: {
-      automation: "I can help you with workflow automation! Our services include:\n\n• N8N Workflow Creation\n• Process Automation\n• API Integrations\n• Data Processing Pipelines\n• Custom Automation Solutions\n\nWhat type of workflow would you like to automate?",
-      n8n: "N8N is a powerful workflow automation tool we use to create custom automation solutions. We can help you:\n\n• Design automated workflows\n• Connect different services and APIs\n• Process data automatically\n• Create custom integrations\n\nWhat would you like to automate?",
-      default: "I'm your workflow automation specialist. I can help you automate repetitive tasks, create custom workflows, and integrate different systems. What processes would you like to automate?"
+      templates: "I have several ready-to-use workflow templates for you:\n\n• Email Automation (15 min setup)\n• Data Processing Pipeline (20 min setup)\n• System Integration (30 min setup)\n• Automated Notifications (10 min setup)\n• Sentiment Analysis (25 min setup)\n\nWhich template interests you, or would you like a custom workflow?",
+      execute: "To execute a workflow, I need to verify your authentication first. Are you an existing customer with an active account? If yes, please provide your customer ID or email.",
+      create: "I can help you create a custom n8n workflow! Let me understand your needs:\n\n• What process do you want to automate?\n• What systems need to be connected?\n• How often should it run?\n• What's the expected input/output?\n\nTell me about your automation requirements.",
+      status: "I can check the status of your workflows. Please provide:\n\n• Workflow ID or name\n• Customer account information\n\nI'll show you execution history, performance metrics, and any issues.",
+      default: "I'm your n8n workflow automation specialist! I can help authenticated customers with:\n\n• Creating workflows from templates\n• Executing existing workflows\n• Monitoring workflow performance\n• Custom automation solutions\n\nNote: You need to be authenticated to use workflow services. How can I help you today?"
     },
     ar: {
-      automation: "يمكنني مساعدتك في أتمتة سير العمل! خدماتنا تشمل:\n\n• إنشاء سير عمل N8N\n• أتمتة العمليات\n• تكامل واجهات برمجة التطبيقات\n• خطوط معالجة البيانات\n• حلول الأتمتة المخصصة\n\nما نوع سير العمل الذي تود أتمتته؟",
-      n8n: "N8N هو أداة قوية لأتمتة سير العمل نستخدمها لإنشاء حلول أتمتة مخصصة. يمكننا مساعدتك في:\n\n• تصميم سير عمل آلي\n• ربط خدمات وواجهات برمجة مختلفة\n• معالجة البيانات تلقائياً\n• إنشاء تكاملات مخصصة\n\nماذا تود أن تؤتمت؟",
-      default: "أنا متخصص أتمتة سير العمل. يمكنني مساعدتك في أتمتة المهام المتكررة، وإنشاء سير عمل مخصص، ودمج أنظمة مختلفة. ما العمليات التي تود أتمتتها؟"
+      templates: "لدي عدة قوالب سير عمل جاهزة للاستخدام:\n\n• أتمتة البريد الإلكتروني (إعداد 15 دقيقة)\n• خط معالجة البيانات (إعداد 20 دقيقة)\n• تكامل الأنظمة (إعداد 30 دقيقة)\n• إشعارات تلقائية (إعداد 10 دقائق)\n• تحليل المشاعر (إعداد 25 دقيقة)\n\nأي قالب يهمك، أم تريد سير عمل مخصص؟",
+      execute: "لتنفيذ سير العمل، أحتاج للتحقق من صحة هويتك أولاً. هل أنت عميل حالي لديك حساب نشط؟ إذا كان الجواب نعم، يرجى تقديم معرف العميل أو البريد الإلكتروني.",
+      create: "يمكنني مساعدتك في إنشاء سير عمل n8n مخصص! دعني أفهم احتياجاتك:\n\n• ما العملية التي تريد أتمتتها؟\n• ما الأنظمة التي تحتاج للربط؟\n• كم مرة يجب أن يعمل؟\n• ما المدخلات/المخرجات المتوقعة؟\n\nأخبرني عن متطلبات الأتمتة.",
+      status: "يمكنني التحقق من حالة سير العمل الخاص بك. يرجى تقديم:\n\n• معرف أو اسم سير العمل\n• معلومات حساب العميل\n\nسأعرض لك تاريخ التنفيذ ومقاييس الأداء وأي مشاكل.",
+      default: "أنا متخصص أتمتة سير العمل n8n! يمكنني مساعدة العملاء المصرح لهم في:\n\n• إنشاء سير عمل من القوالب\n• تنفيذ سير العمل الحالي\n• مراقبة أداء سير العمل\n• حلول الأتمتة المخصصة\n\nملاحظة: تحتاج للمصادقة لاستخدام خدمات سير العمل. كيف يمكنني مساعدتك اليوم؟"
     }
   }
 
-  const messageType = message.toLowerCase().includes('automat') || message.includes('أتمتة') ? 'automation' :
-                     message.toLowerCase().includes('n8n') ? 'n8n' : 'default'
+  const messageType = message.toLowerCase().includes('template') || message.includes('قالب') ? 'templates' :
+                     message.toLowerCase().includes('execute') || message.includes('تنفيذ') || message.includes('تشغيل') ? 'execute' :
+                     message.toLowerCase().includes('create') || message.includes('إنشاء') || message.includes('بناء') ? 'create' :
+                     message.toLowerCase().includes('status') || message.includes('حالة') || message.includes('وضع') ? 'status' : 'default'
+
+  return {
+    message: responses[language as keyof typeof responses][messageType as keyof typeof responses.en],
+    confidence: 0.95,
+    next_action: 'workflow_assistance',
+    agent_type: 'n8n_workflow'
+  }
+}
+
+async function handleCodeGenerationAgent(message: string, customerId?: string, language = 'en', context?: any): Promise<ChatResponse> {
+  try {
+    // Try to use real LLM first
+    const llmResponse = await llmService.generateResponse({
+      message,
+      agent_type: 'code_generation',
+      customer_id: customerId,
+      context,
+      language
+    })
+
+    if (llmResponse.success && llmResponse.response) {
+      return {
+        message: llmResponse.response,
+        confidence: 0.9,
+        next_action: 'analyze_requirements',
+        agent_type: 'code_generation',
+        model: llmResponse.model,
+        usage: llmResponse.usage
+      }
+    }
+  } catch (error) {
+    console.error('LLM service error for code generation agent:', error)
+  }
+
+  // Fallback to mock responses
+  const responses = {
+    en: {
+      frameworks: "I can help you build AI agents using different frameworks:\n\n• Google ADK - Best for simple, production-ready agents\n• LangGraph - Perfect for complex multi-agent workflows\n• Pydantic AI - Ideal for structured, type-safe applications\n\nWhat type of agent do you want to build? Describe your requirements and I'll recommend the best framework.",
+      requirements: "Great! Let me analyze your requirements to build the perfect AI agent. Please tell me:\n\n• What should your agent do? (main functionality)\n• What data sources will it use?\n• What systems should it integrate with?\n• How complex should the workflow be?\n• Any specific technical requirements?\n\nThe more details you provide, the better I can help!",
+      architecture: "Based on your requirements, I'll create a complete project structure including:\n\n• Full source code with best practices\n• Database schema and models\n• API endpoints and integrations\n• Comprehensive tests\n• Documentation and setup guides\n• Deployment instructions\n\nThis usually takes 15-30 minutes. Ready to proceed?",
+      default: "I'm your AI agent development specialist! I build complete, production-ready AI agents using:\n\n• Google ADK (simple agents)\n• LangGraph (complex workflows)\n• Pydantic AI (structured apps)\n\nI provide full code, tests, documentation, and deployment guides. What kind of AI agent do you want to build?"
+    },
+    ar: {
+      frameworks: "يمكنني مساعدتك في بناء وكلاء ذكاء اصطناعي باستخدام أطر عمل مختلفة:\n\n• Google ADK - الأفضل للوكلاء البسيطة الجاهزة للإنتاج\n• LangGraph - مثالي لسير العمل المعقد متعدد الوكلاء\n• Pydantic AI - مثالي للتطبيقات المنظمة وآمنة الأنواع\n\nما نوع الوكيل الذي تريد بناءه؟ اوصف متطلباتك وسأوصي بأفضل إطار عمل.",
+      requirements: "ممتاز! دعني أحلل متطلباتك لبناء الوكيل الذكي المثالي. يرجى إخباري:\n\n• ماذا يجب أن يفعل وكيلك؟ (الوظيفة الأساسية)\n• ما مصادر البيانات التي سيستخدمها؟\n• ما الأنظمة التي يجب أن يتكامل معها؟\n• ما مدى تعقيد سير العمل؟\n• أي متطلبات تقنية محددة؟\n\nكلما قدمت تفاصيل أكثر، كلما تمكنت من مساعدتك بشكل أفضل!",
+      architecture: "بناءً على متطلباتك، سأنشئ هيكل مشروع كامل يتضمن:\n\n• كود مصدري كامل مع أفضل الممارسات\n• مخطط قاعدة البيانات والنماذج\n• نقاط API والتكاملات\n• اختبارات شاملة\n• وثائق وأدلة الإعداد\n• تعليمات النشر\n\nهذا عادة يستغرق 15-30 دقيقة. هل أنت مستعد للمتابعة؟",
+      default: "أنا متخصص تطوير وكلاء الذكاء الاصطناعي! أبني وكلاء كاملة وجاهزة للإنتاج باستخدام:\n\n• Google ADK (وكلاء بسيطة)\n• LangGraph (سير عمل معقد)\n• Pydantic AI (تطبيقات منظمة)\n\nأقدم كود كامل واختبارات ووثائق وأدلة نشر. ما نوع الوكيل الذكي الذي تريد بناءه؟"
+    }
+  }
+
+  const messageType = message.toLowerCase().includes('framework') || message.includes('إطار') || message.includes('أداة') ? 'frameworks' :
+                     message.toLowerCase().includes('requirement') || message.includes('متطلب') || message.includes('احتياج') ? 'requirements' :
+                     message.toLowerCase().includes('architecture') || message.includes('هيكل') || message.includes('تصميم') ? 'architecture' : 'default'
 
   return {
     message: responses[language as keyof typeof responses][messageType as keyof typeof responses.en],
     confidence: 0.9,
-    next_action: 'design_workflow',
-    agent_type: 'workflow'
+    next_action: 'analyze_requirements',
+    agent_type: 'code_generation'
+  }
+}
+
+// Keep the existing consulting agent but enhance it
+async function handleConsultingAgent(message: string, customerId?: string, language = 'en', context?: any): Promise<ChatResponse> {
+  try {
+    // Try to use real LLM first
+    const llmResponse = await llmService.generateResponse({
+      message,
+      agent_type: 'consulting',
+      customer_id: customerId,
+      context,
+      language
+    })
+
+    if (llmResponse.success && llmResponse.response) {
+      return {
+        message: llmResponse.response,
+        confidence: 0.95,
+        next_action: 'offer_consultation',
+        agent_type: 'consulting',
+        model: llmResponse.model,
+        usage: llmResponse.usage
+      }
+    }
+  } catch (error) {
+    console.error('LLM service error for consulting agent:', error)
+  }
+
+  // Fallback to mock responses
+  const responses = {
+    en: {
+      strategy: "I'd love to help you develop an AI strategy! Our strategic consulting includes:\n\n• AI Readiness Assessment (2000-3000 SAR)\n• Strategic Roadmap Development (3000-5000 SAR)\n• ROI Analysis & Business Case (2500-4000 SAR)\n• Implementation Planning (2000-4000 SAR)\n\nWould you like to schedule a consultation to discuss your specific needs?",
+      feasibility: "Feasibility studies are crucial for AI success! Our comprehensive studies include:\n\n• Technical Feasibility Analysis (3000-5000 SAR)\n• Business Impact Assessment (2500-4000 SAR)\n• Cost-Benefit Analysis (2000-3500 SAR)\n• Risk Assessment (2000-3000 SAR)\n\nThis typically takes 1-2 weeks. Shall we schedule a consultation to get started?",
+      implementation: "Implementation support ensures your AI project succeeds! Our services include:\n\n• Project Management (1500-2500 SAR/month)\n• Technical Guidance (2000-3000 SAR/month)\n• Team Training (1000-2000 SAR/session)\n• Quality Assurance (1500-2500 SAR/month)\n\nWould you like to discuss your implementation needs?",
+      schedule: "I'd be happy to schedule a consultation with our AI experts! We offer:\n\n• 30-min Quick Consultation (500-800 SAR)\n• 1-hour Strategy Session (1000-1500 SAR)\n• 2-hour Deep Dive (2000-3000 SAR)\n• Full-day Workshop (5000-8000 SAR)\n\nWhat type of consultation would work best for you?",
+      default: "I'm your AI consulting specialist! I provide strategic guidance for AI implementation. Our services include strategy development, feasibility studies, implementation support, and expert consultations. I can also connect you with our human consultants via video call. How can I help you succeed with AI?"
+    },
+    ar: {
+      strategy: "سأكون سعيداً لمساعدتك في تطوير استراتيجية الذكاء الاصطناعي! استشاراتنا الاستراتيجية تشمل:\n\n• تقييم الجاهزية للذكاء الاصطناعي (2000-3000 ريال)\n• تطوير خارطة طريق استراتيجية (3000-5000 ريال)\n• تحليل العائد على الاستثمار (2500-4000 ريال)\n• تخطيط التنفيذ (2000-4000 ريال)\n\nهل تود جدولة استشارة لمناقشة احتياجاتك المحددة؟",
+      feasibility: "دراسات الجدوى ضرورية لنجاح الذكاء الاصطناعي! دراساتنا الشاملة تشمل:\n\n• تحليل الجدوى التقنية (3000-5000 ريال)\n• تقييم الأثر التجاري (2500-4000 ريال)\n• تحليل التكلفة والفائدة (2000-3500 ريال)\n• تقييم المخاطر (2000-3000 ريال)\n\nهذا عادة يستغرق 1-2 أسبوع. هل نجدول استشارة للبدء؟",
+      implementation: "دعم التنفيذ يضمن نجاح مشروع الذكاء الاصطناعي! خدماتنا تشمل:\n\n• إدارة المشاريع (1500-2500 ريال/شهر)\n• التوجيه التقني (2000-3000 ريال/شهر)\n• تدريب الفريق (1000-2000 ريال/جلسة)\n• ضمان الجودة (1500-2500 ريال/شهر)\n\nهل تود مناقشة احتياجات التنفيذ؟",
+      schedule: "سأكون سعيداً لجدولة استشارة مع خبراء الذكاء الاصطناعي! نقدم:\n\n• استشارة سريعة 30 دقيقة (500-800 ريال)\n• جلسة استراتيجية ساعة واحدة (1000-1500 ريال)\n• جلسة تفصيلية ساعتان (2000-3000 ريال)\n• ورشة عمل يوم كامل (5000-8000 ريال)\n\nما نوع الاستشارة الأنسب لك؟",
+      default: "أنا متخصص استشارات الذكاء الاصطناعي! أقدم التوجيه الاستراتيجي لتطبيق الذكاء الاصطناعي. خدماتنا تشمل تطوير الاستراتيجية، ودراسات الجدوى، ودعم التنفيذ، والاستشارات الخبيرة. يمكنني أيضاً ربطك بمستشارينا البشريين عبر مكالمة فيديو. كيف يمكنني مساعدتك للنجاح مع الذكاء الاصطناعي؟"
+    }
+  }
+
+  const messageType = message.toLowerCase().includes('strategy') || message.includes('استراتيجية') ? 'strategy' :
+                     message.toLowerCase().includes('feasibility') || message.includes('جدوى') ? 'feasibility' :
+                     message.toLowerCase().includes('implementation') || message.includes('تنفيذ') ? 'implementation' :
+                     message.toLowerCase().includes('schedule') || message.includes('جدولة') || message.includes('موعد') ? 'schedule' : 'default'
+
+  return {
+    message: responses[language as keyof typeof responses][messageType as keyof typeof responses.en],
+    confidence: 0.95,
+    next_action: 'offer_consultation',
+    agent_type: 'consulting'
   }
 }

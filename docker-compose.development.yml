@@ -1,28 +1,50 @@
 version: '3.8'
 
 services:
-  frontend-dev:
+  # Consolidated Frontend + n8n Platform + n8n MCP
+  frontend-consolidated-dev:
     build:
       context: .
-      dockerfile: infrastructure/docker/Dockerfile.frontend
+      dockerfile: infrastructure/docker/Dockerfile.consolidated
       args:
         NODE_ENV: development
-    container_name: agentic-frontend-dev
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+    container_name: agentic-consolidated-dev
     ports:
-      - "3001:3000"
+      - "3001:3000"  # Frontend
+      - "5679:5678"  # n8n Platform
+      - "3002:3001"  # n8n MCP
     environment:
       - NODE_ENV=development
       - NEXT_PUBLIC_SITE_URL=https://dev.consulting.sa
       - NEXT_PUBLIC_API_URL=https://dev.consulting.sa/api
+      # n8n Platform Configuration
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD:-admin123}
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=https://dev.consulting.sa/n8n/
+      # n8n MCP Configuration
+      - N8N_API_URL=http://localhost:5678
+      - N8N_API_KEY=${N8N_API_KEY:-dummy_n8n_development_key}
+      - MCP_MODE=http
+      - LOG_LEVEL=info
+      - DISABLE_CONSOLE_OUTPUT=false
     env_file:
       - .env.development
+    volumes:
+      - n8n_dev_data:/home/node/.n8n
+      - consolidated_logs:/var/log/supervisor
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      test: ["CMD", "sh", "-c", "curl -f http://localhost:3000/api/health && curl -f http://localhost:5678/healthz && curl -f http://localhost:3001/health"]
       interval: 30s
-      timeout: 10s
+      timeout: 15s
       retries: 3
-      start_period: 40s
+      start_period: 60s
     depends_on:
       - backend-dev
       - redis-dev
@@ -37,6 +59,9 @@ services:
     environment:
       - ENVIRONMENT=development
       - PORT=8000
+      # Update n8n URLs to point to consolidated container
+      - N8N_URL=http://frontend-consolidated-dev:5678
+      - MCP_SERVER_URL=http://frontend-consolidated-dev:3001
     env_file:
       - .env.development
     restart: unless-stopped
@@ -64,32 +89,12 @@ services:
       timeout: 10s
       retries: 3
 
-  n8n-dev:
-    image: n8nio/n8n:latest
-    container_name: agentic-n8n-dev
-    ports:
-      - "5679:5678"
-    environment:
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER:-admin}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
-      - N8N_HOST=0.0.0.0
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - WEBHOOK_URL=https://dev.consulting.sa/n8n/
-    volumes:
-      - n8n_dev_data:/home/node/.n8n
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5678/healthz"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
 volumes:
   redis_dev_data:
     driver: local
   n8n_dev_data:
+    driver: local
+  consolidated_logs:
     driver: local
 
 networks:

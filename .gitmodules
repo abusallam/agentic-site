@@ -1,0 +1,6 @@
+[submodule "BMAD-METHOD"]
+	path = BMAD-METHOD
+	url = https://github.com/abusallam/BMAD-METHOD.git
+[submodule "n8n-platform"]
+	path = n8n-platform
+	url = https://github.com/abusallam/n8n-platform.git

@@ -10,13 +10,16 @@
 - **Icons**: Lucide React (1000+ icons available)
 - **Internationalization**: Custom i18n system (Arabic/English)
 
-### Backend Stack
-- **Framework**: Google ADK (Agent Development Kit) - PRIMARY
+### Backend Stack - Multi-Agent System
+- **Primary Framework**: Google ADK (Agent Development Kit) - InitialCustomerAgent & N8nWorkflowAgent
+- **Secondary Framework**: LangGraph - CodeGenerationAgent (complex workflows)
+- **Tertiary Framework**: Pydantic AI - ConsultingAgent (structured applications)
 - **Language**: Python 3.11+ with uv package manager
 - **API Layer**: FastAPI for additional endpoints (when needed)
-- **AI Engine**: Google Gemini for conversational AI
+- **AI Engine**: Google Gemini 2.0 Flash for conversational AI
 - **Database**: Supabase (PostgreSQL-based) with real-time features
 - **Workflow Engine**: n8n via MCP (Model Context Protocol) server
+- **Real-time Communication**: LiveKit for human consultant handoff
 
 ### Infrastructure Stack
 - **Containerization**: Docker + Docker Compose (PRODUCTION STANDARD)
@@ -94,21 +97,36 @@ export class ApiService {
 
 ### File Organization Standards
 
-#### Backend Structure (MANDATORY)
+#### Backend Structure (MANDATORY) - Four-Agent System
 ```
 agent/my_adk_agent/
-├── agent.py              # Main CustomerJourneyAgent
+├── agents/               # Four specialized agents
+│   ├── initial_customer_agent.py    # Google ADK - New customer onboarding
+│   ├── n8n_workflow_agent.py        # Google ADK + MCP - Workflow automation
+│   ├── code_generation_agent.py     # LangGraph - Custom development
+│   ├── consulting_agent.py          # Pydantic AI - Strategic consulting
+│   └── __init__.py
 ├── services/             # Service integrations
-│   ├── supabase_service.py
-│   ├── mcp_service.py
-│   ├── monitoring_service.py
-│   └── cicd_service.py
-├── tools/                # ADK tools
-├── tests/                # Comprehensive tests
-│   ├── unit/
-│   ├── integration/
-│   └── smoke/
+│   ├── supabase_service.py          # Database operations
+│   ├── mcp_service.py               # n8n MCP communication
+│   ├── livekit_service.py           # Human handoff
+│   └── __init__.py
+├── models/               # Data models
+│   ├── customer.py                  # Customer data models
+│   ├── workflow.py                  # Workflow data models
+│   ├── project.py                   # Project data models
+│   ├── consultation.py              # Consultation data models
+│   └── __init__.py
+├── mock_google_adk.py    # Mock implementations for development
+├── demo_data_generator.py           # Demo data generation
+├── test_multi_agent_system.py      # Comprehensive testing
 └── __init__.py
+
+n8n-mcp/                  # n8n MCP Server Integration
+├── src/                  # MCP server source code
+├── docker/               # Docker configuration
+├── docs/                 # n8n MCP documentation
+└── docker-compose.yml    # n8n MCP deployment
 ```
 
 #### Frontend Structure (ESTABLISHED)
@@ -165,9 +183,10 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_key
 # AI Services
 GOOGLE_API_KEY=your_gemini_key
 
-# Workflow Automation
-N8N_URL=your_n8n_instance
-MCP_SERVER_URL=your_mcp_server
+# Workflow Automation (n8n MCP Integration)
+N8N_URL=http://localhost:5678
+N8N_API_KEY=your_n8n_api_key
+MCP_SERVER_URL=http://localhost:3001
 
 # Real-time Communication
 LIVEKIT_API_KEY=your_livekit_key

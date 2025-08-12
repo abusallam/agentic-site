@@ -1,0 +1,2036 @@
+{
+  "customers": [
+    {
+      "id": "5dadb5bf-3921-44ec-ae8a-01b412da276c",
+      "name": "أحمد محمد العلي",
+      "email": "ahmed.ali@techcorp.sa",
+      "phone": "00966501234567",
+      "language": "ar",
+      "source": "referral",
+      "status": "contacted",
+      "created_at": "2025-05-28T23:21:22.010474",
+      "updated_at": "2025-07-29T23:21:22.010502",
+      "notes": "Customer interested in التجارة الإلكترونية solutions",
+      "metadata": {
+        "business_domain": "التجارة الإلكترونية",
+        "challenges": [
+          "أتمتة خدمة العملاء",
+          "تحليل البيانات",
+          "تحسين المبيعات"
+        ],
+        "company": "شركة التقنية المتقدمة",
+        "lead_score": 67
+      }
+    },
+    {
+      "id": "122684f2-ea3d-431e-af85-e879179fdb59",
+      "name": "فاطمة سعد الغامدي",
+      "email": "fatima.alghamdi@healthplus.sa",
+      "phone": "00966502345678",
+      "language": "ar",
+      "source": "social_media",
+      "status": "authenticated",
+      "created_at": "2025-06-20T23:21:22.010555",
+      "updated_at": "2025-08-07T23:21:22.010565",
+      "notes": "Customer interested in الرعاية الصحية solutions",
+      "metadata": {
+        "business_domain": "الرعاية الصحية",
+        "challenges": [
+          "إدارة المواعيد",
+          "تحليل البيانات الطبية",
+          "تحسين تجربة المرضى"
+        ],
+        "company": "مجمع الصحة الشامل",
+        "lead_score": 92
+      }
+    },
+    {
+      "id": "b882c64f-52d8-42c7-98ba-1dfc17f2e73d",
+      "name": "خالد عبدالله النمر",
+      "email": "khalid.alnamir@edutech.sa",
+      "phone": "00966503456789",
+      "language": "ar",
+      "source": "referral",
+      "status": "new",
+      "created_at": "2025-07-27T23:21:22.010598",
+      "updated_at": "2025-07-19T23:21:22.010605",
+      "notes": "Customer interested in التعليم solutions",
+      "metadata": {
+        "business_domain": "التعليم",
+        "challenges": [
+          "منصة تعليمية ذكية",
+          "تقييم الطلاب",
+          "إدارة المحتوى"
+        ],
+        "company": "منصة التعليم الذكي",
+        "lead_score": 88
+      }
+    },
+    {
+      "id": "95eb1d88-0b29-4213-977d-6a620e7118b4",
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@globaltech.com",
+      "phone": "00966504567890",
+      "language": "en",
+      "source": "referral",
+      "status": "authenticated",
+      "created_at": "2025-08-10T23:21:22.010635",
+      "updated_at": "2025-07-19T23:21:22.010641",
+      "notes": "Customer interested in Financial Services solutions",
+      "metadata": {
+        "business_domain": "Financial Services",
+        "challenges": [
+          "Risk Assessment",
+          "Fraud Detection",
+          "Customer Analytics"
+        ],
+        "company": "Global Financial Solutions",
+        "lead_score": 78
+      }
+    },
+    {
+      "id": "edaf194a-37e7-4df9-b098-d215926d8d9f",
+      "name": "محمد عبدالرحمن الشهري",
+      "email": "mohammed.alshehri@logistics.sa",
+      "phone": "00966505678901",
+      "language": "ar",
+      "source": "website",
+      "status": "new",
+      "created_at": "2025-07-03T23:21:22.010666",
+      "updated_at": "2025-07-14T23:21:22.010673",
+      "notes": "Customer interested in اللوجستيات solutions",
+      "metadata": {
+        "business_domain": "اللوجستيات",
+        "challenges": [
+          "تتبع الشحنات",
+          "تحسين المسارات",
+          "إدارة المخزون"
+        ],
+        "company": "شركة الشحن السريع",
+        "lead_score": 67
+      }
+    },
+    {
+      "id": "38b420c7-de25-4c87-820a-7820de7738b1",
+      "name": "نورا أحمد البقمي",
+      "email": "nora.albaqami@retail.sa",
+      "phone": "00966506789012",
+      "language": "ar",
+      "source": "website",
+      "status": "authenticated",
+      "created_at": "2025-06-10T23:21:22.010696",
+      "updated_at": "2025-07-14T23:21:22.010701",
+      "notes": "Customer interested in التجزئة solutions",
+      "metadata": {
+        "business_domain": "التجزئة",
+        "challenges": [
+          "تحليل سلوك العملاء",
+          "إدارة المخزون",
+          "التسويق الذكي"
+        ],
+        "company": "مجموعة التجزئة الحديثة",
+        "lead_score": 72
+      }
+    }
+  ],
+  "workflows": [
+    {
+      "id": "6fc583d6-8722-428b-8304-517fa718db8b",
+      "customer_id": "5dadb5bf-3921-44ec-ae8a-01b412da276c",
+      "n8n_workflow_id": "n8n_4896",
+      "template_id": "system_integration",
+      "name": "تكامل الأنظمة - أحمد",
+      "description": "ربط أنظمة مختلفة وتبادل البيانات",
+      "status": "paused",
+      "config": {
+        "template_id": "system_integration",
+        "custom_settings": {
+          "frequency": "hourly",
+          "notifications": true,
+          "auto_retry": true
+        }
+      },
+      "created_at": "2025-06-14T23:21:22.010810",
+      "updated_at": "2025-07-17T23:21:22.010821",
+      "last_executed_at": "2025-08-10T17:21:22.010874",
+      "execution_count": 89,
+      "success_count": 11,
+      "failure_count": 4,
+      "metadata": {
+        "complexity": "high",
+        "estimated_time": "35 minutes",
+        "business_impact": "low"
+      }
+    },
+    {
+      "id": "ed81aabc-b0d9-4d35-bcac-074b0e26139f",
+      "customer_id": "38b420c7-de25-4c87-820a-7820de7738b1",
+      "n8n_workflow_id": "n8n_9922",
+      "template_id": "email_automation",
+      "name": "أتمتة البريد الإلكتروني - نورا",
+      "description": "نظام آلي للرد على استفسارات العملاء",
+      "status": "completed",
+      "config": {
+        "template_id": "email_automation",
+        "custom_settings": {
+          "frequency": "weekly",
+          "notifications": true,
+          "auto_retry": true
+        }
+      },
+      "created_at": "2025-07-01T23:21:22.010937",
+      "updated_at": "2025-07-29T23:21:22.010945",
+      "last_executed_at": "2025-08-11T04:21:22.010950",
+      "execution_count": 35,
+      "success_count": 25,
+      "failure_count": 0,
+      "metadata": {
+        "complexity": "medium",
+        "estimated_time": "15 minutes",
+        "business_impact": "high"
+      }
+    },
+    {
+      "id": "5555fea2-889a-4c0b-8b9b-ca66bb143d8b",
+      "customer_id": "38b420c7-de25-4c87-820a-7820de7738b1",
+      "n8n_workflow_id": "n8n_4547",
+      "template_id": "data_processing",
+      "name": "معالجة البيانات - نورا",
+      "description": "تنظيف وتحليل البيانات تلقائياً",
+      "status": "paused",
+      "config": {
+        "template_id": "data_processing",
+        "custom_settings": {
+          "frequency": "daily",
+          "notifications": true,
+          "auto_retry": true
+        }
+      },
+      "created_at": "2025-07-30T23:21:22.010984",
+      "updated_at": "2025-07-21T23:21:22.010991",
+      "last_executed_at": "2025-08-09T15:21:22.010995",
+      "execution_count": 13,
+      "success_count": 68,
+      "failure_count": 2,
+      "metadata": {
+        "complexity": "high",
+        "estimated_time": "25 minutes",
+        "business_impact": "high"
+      }
+    },
+    {
+      "id": "04246858-4c9c-423b-9067-6a3906f3af97",
+      "customer_id": "edaf194a-37e7-4df9-b098-d215926d8d9f",
+      "n8n_workflow_id": "n8n_4863",
+      "template_id": "system_integration",
+      "name": "تكامل الأنظمة - محمد",
+      "description": "ربط أنظمة مختلفة وتبادل البيانات",
+      "status": "active",
+      "config": {
+        "template_id": "system_integration",
+        "custom_settings": {
+          "frequency": "hourly",
+          "notifications": true,
+          "auto_retry": true
+        }
+      },
+      "created_at": "2025-08-04T23:21:22.011027",
+      "updated_at": "2025-07-13T23:21:22.011032",
+      "last_executed_at": "2025-08-10T04:21:22.011036",
+      "execution_count": 9,
+      "success_count": 17,
+      "failure_count": 0,
+      "metadata": {
+        "complexity": "high",
+        "estimated_time": "35 minutes",
+        "business_impact": "high"
+      }
+    },
+    {
+      "id": "33f323f2-8508-4a40-acea-c885a44ef040",
+      "customer_id": "edaf194a-37e7-4df9-b098-d215926d8d9f",
+      "n8n_workflow_id": "n8n_6836",
+      "template_id": "system_integration",
+      "name": "تكامل الأنظمة - محمد",
+      "description": "ربط أنظمة مختلفة وتبادل البيانات",
+      "status": "completed",
+      "config": {
+        "template_id": "system_integration",
+        "custom_settings": {
+          "frequency": "daily",
+          "notifications": true,
+          "auto_retry": true
+        }
+      },
+      "created_at": "2025-06-29T23:21:22.011065",
+      "updated_at": "2025-07-16T23:21:22.011071",
+      "last_executed_at": "2025-08-11T09:21:22.011076",
+      "execution_count": 20,
+      "success_count": 72,
+      "failure_count": 2,
+      "metadata": {
+        "complexity": "high",
+        "estimated_time": "35 minutes",
+        "business_impact": "medium"
+      }
+    },
+    {
+      "id": "2acdb31d-0104-4be2-b7f9-95144376c709",
+      "customer_id": "edaf194a-37e7-4df9-b098-d215926d8d9f",
+      "n8n_workflow_id": "n8n_4741",
+      "template_id": "sentiment_analysis",
+      "name": "تحليل المشاعر - محمد",
+      "description": "تحليل مشاعر العملاء من التعليقات والمراجعات",
+      "status": "paused",
+      "config": {
+        "template_id": "sentiment_analysis",
+        "custom_settings": {
+          "frequency": "hourly",
+          "notifications": true,
+          "auto_retry": true
+        }
+      },
+      "created_at": "2025-08-09T23:21:22.011111",
+      "updated_at": "2025-08-06T23:21:22.011117",
+      "last_executed_at": "2025-08-09T17:21:22.011121",
+      "execution_count": 86,
+      "success_count": 28,
+      "failure_count": 0,
+      "metadata": {
+        "complexity": "medium",
+        "estimated_time": "20 minutes",
+        "business_impact": "medium"
+      }
+    },
+    {
+      "id": "c42bd191-cac0-4449-b6e6-d6529a2b9793",
+      "customer_id": "122684f2-ea3d-431e-af85-e879179fdb59",
+      "n8n_workflow_id": "n8n_3210",
+      "template_id": "email_automation",
+      "name": "أتمتة البريد الإلكتروني - فاطمة",
+      "description": "نظام آلي للرد على استفسارات العملاء",
+      "status": "created",
+      "config": {
+        "template_id": "email_automation",
+        "custom_settings": {
+          "frequency": "weekly",
+          "notifications": true,
+          "auto_retry": true
+        }
+      },
+      "created_at": "2025-06-23T23:21:22.011162",
+      "updated_at": "2025-07-31T23:21:22.011167",
+      "last_executed_at": "2025-08-11T10:21:22.011171",
+      "execution_count": 66,
+      "success_count": 94,
+      "failure_count": 2,
+      "metadata": {
+        "complexity": "medium",
+        "estimated_time": "15 minutes",
+        "business_impact": "low"
+      }
+    },
+    {
+      "id": "a6351e86-1db8-49a6-8053-a54dab34844f",
+      "customer_id": "122684f2-ea3d-431e-af85-e879179fdb59",
+      "n8n_workflow_id": "n8n_9193",
+      "template_id": "notifications",
+      "name": "إشعارات تلقائية - فاطمة",
+      "description": "إرسال إشعارات بناءً على أحداث معينة",
+      "status": "paused",
+      "config": {
+        "template_id": "notifications",
+        "custom_settings": {
+          "frequency": "weekly",
+          "notifications": true,
+          "auto_retry": true
+        }
+      },
+      "created_at": "2025-08-07T23:21:22.011201",
+      "updated_at": "2025-07-18T23:21:22.011206",
+      "last_executed_at": "2025-08-10T17:21:22.011211",
+      "execution_count": 59,
+      "success_count": 51,
+      "failure_count": 5,
+      "metadata": {
+        "complexity": "low",
+        "estimated_time": "10 minutes",
+        "business_impact": "low"
+      }
+    }
+  ],
+  "projects": [
+    {
+      "id": "e074317d-865c-440a-9dee-383f52ffb2fd",
+      "customer_id": "5dadb5bf-3921-44ec-ae8a-01b412da276c",
+      "name": "وكيل خدمة العملاء - شركة التقنية المتقدمة",
+      "description": "Custom وكيل خدمة العملاء for التجارة الإلكترونية",
+      "framework": "google_adk",
+      "complexity": "low",
+      "requirements": {
+        "agent_type": "customer_service_agent",
+        "functionalities": [
+          "أتمتة خدمة العملاء",
+          "تحليل البيانات",
+          "تحسين المبيعات"
+        ],
+        "data_sources": [
+          "database",
+          "api",
+          "files"
+        ],
+        "integrations": [
+          "supabase",
+          "n8n",
+          "livekit"
+        ],
+        "technical_requirements": [
+          "python",
+          "docker",
+          "api"
+        ]
+      },
+      "architecture": {
+        "components": [
+          "main_agent",
+          "database",
+          "api_layer"
+        ],
+        "deployment": "docker",
+        "monitoring": "prometheus"
+      },
+      "status": "created",
+      "estimated_timeline": "1-2 weeks",
+      "actual_timeline": null,
+      "created_at": "2025-08-06T23:21:22.011276",
+      "updated_at": "2025-07-28T23:21:22.011283",
+      "completed_at": null,
+      "metadata": {
+        "code_files_count": 45,
+        "test_files_count": 19,
+        "documentation_files": 10,
+        "estimated_cost": "12358 SAR"
+      }
+    },
+    {
+      "id": "c16b6900-db0e-4828-8726-bd62f0dbe9f1",
+      "customer_id": "edaf194a-37e7-4df9-b098-d215926d8d9f",
+      "name": "نظام متعدد الوكلاء - شركة الشحن السريع",
+      "description": "Custom نظام متعدد الوكلاء for اللوجستيات",
+      "framework": "langgraph",
+      "complexity": "high",
+      "requirements": {
+        "agent_type": "multi_agent_system",
+        "functionalities": [
+          "تتبع الشحنات",
+          "تحسين المسارات",
+          "إدارة المخزون"
+        ],
+        "data_sources": [
+          "database",
+          "api",
+          "files"
+        ],
+        "integrations": [
+          "supabase",
+          "n8n",
+          "livekit"
+        ],
+        "technical_requirements": [
+          "python",
+          "docker",
+          "api"
+        ]
+      },
+      "architecture": {
+        "components": [
+          "main_agent",
+          "database",
+          "api_layer"
+        ],
+        "deployment": "docker",
+        "monitoring": "prometheus"
+      },
+      "status": "completed",
+      "estimated_timeline": "6-8 weeks",
+      "actual_timeline": "6-8 weeks",
+      "created_at": "2025-06-28T23:21:22.011331",
+      "updated_at": "2025-08-03T23:21:22.011338",
+      "completed_at": "2025-08-02T23:21:22.011345",
+      "metadata": {
+        "code_files_count": 31,
+        "test_files_count": 12,
+        "documentation_files": 3,
+        "estimated_cost": "5314 SAR"
+      }
+    },
+    {
+      "id": "479674ee-e81a-49fe-ace9-372f140d430e",
+      "customer_id": "edaf194a-37e7-4df9-b098-d215926d8d9f",
+      "name": "أتمتة سير العمل - شركة الشحن السريع",
+      "description": "Custom أتمتة سير العمل for اللوجستيات",
+      "framework": "langgraph",
+      "complexity": "high",
+      "requirements": {
+        "agent_type": "workflow_automation",
+        "functionalities": [
+          "تتبع الشحنات",
+          "تحسين المسارات",
+          "إدارة المخزون"
+        ],
+        "data_sources": [
+          "database",
+          "api",
+          "files"
+        ],
+        "integrations": [
+          "supabase",
+          "n8n",
+          "livekit"
+        ],
+        "technical_requirements": [
+          "python",
+          "docker",
+          "api"
+        ]
+      },
+      "architecture": {
+        "components": [
+          "main_agent",
+          "database",
+          "api_layer"
+        ],
+        "deployment": "docker",
+        "monitoring": "prometheus"
+      },
+      "status": "completed",
+      "estimated_timeline": "4-6 weeks",
+      "actual_timeline": "4-6 weeks",
+      "created_at": "2025-07-25T23:21:22.011378",
+      "updated_at": "2025-07-30T23:21:22.011384",
+      "completed_at": "2025-08-06T23:21:22.011389",
+      "metadata": {
+        "code_files_count": 11,
+        "test_files_count": 7,
+        "documentation_files": 7,
+        "estimated_cost": "6221 SAR"
+      }
+    },
+    {
+      "id": "4dccf5a5-cc01-4193-8bcb-55f73c6cd54d",
+      "customer_id": "b882c64f-52d8-42c7-98ba-1dfc17f2e73d",
+      "name": "تطوير روبوت محادثة - منصة التعليم الذكي",
+      "description": "Custom تطوير روبوت محادثة for التعليم",
+      "framework": "google_adk",
+      "complexity": "medium",
+      "requirements": {
+        "agent_type": "chatbot_development",
+        "functionalities": [
+          "منصة تعليمية ذكية",
+          "تقييم الطلاب",
+          "إدارة المحتوى"
+        ],
+        "data_sources": [
+          "database",
+          "api",
+          "files"
+        ],
+        "integrations": [
+          "supabase",
+          "n8n",
+          "livekit"
+        ],
+        "technical_requirements": [
+          "python",
+          "docker",
+          "api"
+        ]
+      },
+      "architecture": {
+        "components": [
+          "main_agent",
+          "database",
+          "api_layer"
+        ],
+        "deployment": "docker",
+        "monitoring": "prometheus"
+      },
+      "status": "completed",
+      "estimated_timeline": "2-3 weeks",
+      "actual_timeline": null,
+      "created_at": "2025-07-02T23:21:22.011424",
+      "updated_at": "2025-08-03T23:21:22.011430",
+      "completed_at": null,
+      "metadata": {
+        "code_files_count": 43,
+        "test_files_count": 20,
+        "documentation_files": 4,
+        "estimated_cost": "9118 SAR"
+      }
+    }
+  ],
+  "consultations": [
+    {
+      "id": "6db6dac2-17d8-459c-ba55-ad069df44cec",
+      "customer_id": "122684f2-ea3d-431e-af85-e879179fdb59",
+      "consultation_type": "feasibility_study",
+      "business_domain": "الرعاية الصحية",
+      "challenges": [
+        "إدارة المواعيد",
+        "تحليل البيانات الطبية",
+        "تحسين تجربة المرضى"
+      ],
+      "desired_outcomes": [
+        "تحسين الكفاءة التشغيلية",
+        "تقليل التكاليف",
+        "تحسين تجربة العملاء"
+      ],
+      "budget_range": "62K SAR",
+      "timeline": "3-6 months",
+      "technical_requirements": [
+        "cloud_deployment",
+        "api_integration",
+        "mobile_support"
+      ],
+      "language": "ar",
+      "status": "in_progress",
+      "scheduled_time": "2025-08-20T23:21:22.011483",
+      "ai_recommendations": [
+        "تطبيق نظام إدارة علاقات العملاء الذكي",
+        "أتمتة العمليات المتكررة"
+      ],
+      "proposed_solutions": [
+        {
+          "solution": "AI-Powered CRM System",
+          "description": "نظام إدارة علاقات عملاء ذكي",
+          "estimated_cost": "27K SAR",
+          "timeline": "3-4 months"
+        },
+        {
+          "solution": "Workflow Automation",
+          "description": "أتمتة سير العمل الأساسية",
+          "estimated_cost": "14K SAR",
+          "timeline": "2-3 months"
+        }
+      ],
+      "estimated_cost": "5000-8000 SAR",
+      "estimated_timeline": "1-2 weeks",
+      "requires_human_consultant": true,
+      "created_at": "2025-07-21T23:21:22.011499",
+      "updated_at": "2025-07-30T23:21:22.011504",
+      "completed_at": "2025-08-06T23:21:22.011513",
+      "metadata": {
+        "consultation_rating": 4,
+        "follow_up_required": true,
+        "referral_potential": "medium"
+      }
+    },
+    {
+      "id": "37f84f79-55b9-4eb1-b0dd-793200d534e8",
+      "customer_id": "38b420c7-de25-4c87-820a-7820de7738b1",
+      "consultation_type": "implementation_support",
+      "business_domain": "التجزئة",
+      "challenges": [
+        "تحليل سلوك العملاء",
+        "إدارة المخزون",
+        "التسويق الذكي"
+      ],
+      "desired_outcomes": [
+        "تحسين الكفاءة التشغيلية",
+        "تقليل التكاليف"
+      ],
+      "budget_range": "11K SAR",
+      "timeline": "6-12 months",
+      "technical_requirements": [
+        "cloud_deployment",
+        "api_integration",
+        "mobile_support"
+      ],
+      "language": "ar",
+      "status": "in_progress",
+      "scheduled_time": "2025-08-17T23:21:22.011581",
+      "ai_recommendations": [
+        "تطبيق نظام إدارة علاقات العملاء الذكي",
+        "أتمتة العمليات المتكررة",
+        "تطوير نظام تحليل البيانات"
+      ],
+      "proposed_solutions": [
+        {
+          "solution": "AI-Powered CRM System",
+          "description": "نظام إدارة علاقات عملاء ذكي",
+          "estimated_cost": "49K SAR",
+          "timeline": "3-4 months"
+        },
+        {
+          "solution": "Workflow Automation",
+          "description": "أتمتة سير العمل الأساسية",
+          "estimated_cost": "22K SAR",
+          "timeline": "2-3 months"
+        }
+      ],
+      "estimated_cost": "2000-3000 SAR/month",
+      "estimated_timeline": "Ongoing",
+      "requires_human_consultant": true,
+      "created_at": "2025-07-30T23:21:22.011602",
+      "updated_at": "2025-07-30T23:21:22.011614",
+      "completed_at": null,
+      "metadata": {
+        "consultation_rating": 5,
+        "follow_up_required": true,
+        "referral_potential": "high"
+      }
+    },
+    {
+      "id": "8caa2b97-4de7-4173-969f-06ad673cd046",
+      "customer_id": "95eb1d88-0b29-4213-977d-6a620e7118b4",
+      "consultation_type": "quick_consultation",
+      "business_domain": "Financial Services",
+      "challenges": [
+        "Risk Assessment",
+        "Fraud Detection",
+        "Customer Analytics"
+      ],
+      "desired_outcomes": [
+        "تحسين الكفاءة التشغيلية",
+        "تقليل التكاليف",
+        "تحسين تجربة العملاء"
+      ],
+      "budget_range": "99K SAR",
+      "timeline": "3-6 months",
+      "technical_requirements": [
+        "cloud_deployment",
+        "api_integration",
+        "mobile_support"
+      ],
+      "language": "en",
+      "status": "in_progress",
+      "scheduled_time": "2025-08-25T23:21:22.011683",
+      "ai_recommendations": [
+        "تطبيق نظام إدارة علاقات العملاء الذكي",
+        "أتمتة العمليات المتكررة",
+        "تطوير نظام تحليل البيانات",
+        "تنفيذ حلول الذكاء الاصطناعي التنبؤية"
+      ],
+      "proposed_solutions": [
+        {
+          "solution": "AI-Powered CRM System",
+          "description": "نظام إدارة علاقات عملاء ذكي",
+          "estimated_cost": "39K SAR",
+          "timeline": "3-4 months"
+        },
+        {
+          "solution": "Workflow Automation",
+          "description": "أتمتة سير العمل الأساسية",
+          "estimated_cost": "10K SAR",
+          "timeline": "2-3 months"
+        }
+      ],
+      "estimated_cost": "500-1000 SAR",
+      "estimated_timeline": "30-60 minutes",
+      "requires_human_consultant": false,
+      "created_at": "2025-08-04T23:21:22.011695",
+      "updated_at": "2025-07-28T23:21:22.011700",
+      "completed_at": null,
+      "metadata": {
+        "consultation_rating": 5,
+        "follow_up_required": true,
+        "referral_potential": "high"
+      }
+    }
+  ],
+  "workflow_executions": [
+    {
+      "id": "8ed31b46-5b9f-48d1-926f-312392286f35",
+      "workflow_id": "6fc583d6-8722-428b-8304-517fa718db8b",
+      "n8n_execution_id": "exec_31731",
+      "status": "running",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 338
+      },
+      "output_data": {
+        "processed_items": 775,
+        "success_rate": 0.9792892066759838
+      },
+      "started_at": "2025-07-28T06:21:22.011748",
+      "completed_at": "2025-07-31T12:21:22.011758",
+      "duration_seconds": 435,
+      "success": false,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 41,
+          "memory_mb": 211
+        }
+      }
+    },
+    {
+      "id": "941ad285-74b8-46ae-aa5a-10cccb5e8a9a",
+      "workflow_id": "6fc583d6-8722-428b-8304-517fa718db8b",
+      "n8n_execution_id": "exec_98467",
+      "status": "running",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 653
+      },
+      "output_data": {
+        "processed_items": 607,
+        "success_rate": 0.9595280658529393
+      },
+      "started_at": "2025-07-26T09:21:22.011825",
+      "completed_at": "2025-07-22T23:21:22.011855",
+      "duration_seconds": 446,
+      "success": false,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 45,
+          "memory_mb": 374
+        }
+      }
+    },
+    {
+      "id": "867a800e-f1e7-4569-b7a8-6fe279048460",
+      "workflow_id": "6fc583d6-8722-428b-8304-517fa718db8b",
+      "n8n_execution_id": "exec_15529",
+      "status": "failed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 192
+      },
+      "output_data": null,
+      "started_at": "2025-07-14T16:21:22.011891",
+      "completed_at": "2025-07-21T00:21:22.011904",
+      "duration_seconds": 159,
+      "success": false,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 50,
+          "memory_mb": 247
+        }
+      }
+    },
+    {
+      "id": "8602636e-ce79-4daf-9a40-8572d68c7dee",
+      "workflow_id": "6fc583d6-8722-428b-8304-517fa718db8b",
+      "n8n_execution_id": "exec_51797",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 26
+      },
+      "output_data": {
+        "processed_items": 346,
+        "success_rate": 0.8694802545947568
+      },
+      "started_at": "2025-07-15T04:21:22.011954",
+      "completed_at": "2025-07-26T11:21:22.011963",
+      "duration_seconds": 81,
+      "success": true,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 19,
+          "memory_mb": 179
+        }
+      }
+    },
+    {
+      "id": "ae7435b2-d12a-4195-a10a-93074ec1503c",
+      "workflow_id": "6fc583d6-8722-428b-8304-517fa718db8b",
+      "n8n_execution_id": "exec_34206",
+      "status": "running",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 96
+      },
+      "output_data": null,
+      "started_at": "2025-07-24T07:21:22.011998",
+      "completed_at": "2025-07-18T14:21:22.012005",
+      "duration_seconds": 123,
+      "success": false,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 24,
+          "memory_mb": 231
+        }
+      }
+    },
+    {
+      "id": "dd606043-6308-4141-99d4-b73b5739bc1c",
+      "workflow_id": "6fc583d6-8722-428b-8304-517fa718db8b",
+      "n8n_execution_id": "exec_51874",
+      "status": "failed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 838
+      },
+      "output_data": {
+        "processed_items": 490,
+        "success_rate": 0.987182223675608
+      },
+      "started_at": "2025-08-01T17:21:22.012035",
+      "completed_at": "2025-08-09T05:21:22.012042",
+      "duration_seconds": 210,
+      "success": true,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 81,
+          "memory_mb": 100
+        }
+      }
+    },
+    {
+      "id": "488c7ce9-aea1-47e0-9c29-40f943d8bdbb",
+      "workflow_id": "ed81aabc-b0d9-4d35-bcac-074b0e26139f",
+      "n8n_execution_id": "exec_18048",
+      "status": "failed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 905
+      },
+      "output_data": {
+        "processed_items": 574,
+        "success_rate": 0.9344717614187198
+      },
+      "started_at": "2025-07-20T18:21:22.012105",
+      "completed_at": "2025-08-01T18:21:22.012119",
+      "duration_seconds": 299,
+      "success": true,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 60,
+          "memory_mb": 155
+        }
+      }
+    },
+    {
+      "id": "5751aea0-9f5f-4a26-b954-957d3a940bd1",
+      "workflow_id": "ed81aabc-b0d9-4d35-bcac-074b0e26139f",
+      "n8n_execution_id": "exec_21326",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 516
+      },
+      "output_data": {
+        "processed_items": 354,
+        "success_rate": 0.9126300263061041
+      },
+      "started_at": "2025-07-24T03:21:22.012178",
+      "completed_at": "2025-07-19T20:21:22.012186",
+      "duration_seconds": 159,
+      "success": true,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 80,
+          "memory_mb": 217
+        }
+      }
+    },
+    {
+      "id": "9f3b3b46-b00c-4a00-bd56-de49b510e1db",
+      "workflow_id": "ed81aabc-b0d9-4d35-bcac-074b0e26139f",
+      "n8n_execution_id": "exec_52859",
+      "status": "failed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 977
+      },
+      "output_data": {
+        "processed_items": 656,
+        "success_rate": 0.9711556124455959
+      },
+      "started_at": "2025-07-19T09:21:22.012218",
+      "completed_at": "2025-08-09T13:21:22.012225",
+      "duration_seconds": 88,
+      "success": true,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 107,
+          "memory_mb": 474
+        }
+      }
+    },
+    {
+      "id": "899364de-f9cd-4096-82a2-73fa8d843eab",
+      "workflow_id": "ed81aabc-b0d9-4d35-bcac-074b0e26139f",
+      "n8n_execution_id": "exec_70612",
+      "status": "failed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 908
+      },
+      "output_data": null,
+      "started_at": "2025-08-05T11:21:22.012256",
+      "completed_at": "2025-08-04T21:21:22.012267",
+      "duration_seconds": 424,
+      "success": false,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 46,
+          "memory_mb": 304
+        }
+      }
+    },
+    {
+      "id": "bd8f4cde-177a-4a25-8ff1-49bdb2b30051",
+      "workflow_id": "5555fea2-889a-4c0b-8b9b-ca66bb143d8b",
+      "n8n_execution_id": "exec_61788",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 128
+      },
+      "output_data": null,
+      "started_at": "2025-08-09T22:21:22.012321",
+      "completed_at": "2025-07-17T16:21:22.012334",
+      "duration_seconds": 487,
+      "success": false,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 70,
+          "memory_mb": 425
+        }
+      }
+    },
+    {
+      "id": "42db6d67-c6f6-45f7-a390-e4226ead4016",
+      "workflow_id": "5555fea2-889a-4c0b-8b9b-ca66bb143d8b",
+      "n8n_execution_id": "exec_81193",
+      "status": "failed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 325
+      },
+      "output_data": {
+        "processed_items": 611,
+        "success_rate": 0.9321542900044876
+      },
+      "started_at": "2025-07-20T04:21:22.012381",
+      "completed_at": "2025-07-23T00:21:22.012390",
+      "duration_seconds": 527,
+      "success": false,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 52,
+          "memory_mb": 340
+        }
+      }
+    },
+    {
+      "id": "eb3d13ae-9fb5-4b78-881e-cde3e97ae068",
+      "workflow_id": "5555fea2-889a-4c0b-8b9b-ca66bb143d8b",
+      "n8n_execution_id": "exec_11045",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 508
+      },
+      "output_data": {
+        "processed_items": 461,
+        "success_rate": 0.9748837247047583
+      },
+      "started_at": "2025-07-23T17:21:22.013764",
+      "completed_at": "2025-07-18T20:21:22.013800",
+      "duration_seconds": 186,
+      "success": false,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 97,
+          "memory_mb": 221
+        }
+      }
+    },
+    {
+      "id": "82b15dcc-99e5-44cc-a0b2-3524c6dee819",
+      "workflow_id": "5555fea2-889a-4c0b-8b9b-ca66bb143d8b",
+      "n8n_execution_id": "exec_38311",
+      "status": "failed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 790
+      },
+      "output_data": null,
+      "started_at": "2025-07-15T15:21:22.013866",
+      "completed_at": "2025-08-05T22:21:22.013876",
+      "duration_seconds": 492,
+      "success": true,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 120,
+          "memory_mb": 158
+        }
+      }
+    },
+    {
+      "id": "de4b5914-c6cb-4ad5-b045-62bd25d6c511",
+      "workflow_id": "04246858-4c9c-423b-9067-6a3906f3af97",
+      "n8n_execution_id": "exec_10378",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 129
+      },
+      "output_data": {
+        "processed_items": 84,
+        "success_rate": 0.9646937499737246
+      },
+      "started_at": "2025-07-19T18:21:22.013921",
+      "completed_at": "2025-07-21T07:21:22.013931",
+      "duration_seconds": 491,
+      "success": true,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 36,
+          "memory_mb": 144
+        }
+      }
+    },
+    {
+      "id": "24ffbe91-bf44-46d1-88ce-0f9fcbcf7e61",
+      "workflow_id": "04246858-4c9c-423b-9067-6a3906f3af97",
+      "n8n_execution_id": "exec_75631",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 946
+      },
+      "output_data": null,
+      "started_at": "2025-07-18T06:21:22.013970",
+      "completed_at": "2025-08-02T09:21:22.013980",
+      "duration_seconds": 321,
+      "success": false,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 54,
+          "memory_mb": 382
+        }
+      }
+    },
+    {
+      "id": "cd581fca-affd-41cd-ba07-28879d489dee",
+      "workflow_id": "04246858-4c9c-423b-9067-6a3906f3af97",
+      "n8n_execution_id": "exec_45120",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 405
+      },
+      "output_data": null,
+      "started_at": "2025-08-09T05:21:22.014017",
+      "completed_at": "2025-08-05T15:21:22.014026",
+      "duration_seconds": 581,
+      "success": true,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 26,
+          "memory_mb": 313
+        }
+      }
+    },
+    {
+      "id": "6337d1b2-ad35-4f06-9093-b392e7c87c8a",
+      "workflow_id": "04246858-4c9c-423b-9067-6a3906f3af97",
+      "n8n_execution_id": "exec_76700",
+      "status": "failed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 261
+      },
+      "output_data": null,
+      "started_at": "2025-07-23T02:21:22.014071",
+      "completed_at": "2025-07-22T14:21:22.014080",
+      "duration_seconds": 248,
+      "success": true,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 88,
+          "memory_mb": 440
+        }
+      }
+    },
+    {
+      "id": "73df6f6f-43d9-4fc6-9b9f-8b714baffef3",
+      "workflow_id": "04246858-4c9c-423b-9067-6a3906f3af97",
+      "n8n_execution_id": "exec_36633",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 721
+      },
+      "output_data": {
+        "processed_items": 220,
+        "success_rate": 0.9448272746467028
+      },
+      "started_at": "2025-07-20T00:21:22.014126",
+      "completed_at": "2025-07-12T12:21:22.014136",
+      "duration_seconds": 564,
+      "success": true,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 14,
+          "memory_mb": 94
+        }
+      }
+    },
+    {
+      "id": "4dabc52b-859b-40f4-ae46-661adf278257",
+      "workflow_id": "04246858-4c9c-423b-9067-6a3906f3af97",
+      "n8n_execution_id": "exec_82778",
+      "status": "running",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 190
+      },
+      "output_data": null,
+      "started_at": "2025-08-06T11:21:22.014169",
+      "completed_at": "2025-07-26T13:21:22.014176",
+      "duration_seconds": 560,
+      "success": false,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 80,
+          "memory_mb": 139
+        }
+      }
+    },
+    {
+      "id": "cf1ef8ad-2cb4-4086-995a-4bccfcdfb03f",
+      "workflow_id": "04246858-4c9c-423b-9067-6a3906f3af97",
+      "n8n_execution_id": "exec_39629",
+      "status": "running",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 220
+      },
+      "output_data": null,
+      "started_at": "2025-07-16T13:21:22.014210",
+      "completed_at": "2025-07-27T20:21:22.014218",
+      "duration_seconds": 593,
+      "success": false,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 82,
+          "memory_mb": 275
+        }
+      }
+    },
+    {
+      "id": "9c9962d4-f4b0-4ba9-b684-179b48acf553",
+      "workflow_id": "04246858-4c9c-423b-9067-6a3906f3af97",
+      "n8n_execution_id": "exec_92395",
+      "status": "failed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 552
+      },
+      "output_data": {
+        "processed_items": 162,
+        "success_rate": 0.9945374563068705
+      },
+      "started_at": "2025-07-21T01:21:22.014268",
+      "completed_at": "2025-07-23T19:21:22.014284",
+      "duration_seconds": 213,
+      "success": false,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 116,
+          "memory_mb": 119
+        }
+      }
+    },
+    {
+      "id": "c3a720c5-8642-415a-86bc-fcca26ace0f3",
+      "workflow_id": "04246858-4c9c-423b-9067-6a3906f3af97",
+      "n8n_execution_id": "exec_86796",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 51
+      },
+      "output_data": {
+        "processed_items": 732,
+        "success_rate": 0.978652578849101
+      },
+      "started_at": "2025-07-29T08:21:22.014322",
+      "completed_at": "2025-07-17T14:21:22.014332",
+      "duration_seconds": 373,
+      "success": true,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 44,
+          "memory_mb": 187
+        }
+      }
+    },
+    {
+      "id": "b03ae207-a28d-4e74-8e26-b7cc7451322c",
+      "workflow_id": "33f323f2-8508-4a40-acea-c885a44ef040",
+      "n8n_execution_id": "exec_84849",
+      "status": "running",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 244
+      },
+      "output_data": {
+        "processed_items": 287,
+        "success_rate": 0.8817399404269775
+      },
+      "started_at": "2025-08-01T07:21:22.014378",
+      "completed_at": "2025-07-23T22:21:22.014387",
+      "duration_seconds": 449,
+      "success": false,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 50,
+          "memory_mb": 360
+        }
+      }
+    },
+    {
+      "id": "6aef475d-6854-4302-a744-a90f7f50792f",
+      "workflow_id": "33f323f2-8508-4a40-acea-c885a44ef040",
+      "n8n_execution_id": "exec_87077",
+      "status": "running",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 218
+      },
+      "output_data": null,
+      "started_at": "2025-07-12T01:21:22.014428",
+      "completed_at": "2025-07-20T16:21:22.014436",
+      "duration_seconds": 439,
+      "success": true,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 97,
+          "memory_mb": 481
+        }
+      }
+    },
+    {
+      "id": "e6f0b1f5-dda8-4785-91af-cbbbc03e4173",
+      "workflow_id": "33f323f2-8508-4a40-acea-c885a44ef040",
+      "n8n_execution_id": "exec_98778",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 893
+      },
+      "output_data": null,
+      "started_at": "2025-08-04T03:21:22.014470",
+      "completed_at": "2025-07-18T17:21:22.014478",
+      "duration_seconds": 158,
+      "success": true,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 84,
+          "memory_mb": 51
+        }
+      }
+    },
+    {
+      "id": "842cdbdc-e91b-494b-a650-8c0b702d8234",
+      "workflow_id": "33f323f2-8508-4a40-acea-c885a44ef040",
+      "n8n_execution_id": "exec_66358",
+      "status": "running",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 123
+      },
+      "output_data": {
+        "processed_items": 68,
+        "success_rate": 0.9018441857884091
+      },
+      "started_at": "2025-07-16T15:21:22.014520",
+      "completed_at": "2025-07-14T18:21:22.014529",
+      "duration_seconds": 82,
+      "success": false,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 48,
+          "memory_mb": 421
+        }
+      }
+    },
+    {
+      "id": "e814252a-3f70-40f1-8301-f18359e8d0b4",
+      "workflow_id": "33f323f2-8508-4a40-acea-c885a44ef040",
+      "n8n_execution_id": "exec_60157",
+      "status": "failed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 872
+      },
+      "output_data": null,
+      "started_at": "2025-08-07T19:21:22.014571",
+      "completed_at": "2025-08-09T19:21:22.014579",
+      "duration_seconds": 36,
+      "success": false,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 104,
+          "memory_mb": 138
+        }
+      }
+    },
+    {
+      "id": "85553e9a-d9fe-4110-beea-160aead8623f",
+      "workflow_id": "2acdb31d-0104-4be2-b7f9-95144376c709",
+      "n8n_execution_id": "exec_68563",
+      "status": "running",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 568
+      },
+      "output_data": {
+        "processed_items": 474,
+        "success_rate": 0.9709389101562829
+      },
+      "started_at": "2025-07-16T07:21:22.014615",
+      "completed_at": "2025-08-02T09:21:22.014623",
+      "duration_seconds": 536,
+      "success": false,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 12,
+          "memory_mb": 163
+        }
+      }
+    },
+    {
+      "id": "aed7a656-9ff7-4b02-88d4-96a8859401f3",
+      "workflow_id": "2acdb31d-0104-4be2-b7f9-95144376c709",
+      "n8n_execution_id": "exec_92678",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 434
+      },
+      "output_data": {
+        "processed_items": 44,
+        "success_rate": 0.9483648582229861
+      },
+      "started_at": "2025-07-26T15:21:22.014658",
+      "completed_at": "2025-07-14T10:21:22.014666",
+      "duration_seconds": 555,
+      "success": true,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 117,
+          "memory_mb": 60
+        }
+      }
+    },
+    {
+      "id": "51af2c62-4576-4684-bf36-123e748244b3",
+      "workflow_id": "2acdb31d-0104-4be2-b7f9-95144376c709",
+      "n8n_execution_id": "exec_49069",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 711
+      },
+      "output_data": null,
+      "started_at": "2025-07-30T06:21:22.014703",
+      "completed_at": "2025-08-04T14:21:22.014715",
+      "duration_seconds": 249,
+      "success": true,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 45,
+          "memory_mb": 215
+        }
+      }
+    },
+    {
+      "id": "8179e1e5-dd99-49e2-a0c7-a2ce31b58ed2",
+      "workflow_id": "c42bd191-cac0-4449-b6e6-d6529a2b9793",
+      "n8n_execution_id": "exec_41913",
+      "status": "running",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 464
+      },
+      "output_data": null,
+      "started_at": "2025-07-21T19:21:22.014758",
+      "completed_at": "2025-07-24T18:21:22.014767",
+      "duration_seconds": 423,
+      "success": true,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 50,
+          "memory_mb": 467
+        }
+      }
+    },
+    {
+      "id": "a62693e9-2777-4207-8bac-582b83dccc7a",
+      "workflow_id": "c42bd191-cac0-4449-b6e6-d6529a2b9793",
+      "n8n_execution_id": "exec_47172",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 45
+      },
+      "output_data": {
+        "processed_items": 50,
+        "success_rate": 0.9759697629216656
+      },
+      "started_at": "2025-08-09T04:21:22.014807",
+      "completed_at": "2025-07-14T19:21:22.014816",
+      "duration_seconds": 517,
+      "success": false,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 20,
+          "memory_mb": 94
+        }
+      }
+    },
+    {
+      "id": "82a02aa1-68d8-4ed3-8a6e-b19ff16f2f82",
+      "workflow_id": "c42bd191-cac0-4449-b6e6-d6529a2b9793",
+      "n8n_execution_id": "exec_30998",
+      "status": "running",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 158
+      },
+      "output_data": null,
+      "started_at": "2025-08-09T18:21:22.014882",
+      "completed_at": "2025-07-21T22:21:22.014892",
+      "duration_seconds": 283,
+      "success": false,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 90,
+          "memory_mb": 329
+        }
+      }
+    },
+    {
+      "id": "7ccc0ba4-4702-45fc-b6c8-a28a0a5e1773",
+      "workflow_id": "c42bd191-cac0-4449-b6e6-d6529a2b9793",
+      "n8n_execution_id": "exec_58908",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 918
+      },
+      "output_data": {
+        "processed_items": 268,
+        "success_rate": 0.8801649649165464
+      },
+      "started_at": "2025-08-01T15:21:22.014937",
+      "completed_at": "2025-07-20T16:21:22.014945",
+      "duration_seconds": 414,
+      "success": true,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 120,
+          "memory_mb": 353
+        }
+      }
+    },
+    {
+      "id": "b29043e9-4685-4bdc-804f-f50d268df097",
+      "workflow_id": "c42bd191-cac0-4449-b6e6-d6529a2b9793",
+      "n8n_execution_id": "exec_78140",
+      "status": "running",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 40
+      },
+      "output_data": {
+        "processed_items": 579,
+        "success_rate": 0.8750962470626942
+      },
+      "started_at": "2025-07-17T04:21:22.014980",
+      "completed_at": "2025-07-13T07:21:22.014989",
+      "duration_seconds": 86,
+      "success": true,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 105,
+          "memory_mb": 165
+        }
+      }
+    },
+    {
+      "id": "c3db9193-f1ed-4cf8-b90f-66cbd2e8c638",
+      "workflow_id": "c42bd191-cac0-4449-b6e6-d6529a2b9793",
+      "n8n_execution_id": "exec_59723",
+      "status": "running",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 996
+      },
+      "output_data": null,
+      "started_at": "2025-07-14T03:21:22.015024",
+      "completed_at": "2025-08-05T19:21:22.015033",
+      "duration_seconds": 431,
+      "success": false,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 120,
+          "memory_mb": 454
+        }
+      }
+    },
+    {
+      "id": "320e44b7-ead2-43ba-953e-e223f813ef37",
+      "workflow_id": "c42bd191-cac0-4449-b6e6-d6529a2b9793",
+      "n8n_execution_id": "exec_87389",
+      "status": "running",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 927
+      },
+      "output_data": null,
+      "started_at": "2025-08-04T19:21:22.015088",
+      "completed_at": "2025-08-09T16:21:22.015099",
+      "duration_seconds": 41,
+      "success": true,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 65,
+          "memory_mb": 450
+        }
+      }
+    },
+    {
+      "id": "2dea3488-41f0-48d9-bb72-c62a6e8d2570",
+      "workflow_id": "c42bd191-cac0-4449-b6e6-d6529a2b9793",
+      "n8n_execution_id": "exec_49609",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 862
+      },
+      "output_data": null,
+      "started_at": "2025-07-12T04:21:22.015131",
+      "completed_at": "2025-07-20T00:21:22.015139",
+      "duration_seconds": 426,
+      "success": true,
+      "error_message": null,
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 75,
+          "memory_mb": 408
+        }
+      }
+    },
+    {
+      "id": "a2e90ec8-a0ea-47d5-9839-3726da0b94b6",
+      "workflow_id": "a6351e86-1db8-49a6-8053-a54dab34844f",
+      "n8n_execution_id": "exec_68488",
+      "status": "completed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 874
+      },
+      "output_data": {
+        "processed_items": 666,
+        "success_rate": 0.8917179084900374
+      },
+      "started_at": "2025-07-17T19:21:22.015187",
+      "completed_at": "2025-07-12T17:21:22.015205",
+      "duration_seconds": 157,
+      "success": true,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 56,
+          "memory_mb": 86
+        }
+      }
+    },
+    {
+      "id": "537eb5a5-f13b-4b7a-9ac7-1d064239731e",
+      "workflow_id": "a6351e86-1db8-49a6-8053-a54dab34844f",
+      "n8n_execution_id": "exec_70964",
+      "status": "failed",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 155
+      },
+      "output_data": {
+        "processed_items": 461,
+        "success_rate": 0.8952140449256711
+      },
+      "started_at": "2025-08-09T03:21:22.015255",
+      "completed_at": "2025-08-04T00:21:22.015266",
+      "duration_seconds": 473,
+      "success": false,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 73,
+          "memory_mb": 129
+        }
+      }
+    },
+    {
+      "id": "3df9d48b-a990-4b21-9ff3-4ca72590eb47",
+      "workflow_id": "a6351e86-1db8-49a6-8053-a54dab34844f",
+      "n8n_execution_id": "exec_63094",
+      "status": "running",
+      "input_data": {
+        "trigger": "scheduled",
+        "data_count": 836
+      },
+      "output_data": null,
+      "started_at": "2025-08-04T18:21:22.015311",
+      "completed_at": "2025-07-16T09:21:22.015327",
+      "duration_seconds": 89,
+      "success": true,
+      "error_message": "Connection timeout",
+      "logs": [
+        "Workflow started successfully",
+        "Processing data batch 1",
+        "Data transformation completed",
+        "Workflow completed successfully"
+      ],
+      "metadata": {
+        "execution_mode": "automatic",
+        "resource_usage": {
+          "cpu_seconds": 57,
+          "memory_mb": 333
+        }
+      }
+    }
+  ],
+  "consultation_sessions": [],
+  "summary": {
+    "total_customers": 6,
+    "total_workflows": 8,
+    "total_projects": 4,
+    "total_consultations": 3,
+    "total_executions": 42,
+    "total_sessions": 0
+  }
+}

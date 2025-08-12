@@ -1,0 +1,39 @@
+name: "n8n MCP Workflow Manager"
+description: "Manage n8n workflows via MCP server integration"
+trigger:
+  type: "manual"
+  icon: "🔄"
+  label: "Manage n8n Workflows"
+
+steps:
+  - name: "Start n8n MCP Stack"
+    type: "command"
+    command: "docker-compose -f docker-compose.development.yml up -d n8n-dev n8n-mcp-dev"
+    description: "Start n8n and n8n MCP server containers"
+    
+  - name: "Check n8n Instance Health"
+    type: "command"
+    command: "curl -f http://localhost:5679/healthz"
+    description: "Verify n8n instance is running and healthy"
+    
+  - name: "Check MCP Server Health"
+    type: "command"
+    command: "curl -f http://localhost:3002/health"
+    description: "Verify n8n MCP server is operational"
+    
+  - name: "List Available Workflow Templates"
+    type: "command"
+    command: "uv run -c 'from agent.my_adk_agent.agents.n8n_workflow_agent import N8nWorkflowAgent; import asyncio; agent = N8nWorkflowAgent({}); print(asyncio.run(agent.list_workflow_templates(\"en\")))'"
+    description: "List available n8n workflow templates"
+    
+  - name: "Test MCP Communication"
+    type: "command"
+    command: "uv run -c 'from agent.my_adk_agent.services.mcp_service import MCPService; import asyncio; mcp = MCPService({\"MCP_SERVER_URL\": \"http://localhost:3002\", \"N8N_URL\": \"http://localhost:5679\"}); print(asyncio.run(mcp.get_workflow_status(\"test\")))'"
+    description: "Test MCP service communication with n8n"
+
+outputs:
+  - "n8n container startup status"
+  - "n8n instance health check"
+  - "MCP server health status"
+  - "Available workflow templates"
+  - "MCP communication test results"

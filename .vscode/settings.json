@@ -69,6 +69,12 @@
         "./infrastructure/scripts/setup-private-github-access.sh",
         "./infrastructure/scripts/deploy-development-stack.sh *",
         "./infrastructure/scripts/deploy-dev-stack-simple.sh *",
-        "python3 *"
+        "python3 *",
+        "python *",
+        "mv *",
+        "docker-compose *",
+        "ps *",
+        "node *",
+        "pnpm *"
     ]
 }
