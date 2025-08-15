@@ -1,69 +1,43 @@
 version: '3.8'
 
 services:
-  # Consolidated Frontend + n8n Platform + n8n MCP
-  frontend-consolidated-dev:
-    build:
-      context: .
-      dockerfile: infrastructure/docker/Dockerfile.consolidated
-      args:
-        NODE_ENV: development
-        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-    container_name: agentic-consolidated-dev
+  agentic-frontend-dev:
+    image: agentic/frontend:latest
+    container_name: agentic-frontend-dev
     ports:
-      - "3001:3000"  # Frontend
-      - "5679:5678"  # n8n Platform
-      - "3002:3001"  # n8n MCP
+      - "3001:3000"
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_SITE_URL=https://dev.consulting.sa
+      - NEXT_PUBLIC_DOMAIN=dev.consulting.sa
       - NEXT_PUBLIC_API_URL=https://dev.consulting.sa/api
-      # n8n Platform Configuration
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER:-admin}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD:-admin123}
-      - N8N_HOST=0.0.0.0
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - WEBHOOK_URL=https://dev.consulting.sa/n8n/
-      # n8n MCP Configuration
-      - N8N_API_URL=http://localhost:5678
-      - N8N_API_KEY=${N8N_API_KEY:-dummy_n8n_development_key}
-      - MCP_MODE=http
-      - LOG_LEVEL=info
-      - DISABLE_CONSOLE_OUTPUT=false
-    env_file:
-      - .env.development
-    volumes:
-      - n8n_dev_data:/home/node/.n8n
-      - consolidated_logs:/var/log/supervisor
+    networks:
+      - agentic-dev-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "sh", "-c", "curl -f http://localhost:3000/api/health && curl -f http://localhost:5678/healthz && curl -f http://localhost:3001/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
       interval: 30s
-      timeout: 15s
+      timeout: 10s
       retries: 3
-      start_period: 60s
-    depends_on:
-      - backend-dev
-      - redis-dev
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1g
+        reservations:
+          cpus: '0.5'
+          memory: 512m
 
-  backend-dev:
-    build:
-      context: .
-      dockerfile: infrastructure/docker/Dockerfile.backend
+  agentic-backend-dev:
+    image: agentic/backend:latest
     container_name: agentic-backend-dev
     ports:
       - "8001:8000"
     environment:
+      - PYTHONPATH=/app
       - ENVIRONMENT=development
-      - PORT=8000
-      # Update n8n URLs to point to consolidated container
-      - N8N_URL=http://frontend-consolidated-dev:5678
-      - MCP_SERVER_URL=http://frontend-consolidated-dev:3001
-    env_file:
-      - .env.development
+    networks:
+      - agentic-dev-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -71,33 +45,71 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    depends_on:
-      - redis-dev
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1g
+        reservations:
+          cpus: '0.5'
+          memory: 512m
 
-  redis-dev:
+  agentic-redis-dev:
     image: redis:7-alpine
     container_name: agentic-redis-dev
     ports:
       - "6380:6379"
-    command: redis-server --appendonly yes
-    volumes:
-      - redis_dev_data:/data
+    networks:
+      - agentic-dev-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 30s
       timeout: 10s
       retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256m
+        reservations:
+          cpus: '0.1'
+          memory: 128m
 
-volumes:
-  redis_dev_data:
-    driver: local
-  n8n_dev_data:
-    driver: local
-  consolidated_logs:
-    driver: local
+  agentic-n8n-dev:
+    image: n8nio/n8n:latest
+    container_name: agentic-n8n-dev
+    ports:
+      - "5679:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin123
+    networks:
+      - agentic-dev-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1g
+        reservations:
+          cpus: '0.5'
+          memory: 512m
 
 networks:
-  default:
-    name: agentic-development
+  agentic-dev-network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+
+volumes:
+  agentic-dev-data:
+    driver: local

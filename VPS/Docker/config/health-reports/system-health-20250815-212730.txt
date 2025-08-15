@@ -1,0 +1,54 @@
+=== SYSTEM HEALTH CHECK ===
+Timestamp: Fri Aug 15 06:21:54 PM UTC 2025
+Hostname: ssdnode-11723579473
+Uptime: up 1 week, 6 days, 1 hour, 14 minutes
+
+=== RESOURCE USAGE ===
+CPU Usage:
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st 
+Memory Usage:
+               total        used        free      shared  buff/cache   available
+Mem:            23Gi       1.9Gi        21Gi       1.7Mi       552Mi        21Gi
+Swap:             0B          0B          0B
+Disk Usage:
+/dev/sda1       394G   72G  302G  20% /
+Load Average: 0.23 0.06 0.02 1/225 1505814
+
+=== SYSTEM SERVICES ===
+nginx: ✅ ACTIVE
+docker: ✅ ACTIVE
+ssh: ✅ ACTIVE
+fail2ban: ✅ ACTIVE
+
+=== NETWORK STATUS ===
+Listening Ports:
+tcp        0      0 0.0.0.0:40241           0.0.0.0:*               LISTEN      31243/sshd: /usr/sb 
+tcp        0      0 0.0.0.0:443             0.0.0.0:*               LISTEN      31880/nginx: master 
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      31243/sshd: /usr/sb 
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      31880/nginx: master 
+tcp        0      0 127.0.0.1:6382          0.0.0.0:*               LISTEN      1414813/docker-prox 
+
+Firewall Status:
+Status: active
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW       Anywhere                   # SSH
+
+=== SECURITY STATUS ===
+Failed Login Attempts (last 10):
+2025-08-15T18:20:24.704185+00:00 ssdnode-11723579473 sshd[1505488]: 142.93.246.65 port 53004
+2025-08-15T18:20:48.126488+00:00 ssdnode-11723579473 sshd[1505508]: 67.207.83.103 port 47020
+2025-08-15T18:21:33.418790+00:00 ssdnode-11723579473 sshd[1505570]: 45.88.8.186 port 59908
+2025-08-15T18:21:37.022279+00:00 ssdnode-11723579473 sshd[1505610]: 102.88.137.213 port 1209
+2025-08-15T18:21:37.578393+00:00 ssdnode-11723579473 sshd[1505620]: 193.46.255.217 port 17780
+2025-08-15T18:21:42.051661+00:00 ssdnode-11723579473 sshd[1505620]: 193.46.255.217 port 17780
+2025-08-15T18:21:44.966258+00:00 ssdnode-11723579473 sshd[1505721]: 142.93.246.65 port 36222
+2025-08-15T18:21:45.838319+00:00 ssdnode-11723579473 sshd[1505620]: 193.46.255.217 port 17780
+2025-08-15T18:21:49.162213+00:00 ssdnode-11723579473 sshd[1505735]: 193.46.255.217 port 37246
+2025-08-15T18:21:51.942115+00:00 ssdnode-11723579473 sshd[1505771]: 67.207.83.103 port 58214
+
+Fail2ban Status:
+Status
+|- Number of jail:	1
+`- Jail list:	sshd

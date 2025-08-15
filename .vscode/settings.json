@@ -88,6 +88,8 @@
         "./scripts/deployment/validate-deployment-v1-20250814.sh *",
         "pip *",
         "wc *",
-        "sed *"
+        "sed *",
+        "./VPS/Docker/scripts/deployment/deploy.sh *",
+        "docker *"
     ]
 }

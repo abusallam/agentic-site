@@ -1,0 +1,127 @@
+{
+  "test_run_id": "20250815_211146",
+  "start_time": "2025-08-15T21:11:46.036004",
+  "base_url": "http://localhost:3000",
+  "tests": {
+    "frontend_health": {
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: /api/health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fcb6e91d4f0>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "timestamp": "2025-08-15T21:11:46.039878"
+    },
+    "backend_health": {
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fcb6e91dca0>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "timestamp": "2025-08-15T21:11:46.041326"
+    },
+    "agent_status": {
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /agent/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fcb6e91e120>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "timestamp": "2025-08-15T21:11:46.043074"
+    },
+    "scenario_arabic_ai_consultation": {
+      "name": "Arabic AI Consultation Journey",
+      "language": "ar",
+      "messages_tested": 4,
+      "agents_encountered": [],
+      "features_tested": [],
+      "conversation_flow": [],
+      "performance_metrics": {},
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: /api/chat (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fcb6e91e870>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    "scenario_english_workflow_automation": {
+      "name": "English Workflow Automation",
+      "language": "en",
+      "messages_tested": 4,
+      "agents_encountered": [],
+      "features_tested": [],
+      "conversation_flow": [],
+      "performance_metrics": {},
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: /api/chat (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fcb6e91ef00>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    "scenario_code_generation_request": {
+      "name": "Code Generation with Requirements",
+      "language": "en",
+      "messages_tested": 4,
+      "agents_encountered": [],
+      "features_tested": [],
+      "conversation_flow": [],
+      "performance_metrics": {},
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: /api/chat (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fcb6eed66f0>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    "scenario_billing_inquiry": {
+      "name": "Billing and Usage Inquiry",
+      "language": "ar",
+      "messages_tested": 3,
+      "agents_encountered": [],
+      "features_tested": [],
+      "conversation_flow": [],
+      "performance_metrics": {},
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: /api/chat (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fcb6e91e750>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    "speech_to_text_arabic": {
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: /api/speech-to-text (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fcb6e91e3c0>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "timestamp": "2025-08-15T21:11:46.056402"
+    },
+    "speech_to_text_english": {
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: /api/speech-to-text (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fcb6e91da90>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "timestamp": "2025-08-15T21:11:46.058340"
+    },
+    "file_upload": {
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: /api/file-upload (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fcb6e91f7a0>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "timestamp": "2025-08-15T21:11:46.060449"
+    },
+    "live_session": {
+      "status": "ERROR",
+      "error": "HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: /api/live-session (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fcb6e75c110>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "timestamp": "2025-08-15T21:11:46.062609"
+    },
+    "memory_context": {
+      "status": "FAIL",
+      "messages_tested": 3,
+      "timestamp": "2025-08-15T21:11:46.064445"
+    },
+    "performance_load": {
+      "status": "FAIL",
+      "concurrent_requests": 10,
+      "successful_requests": 0,
+      "success_rate": 0.0,
+      "average_response_time": 30.0,
+      "total_time": 0.0193936824798584,
+      "timestamp": "2025-08-15T21:11:46.084220"
+    },
+    "security_rate_limiting": {
+      "status": "FAIL",
+      "rate_limit_triggered": false,
+      "requests_sent": 20,
+      "timestamp": "2025-08-15T21:11:46.118841"
+    }
+  },
+  "summary": {
+    "total_tests": 14,
+    "passed_tests": 0,
+    "failed_tests": 3,
+    "error_tests": 11,
+    "success_rate": 0.0,
+    "overall_status": "FAIL"
+  },
+  "end_time": "2025-08-15T21:11:46.119137"
+}2025-08-15 21:11:46,119 - INFO - ============================================================
+2025-08-15 21:11:46,119 - INFO - 🎯 PRODUCTION TEST RESULTS SUMMARY
+2025-08-15 21:11:46,120 - INFO - ============================================================
+2025-08-15 21:11:46,120 - INFO - 📊 Total Tests: 14
+2025-08-15 21:11:46,120 - INFO - ✅ Passed: 0
+2025-08-15 21:11:46,120 - INFO - ❌ Failed: 3
+2025-08-15 21:11:46,120 - INFO - ⚠️  Errors: 11
+2025-08-15 21:11:46,120 - INFO - 📈 Success Rate: 0.0%
+2025-08-15 21:11:46,120 - INFO - 🎯 Overall Status: FAIL
+2025-08-15 21:11:46,120 - INFO - 📄 Detailed Results: production_test_results_20250815_211146.json
+2025-08-15 21:11:46,120 - INFO - ============================================================
+2025-08-15 21:11:46,120 - ERROR - ❌ PRODUCTION DEPLOYMENT TESTS FAILED!
+2025-08-15 21:11:46,120 - ERROR - 🔧 System needs attention before production use

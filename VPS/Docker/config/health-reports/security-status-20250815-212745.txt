@@ -1,0 +1,48 @@
+=== SECURITY STATUS CHECK ===
+
+=== FIREWALL STATUS ===
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 22/tcp                     ALLOW IN    Anywhere                   # SSH
+[ 2] 80/tcp                     ALLOW IN    Anywhere                   # HTTP
+[ 3] 443/tcp                    ALLOW IN    Anywhere                   # HTTPS
+[ 4] 3001/tcp                   ALLOW IN    Anywhere                   # Frontend Dev
+[ 5] 8001/tcp                   ALLOW IN    Anywhere                   # Backend Dev
+[ 6] 5679/tcp                   ALLOW IN    Anywhere                   # n8n Dev
+[ 7] 6380/tcp                   ALLOW IN    Anywhere                   # Redis Dev
+[ 8] 22/tcp (v6)                ALLOW IN    Anywhere (v6)              # SSH
+[ 9] 80/tcp (v6)                ALLOW IN    Anywhere (v6)              # HTTP
+[10] 443/tcp (v6)               ALLOW IN    Anywhere (v6)              # HTTPS
+[11] 3001/tcp (v6)              ALLOW IN    Anywhere (v6)              # Frontend Dev
+
+=== SSH SECURITY ===
+SSH Configuration:
+Port 22
+Port 40241
+PermitRootLogin yes
+PubkeyAuthentication yes
+PasswordAuthentication yes
+
+Active SSH Sessions:
+
+=== FAIL2BAN STATUS ===
+Fail2ban: ✅ ACTIVE
+Status
+|- Number of jail:	1
+`- Jail list:	sshd
+
+=== RECENT SECURITY EVENTS ===
+Failed Login Attempts (last 24 hours):
+1820
+
+Successful Logins (last 24 hours):
+0
+
+=== SYSTEM UPDATES ===
+Available Updates:
+3
+
+Last Update:
+Modify: 2025-08-08 23:47:04.016000000 +0000

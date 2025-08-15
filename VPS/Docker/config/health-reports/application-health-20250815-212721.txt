@@ -1,0 +1,26 @@
+=== APPLICATION HEALTH CHECK ===
+
+=== HTTP ENDPOINT TESTS ===
+
+=== SSL CERTIFICATE STATUS ===
+Checking consulting.sa:
+notBefore=Jul 19 22:21:51 2025 GMT
+notAfter=Oct 17 23:21:27 2025 GMT
+  ✅ SSL certificate valid
+Checking tacticalops.console.ts:
+  ❌ SSL certificate issue
+
+=== NGINX STATUS ===
+Nginx: ✅ ACTIVE
+Nginx Configuration Test:
+2025/08/15 18:21:44 [info] 1505728#1505728: Using 116KiB of shared memory for nchan in /etc/nginx/nginx.conf:61
+2025/08/15 18:21:44 [info] 1505728#1505728: Using 131072KiB of shared memory for nchan in /etc/nginx/nginx.conf:61
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+Active Sites:
+  . -> 
+  .. -> 
+  development.conf -> /etc/nginx/sites-available/development.conf
+  production.conf -> /etc/nginx/sites-available/production.conf
+  tac.conf -> /etc/nginx/sites-available/tac.conf
+  tacticalops.conf -> /etc/nginx/sites-available/tacticalops.conf
+  tacticalops-ssl.conf -> /etc/nginx/sites-available/tacticalops-ssl.conf
