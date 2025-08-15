@@ -1,0 +1,44 @@
+=== SECURITY AUDIT ===
+SSH Configuration:
+Port 22
+Port 40241
+PermitRootLogin yes
+PubkeyAuthentication yes
+PasswordAuthentication yes
+
+Failed Login Attempts (last 100):
+2025-08-13T20:34:00.374183+00:00 ssdnode-11723579473 sshd[434811]: Failed password for root from 150.139.201.247 port 44046 ssh2
+2025-08-13T20:34:18.624827+00:00 ssdnode-11723579473 sshd[434928]: Failed password for root from 61.222.211.114 port 60732 ssh2
+2025-08-13T20:34:58.016680+00:00 ssdnode-11723579473 sshd[435183]: Failed password for root from 150.139.201.247 port 59182 ssh2
+2025-08-13T20:35:11.616886+00:00 ssdnode-11723579473 sshd[435261]: Failed password for root from 221.159.150.85 port 39032 ssh2
+2025-08-13T20:35:28.762371+00:00 ssdnode-11723579473 sshd[435377]: Failed password for root from 152.32.131.45 port 14732 ssh2
+2025-08-13T20:35:31.901569+00:00 ssdnode-11723579473 sshd[435394]: Failed password for root from 61.222.211.114 port 59774 ssh2
+2025-08-13T20:35:55.067910+00:00 ssdnode-11723579473 sshd[435569]: Failed password for root from 150.139.201.247 port 46088 ssh2
+2025-08-13T20:36:30.285719+00:00 ssdnode-11723579473 sshd[435758]: Failed password for root from 221.159.150.85 port 42810 ssh2
+2025-08-13T20:37:01.262494+00:00 ssdnode-11723579473 sshd[435945]: Failed password for root from 152.32.131.45 port 44970 ssh2
+2025-08-13T20:37:56.343681+00:00 ssdnode-11723579473 sshd[436300]: Failed password for root from 45.88.8.215 port 43630 ssh2
+
+Fail2ban Status:
+Status
+|- Number of jail:	1
+`- Jail list:	sshd
+
+Open Ports Summary:
+
+22
+80
+443
+3000
+3001
+3020
+5678
+5679
+6379
+6380
+6382
+8000
+8001
+40241
+
+System Updates Available:
+3

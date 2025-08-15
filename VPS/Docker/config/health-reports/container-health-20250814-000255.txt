@@ -1,0 +1,67 @@
+=== CONTAINER HEALTH CHECK ===
+Docker Status: active
+Docker Version: Docker version 28.3.3, build 980b856
+
+=== RUNNING CONTAINERS ===
+NAMES                      STATUS                      PORTS
+tacticalops-app            Up 12 minutes (unhealthy)   127.0.0.1:3020->3000/tcp
+tacticalops-redis          Up 7 hours (healthy)        127.0.0.1:6382->6379/tcp
+agentic-frontend-dev       Up 2 days (healthy)         0.0.0.0:3001->3000/tcp, [::]:3001->3000/tcp
+agentic-backend-dev        Up 2 days (healthy)         0.0.0.0:8001->8000/tcp, [::]:8001->8000/tcp
+agentic-n8n-dev            Up 2 days (unhealthy)       0.0.0.0:5679->5678/tcp, [::]:5679->5678/tcp
+agentic-redis-dev          Up 2 days (healthy)         0.0.0.0:6380->6379/tcp, [::]:6380->6379/tcp
+consulting-frontend-prod   Up 4 days (unhealthy)       0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+consulting-backend-prod    Up 4 days (healthy)         0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+consulting-n8n-prod        Up 4 days (unhealthy)       0.0.0.0:5678->5678/tcp, [::]:5678->5678/tcp
+consulting-redis-prod      Up 4 days (healthy)         0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp
+
+=== CONTAINER HEALTH STATUS ===
+tacticalops-app: ❌ UNHEALTHY
+tacticalops-redis: ✅ HEALTHY
+agentic-frontend-dev: ✅ HEALTHY
+agentic-backend-dev: ✅ HEALTHY
+agentic-n8n-dev: ❌ UNHEALTHY
+agentic-redis-dev: ✅ HEALTHY
+consulting-frontend-prod: ❌ UNHEALTHY
+consulting-backend-prod: ✅ HEALTHY
+consulting-n8n-prod: ❌ UNHEALTHY
+consulting-redis-prod: ✅ HEALTHY
+
+=== CONTAINER RESOURCE USAGE ===
+NAME                       CPU %     MEM USAGE / LIMIT     NET I/O
+tacticalops-app            0.00%     49.19MiB / 1GiB       1.01kB / 126B
+tacticalops-redis          0.92%     10.3MiB / 256MiB      3.05kB / 126B
+agentic-frontend-dev       0.00%     737.5MiB / 23.47GiB   4.04MB / 59.9MB
+agentic-backend-dev        9.10%     72.33MiB / 23.47GiB   457kB / 296kB
+agentic-n8n-dev            0.01%     196.3MiB / 23.47GiB   49.4kB / 39.5kB
+agentic-redis-dev          0.84%     7.797MiB / 23.47GiB   37kB / 15.9kB
+consulting-frontend-prod   0.02%     61.01MiB / 23.47GiB   31.2MB / 143MB
+consulting-backend-prod    6.27%     39.88MiB / 23.47GiB   1.65MB / 596kB
+consulting-n8n-prod        0.01%     193.4MiB / 23.47GiB   250kB / 3.71MB
+consulting-redis-prod      1.21%     8.293MiB / 23.47GiB   515kB / 705kB
+
+=== DOCKER NETWORKS ===
+NETWORK ID     NAME                                 DRIVER    SCOPE
+7f5e63e29ce4   agentic-dev-network                  bridge    local
+278dab5ee0a0   agentic-development                  bridge    local
+4e655db809a4   agentic-prod-network                 bridge    local
+a07a19ac65d7   agentic-production                   bridge    local
+05439df7cc1a   agentic-site_consulting-production   bridge    local
+3179d15fb45f   bridge                               bridge    local
+e3a1bc364190   development_agentic-dev              bridge    local
+20bb8ceaa87a   host                                 host      local
+fbd8a12bee0f   none                                 null      local
+3f960d991667   production_default                   bridge    local
+219954eb04f3   tacticalops_tacticalops-network      bridge    local
+
+=== DOCKER VOLUMES ===
+DRIVER    VOLUME NAME
+local     67afacfae2788e7791418d87de4338b80cc4cff92f24ff452aae6ca597c6a5e4
+local     91d9bcf35def07713be60f4f6f38f0d31214aa8e2c878725f8bd0bb2b1271d31
+local     877db30df54133babe1b5201e17cdd91726f9b38bc05f1212ed92d0ccdf3291b
+local     74393e9d22312f2692de378a09e819fe20d221ac3ec35a17eacc84fb091f7f99
+local     175673aa1e0b3878a9f45451c255eb135c6af9a8c4228eec600bc6c5d84fd7e1
+local     6020347e5955fcb5c06c90438427e8c400a097890c7183c1f4637cfcd6a47869
+local     62869281a185b822de0aeabccee582f3bd8c1551d2a2de022d3d83b7fbfe483c
+local     agentic-dev-backend-data
+local     agentic-dev-frontend-data

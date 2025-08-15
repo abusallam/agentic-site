@@ -1,0 +1,45 @@
+=== TACTICAL OPS DISCOVERY ===
+Container Status:
+NAMES               STATUS                   PORTS                      IMAGE
+tacticalops-app     Up 7 hours (unhealthy)   127.0.0.1:3020->3000/tcp   tacticalops/platform:latest
+tacticalops-redis   Up 7 hours (healthy)     127.0.0.1:6382->6379/tcp   redis:7-alpine
+
+Container Logs (last 20 lines):
+   ▲ Next.js 15.4.3
+   - Local:        http://ecbdb36929ce:3000
+   - Network:      http://ecbdb36929ce:3000
+
+ ✓ Starting...
+ ✓ Ready in 375ms
+prisma:error 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Error querying the database: Error code 14: Unable to open the database file
+   ▲ Next.js 15.4.3
+   - Local:        http://ecbdb36929ce:3000
+   - Network:      http://ecbdb36929ce:3000
+
+ ✓ Starting...
+ ✓ Ready in 386ms
+
+Nginx Configuration:
+-rw-r--r-- 1 root root  933 Aug 13 01:30 tacticalops-clean
+-rw-r--r-- 1 root root  933 Aug 13 02:08 tacticalops-clean.backup.20250813_051414
+-rw-r--r-- 1 root root  933 Aug 13 02:13 tacticalops-clean.backup.20250813_051907
+-rw-r--r-- 1 root root 5155 Aug 13 13:09 tacticalops.conf
+-rw-r--r-- 1 root root 5109 Aug 13 14:15 tacticalops-fixed.conf
+
+Current Nginx Sites:
+total 8
+drwxr-xr-x 2 root root 4096 Aug 13 14:17 .
+drwxr-xr-x 8 root root 4096 Aug  9 01:11 ..
+lrwxrwxrwx 1 root root   43 Aug  2 19:40 development.conf -> /etc/nginx/sites-available/development.conf
+lrwxrwxrwx 1 root root   42 Aug  2 19:40 production.conf -> /etc/nginx/sites-available/production.conf
+lrwxrwxrwx 1 root root   49 Aug 13 14:17 tacticalops-fixed.conf -> /etc/nginx/sites-available/tacticalops-fixed.conf
+
+Port 3020 Status:
+tcp        0      0 127.0.0.1:3020          0.0.0.0:*               LISTEN      276930/docker-proxy 
+
+Docker Network:
+map[tacticalops_tacticalops-network:0xc0004421c0]

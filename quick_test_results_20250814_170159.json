@@ -1,0 +1,165 @@
+{
+  "overall_score": 0.9866666666666666,
+  "target_achieved": true,
+  "detailed_results": {
+    "routing_accuracy": {
+      "accuracy": 1.0,
+      "correct": 5,
+      "total": 5,
+      "results": [
+        {
+          "message": "مرحباً، أريد معرفة خدماتكم",
+          "expected": "initial_customer",
+          "predicted": "initial_customer",
+          "correct": true
+        },
+        {
+          "message": "أريد إنشاء سير عمل n8n",
+          "expected": "n8n_workflow",
+          "predicted": "n8n_workflow",
+          "correct": true
+        },
+        {
+          "message": "I need help building a chatbot",
+          "expected": "code_generation",
+          "predicted": "code_generation",
+          "correct": true
+        },
+        {
+          "message": "أريد استشارة استراتيجية",
+          "expected": "consulting",
+          "predicted": "consulting",
+          "correct": true
+        },
+        {
+          "message": "Create workflow automation",
+          "expected": "n8n_workflow",
+          "predicted": "n8n_workflow",
+          "correct": true
+        }
+      ]
+    },
+    "language_detection": {
+      "accuracy": 1.0,
+      "correct": 8,
+      "total": 8,
+      "results": [
+        {
+          "text": "مرحباً بك في موقعنا",
+          "expected": "ar",
+          "detected": "ar",
+          "correct": true
+        },
+        {
+          "text": "Hello and welcome",
+          "expected": "en",
+          "detected": "en",
+          "correct": true
+        },
+        {
+          "text": "أريد معرفة الأسعار",
+          "expected": "ar",
+          "detected": "ar",
+          "correct": true
+        },
+        {
+          "text": "What are your prices?",
+          "expected": "en",
+          "detected": "en",
+          "correct": true
+        },
+        {
+          "text": "شكراً لك",
+          "expected": "ar",
+          "detected": "ar",
+          "correct": true
+        },
+        {
+          "text": "Thank you",
+          "expected": "en",
+          "detected": "en",
+          "correct": true
+        },
+        {
+          "text": "كيف يمكنني المساعدة؟",
+          "expected": "ar",
+          "detected": "ar",
+          "correct": true
+        },
+        {
+          "text": "How can I help?",
+          "expected": "en",
+          "detected": "en",
+          "correct": true
+        }
+      ]
+    },
+    "action_detection": {
+      "accuracy": 1.0,
+      "correct": 4,
+      "total": 4,
+      "results": [
+        {
+          "message": "أريد التحدث مع شخص",
+          "expected": [
+            "human_handoff"
+          ],
+          "detected": [
+            "human_handoff"
+          ],
+          "correct": true
+        },
+        {
+          "message": "show me workflow templates",
+          "expected": [
+            "show_templates"
+          ],
+          "detected": [
+            "show_templates"
+          ],
+          "correct": true
+        },
+        {
+          "message": "أريد حجز موعد",
+          "expected": [
+            "schedule"
+          ],
+          "detected": [
+            "schedule"
+          ],
+          "correct": true
+        },
+        {
+          "message": "execute my workflow",
+          "expected": [
+            "execute"
+          ],
+          "detected": [
+            "execute"
+          ],
+          "correct": true
+        }
+      ]
+    },
+    "response_quality": {
+      "average_quality": 0.9333333333333332,
+      "scores": [
+        1.0,
+        1.0,
+        0.8
+      ],
+      "total_responses": 3
+    },
+    "error_handling": {
+      "error_handling_rate": 1.0,
+      "handled_correctly": 4,
+      "total_scenarios": 4
+    }
+  },
+  "recommendations": [
+    "✅ System ready for production deployment",
+    "🔄 Set up continuous monitoring",
+    "📊 Implement real-time performance tracking",
+    "🧪 Create automated testing pipeline"
+  ]
+}

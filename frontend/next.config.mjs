@@ -1,29 +1,74 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Minimal configuration for development environment
+  // Enable standalone output for Docker deployment
+  output: 'standalone',
+  
+  // Optimize for production
+  compress: true,
   poweredByHeader: false,
   
-  // TypeScript configuration
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-
-  // ESLint configuration
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
-  // Skip trailing slash redirect
-  skipTrailingSlashRedirect: true,
-  
-  // Images configuration for development
+  // Image optimization
   images: {
-    domains: ['localhost', 'dev.consulting.sa', 'consulting.sa'],
-    unoptimized: true,
+    domains: ['consulting.sa', 'localhost'],
+    formats: ['image/webp', 'image/avif'],
   },
   
-  // Output configuration - only for production
-  ...(process.env.NODE_ENV === 'production' && { output: 'standalone' }),
-}
+  // Environment variables
+  env: {
+    CUSTOM_KEY: process.env.CUSTOM_KEY,
+  },
+  
+  // Experimental features
+  experimental: {
+    // Enable server components
+    serverComponentsExternalPackages: ['@supabase/supabase-js'],
+  },
+  
+  // Webpack configuration
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Add any custom webpack configuration here
+    return config;
+  },
+  
+  // Headers for security
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
+          },
+        ],
+      },
+    ];
+  },
+  
+  // Redirects
+  async redirects() {
+    return [
+      // Add any redirects here
+    ];
+  },
+  
+  // Rewrites for API routes
+  async rewrites() {
+    return [
+      {
+        source: '/api/agent/:path*',
+        destination: 'http://localhost:8000/:path*',
+      },
+    ];
+  },
+};
 
-export default nextConfig
+export default nextConfig;

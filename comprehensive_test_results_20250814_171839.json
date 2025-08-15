@@ -1,0 +1,329 @@
+{
+  "timestamp": "2025-08-14T17:18:39.260455",
+  "overall_score": 0.5166666666666667,
+  "target_achieved": false,
+  "iterations_completed": 3,
+  "detailed_results": {
+    "chat_routing": {
+      "accuracy": 0.8333333333333334,
+      "correct": 5,
+      "total": 6,
+      "results": [
+        {
+          "scenario": "New customer greeting",
+          "message": "مرحباً، أريد معرفة خدماتكم في الذكاء الاصطناعي...",
+          "expected": "initial_customer",
+          "actual": "initial_customer",
+          "correct": true,
+          "language": "ar"
+        },
+        {
+          "scenario": "Workflow automation request",
+          "message": "أريد إنشاء سير عمل n8n لأتمتة البريد الإلكتروني...",
+          "expected": "n8n_workflow",
+          "actual": "n8n_workflow",
+          "correct": true,
+          "language": "ar"
+        },
+        {
+          "scenario": "Code generation request",
+          "message": "I need help building a custom chatbot for my busin...",
+          "expected": "code_generation",
+          "actual": "code_generation",
+          "correct": true,
+          "language": "en"
+        },
+        {
+          "scenario": "Strategic consulting request",
+          "message": "أريد استشارة استراتيجية حول تطبيق الذكاء الاصطناعي...",
+          "expected": "consulting",
+          "actual": "consulting",
+          "correct": true,
+          "language": "ar"
+        },
+        {
+          "scenario": "Business consulting",
+          "message": "Can you help me create an AI strategy for my start...",
+          "expected": "consulting",
+          "actual": "code_generation",
+          "correct": false,
+          "language": "en"
+        },
+        {
+          "scenario": "Template inquiry",
+          "message": "Show me available workflow templates...",
+          "expected": "n8n_workflow",
+          "actual": "n8n_workflow",
+          "correct": true,
+          "language": "en"
+        }
+      ]
+    },
+    "initial_customer_agent": {
+      "success_rate": 0.0,
+      "successful": 0,
+      "total": 4,
+      "results": [
+        {
+          "name": "Arabic Service Inquiry",
+          "success": false,
+          "response_quality": 0.7,
+          "language_consistency": true
+        },
+        {
+          "name": "English Contact Collection",
+          "success": false,
+          "response_quality": 1.0,
+          "language_consistency": true
+        },
+        {
+          "name": "Human Agent Request",
+          "success": false,
+          "response_quality": 0.8,
+          "language_consistency": true
+        },
+        {
+          "name": "Specific Service Question",
+          "success": false,
+          "response_quality": 0.8,
+          "language_consistency": true
+        }
+      ]
+    },
+    "n8n_workflow_agent": {
+      "success_rate": 0.0,
+      "successful": 0,
+      "total": 4,
+      "results": [
+        {
+          "name": "Template Request Arabic",
+          "success": false,
+          "technical_accuracy": 0.0,
+          "workflow_understanding": false
+        },
+        {
+          "name": "Workflow Creation English",
+          "success": false,
+          "technical_accuracy": 0.0,
+          "workflow_understanding": false
+        },
+        {
+          "name": "Execution Request",
+          "success": false,
+          "technical_accuracy": 0.0,
+          "workflow_understanding": false
+        },
+        {
+          "name": "Performance Monitoring",
+          "success": false,
+          "technical_accuracy": 0.4,
+          "workflow_understanding": false
+        }
+      ]
+    },
+    "consulting_agent": {
+      "success_rate": 0.0,
+      "successful": 0,
+      "total": 4,
+      "results": [
+        {
+          "name": "AI Strategy Request",
+          "success": false,
+          "business_understanding": 0.0,
+          "consultation_quality": 0.0
+        },
+        {
+          "name": "Feasibility Study",
+          "success": false,
+          "business_understanding": 0.3333333333333333,
+          "consultation_quality": 0.2
+        },
+        {
+          "name": "Quick Consultation",
+          "success": false,
+          "business_understanding": 0.0,
+          "consultation_quality": 0.0
+        },
+        {
+          "name": "Implementation Support",
+          "success": false,
+          "business_understanding": 0.0,
+          "consultation_quality": 0.0
+        }
+      ]
+    },
+    "multi_agent_coordination": {
+      "coordination_rate": 1.0,
+      "successful": 3,
+      "total": 3,
+      "results": [
+        {
+          "name": "Customer to Workflow Handoff",
+          "success": true,
+          "flow": [
+            "initial_customer",
+            "n8n_workflow"
+          ],
+          "context_preservation": true
+        },
+        {
+          "name": "Consulting to Code Generation",
+          "success": true,
+          "flow": [
+            "consulting",
+            "code_generation"
+          ],
+          "context_preservation": true
+        },
+        {
+          "name": "Workflow to Consulting Escalation",
+          "success": true,
+          "flow": [
+            "n8n_workflow",
+            "consulting"
+          ],
+          "context_preservation": true
+        }
+      ]
+    },
+    "arabic_english_handling": {
+      "bilingual_rate": 1.0,
+      "handled_correctly": 5,
+      "total": 5,
+      "results": [
+        {
+          "input": "مرحباً، can you help me with AI services?...",
+          "detected_language": "en",
+          "expected": "mixed",
+          "can_handle": true,
+          "success": true
+        },
+        {
+          "input": "أريد معرفة pricing for your chatbots...",
+          "detected_language": "en",
+          "expected": "mixed",
+          "can_handle": true,
+          "success": true
+        },
+        {
+          "input": "Hello, أحتاج مساعدة في الذكاء الاصطناعي...",
+          "detected_language": "ar",
+          "expected": "mixed",
+          "can_handle": true,
+          "success": true
+        },
+        {
+          "input": "مرحباً بكم في موقعنا الإلكتروني...",
+          "detected_language": "ar",
+          "expected": "ar",
+          "can_handle": true,
+          "success": true
+        },
+        {
+          "input": "Welcome to our website...",
+          "detected_language": "en",
+          "expected": "en",
+          "can_handle": true,
+          "success": true
+        }
+      ]
+    },
+    "error_recovery": {
+      "recovery_rate": 1.0,
+      "recovered": 5,
+      "total": 5,
+      "results": [
+        {
+          "type": "empty_input",
+          "recovered": true,
+          "response_provided": true,
+          "graceful_degradation": true
+        },
+        {
+          "type": "very_long_input",
+          "recovered": true,
+          "response_provided": true,
+          "graceful_degradation": true
+        },
+        {
+          "type": "special_characters",
+          "recovered": true,
+          "response_provided": true,
+          "graceful_degradation": true
+        },
+        {
+          "type": "nonsense_text",
+          "recovered": true,
+          "response_provided": true,
+          "graceful_degradation": true
+        },
+        {
+          "type": "mixed_scripts",
+          "recovered": true,
+          "response_provided": true,
+          "graceful_degradation": true
+        }
+      ]
+    },
+    "performance_metrics": {
+      "performance_rate": 1.0,
+      "metrics_passed": 5,
+      "total_metrics": 5,
+      "results": {
+        "response_time": 0.8,
+        "memory_usage": 45,
+        "cpu_usage": 25,
+        "throughput": 150,
+        "error_rate": 0.02
+      },
+      "targets": {
+        "response_time": 2.0,
+        "memory_usage": 100,
+        "cpu_usage": 70,
+        "throughput": 100,
+        "error_rate": 0.05
+      }
+    }
+  },
+  "summary": {
+    "chat_routing": {
+      "score": 0.8333333333333334,
+      "status": "✅ PASS"
+    },
+    "initial_customer_agent": {
+      "score": 0.0,
+      "status": "❌ NEEDS IMPROVEMENT"
+    },
+    "n8n_workflow_agent": {
+      "score": 0.0,
+      "status": "❌ NEEDS IMPROVEMENT"
+    },
+    "consulting_agent": {
+      "score": 0.0,
+      "status": "❌ NEEDS IMPROVEMENT"
+    },
+    "multi_agent_coordination": {
+      "score": 1.0,
+      "status": "✅ PASS"
+    },
+    "arabic_english_handling": {
+      "score": 1.0,
+      "status": "✅ PASS"
+    },
+    "error_recovery": {
+      "score": 1.0,
+      "status": "✅ PASS"
+    },
+    "performance_metrics": {
+      "score": 1.0,
+      "status": "✅ PASS"
+    }
+  },
+  "recommendations": [
+    "🔧 Continue prompt optimization",
+    "📝 Enhance keyword dictionaries",
+    "🧠 Consider upgrading to better language models",
+    "🎯 Focus on lowest-performing categories",
+    "🧪 Increase test coverage"
+  ]
+}

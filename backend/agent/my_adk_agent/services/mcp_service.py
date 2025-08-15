@@ -1,23 +1,39 @@
-"""MCP service for n8n workflow integration."""
+"""Enhanced MCP service for n8n workflow integration with comprehensive error handling."""
 
 import os
 import logging
+import base64
 from typing import Dict, List, Optional, Any
 import httpx
 import asyncio
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 
-class MCPService:
-    """Service for MCP (Model Context Protocol) integration with n8n."""
+class EnhancedMCPService:
+    """Enhanced service for MCP (Model Context Protocol) integration with n8n."""
     
     def __init__(self):
-        """Initialize MCP service."""
+        """Initialize enhanced MCP service."""
         self.server_url = os.getenv("MCP_SERVER_URL", "http://localhost:3001")
-        self.n8n_url = os.getenv("N8N_URL", "http://localhost:5678")
+        self.n8n_url = os.getenv("N8N_URL", "http://217.79.255.54:5680")
+        self.n8n_api_user = os.getenv("N8N_API_USER", "admin")
+        self.n8n_api_password = os.getenv("N8N_API_PASSWORD", "admin123")
         self.n8n_api_key = os.getenv("N8N_API_KEY")
         self.timeout = 30.0
+        self.max_retries = 3
+        self.retry_delay = 2.0
+        
+        # Create basic auth header
+        if self.n8n_api_user and self.n8n_api_password:
+            credentials = f"{self.n8n_api_user}:{self.n8n_api_password}"
+            encoded_credentials = base64.b64encode(credentials.encode()).decode()
+            self.auth_header = f"Basic {encoded_credentials}"
+        else:
+            self.auth_header = None
+        
+        logger.info(f"Enhanced MCP Service initialized with N8N URL: {self.n8n_url}")
     
     async def health_check(self) -> bool:
         """Check if MCP server is healthy."""

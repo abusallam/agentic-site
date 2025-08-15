@@ -1,0 +1,32 @@
+=== APPLICATION HEALTH CHECK ===
+
+=== HTTP ENDPOINT TESTS ===
+Testing port 3000:
+  ✅ Port 3000 basic check: PASSED
+Testing port 3001:
+  ✅ Port 3001 basic check: PASSED
+Testing port 8000:
+{"status":"degraded","timestamp":"2025-08-13T20:57:25.359403","environment":"production","services":{"supabase":"configured","gemini":"configured","n8n":"missing","mcp":"missing","livekit":"missing","stripe":"configured"},"uptime":0.0}  ✅ Port 8000 health check: PASSED
+Testing port 8001:
+{"status":"degraded","timestamp":"2025-08-13T20:57:25.390653","environment":"development","services":{"supabase":"configured","gemini":"configured","n8n":"configured","mcp":"missing","livekit":"configured","stripe":"configured"},"uptime":0.0}  ✅ Port 8001 health check: PASSED
+
+=== SSL CERTIFICATE STATUS ===
+Checking consulting.sa:
+notBefore=Jul 19 22:21:51 2025 GMT
+notAfter=Oct 17 23:21:27 2025 GMT
+  ✅ SSL certificate valid
+Checking tacticalops.console.ts:
+  ❌ SSL certificate issue
+
+=== NGINX STATUS ===
+Nginx: ✅ ACTIVE
+Nginx Configuration Test:
+2025/08/13 20:57:27 [info] 444787#444787: Using 116KiB of shared memory for nchan in /etc/nginx/nginx.conf:61
+2025/08/13 20:57:27 [info] 444787#444787: Using 131072KiB of shared memory for nchan in /etc/nginx/nginx.conf:61
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+Active Sites:
+  . -> 
+  .. -> 
+  development.conf -> /etc/nginx/sites-available/development.conf
+  production.conf -> /etc/nginx/sites-available/production.conf
+  tacticalops-ssl.conf -> /etc/nginx/sites-available/tacticalops-ssl.conf

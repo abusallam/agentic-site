@@ -33,9 +33,10 @@ except ImportError:
             })()
     
     RunContext = object
-    KnownModelName = type('MockKnownModelName', (), {
-        'gemini_2_0_flash_exp': 'gemini-2.0-flash-exp'
-    })()
+    class MockKnownModelName:
+        gemini_2_0_flash_exp = 'gemini-2.0-flash-exp'
+    
+    KnownModelName = MockKnownModelName()
 
 from ..services.supabase_service import SupabaseService
 from ..services.livekit_service import LiveKitService
@@ -68,6 +69,8 @@ class ConsultationResponse(BaseModel):
 
 class ConsultingAgentDeps(BaseModel):
     """Dependencies for the consulting agent"""
+    model_config = {"arbitrary_types_allowed": True}
+    
     supabase: SupabaseService
     livekit: LiveKitService
     config: Dict[str, Any]
@@ -87,13 +90,17 @@ class ConsultingAgent:
         self.supabase = SupabaseService(config)
         self.livekit = LiveKitService(config)
         
-        # Initialize Pydantic AI agent
-        self.agent = Agent(
-            model=KnownModelName.gemini_2_0_flash_exp,
-            deps_type=ConsultingAgentDeps,
-            result_type=ConsultationResponse,
-            system_prompt=self._get_system_prompt()
-        )
+        # Initialize Pydantic AI agent (mock for development)
+        try:
+            self.agent = Agent(
+                model=KnownModelName.gemini_2_0_flash_exp,
+                deps_type=ConsultingAgentDeps,
+                result_type=ConsultationResponse,
+                system_prompt=self._get_system_prompt()
+            )
+        except Exception as e:
+            logger.warning(f"Using mock Pydantic AI agent: {e}")
+            self.agent = Agent()
         
         # Consultation types and their characteristics
         self.consultation_types = {

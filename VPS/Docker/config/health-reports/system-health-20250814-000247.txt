@@ -1,0 +1,59 @@
+=== SYSTEM HEALTH CHECK ===
+Timestamp: Wed Aug 13 08:57:10 PM UTC 2025
+Hostname: ssdnode-11723579473
+Uptime: up 1 week, 4 days, 3 hours, 49 minutes
+
+=== RESOURCE USAGE ===
+CPU Usage:
+%Cpu(s):  0.0 us, 20.0 sy,  0.0 ni, 80.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st 
+Memory Usage:
+               total        used        free      shared  buff/cache   available
+Mem:            23Gi       3.4Gi        20Gi       7.4Mi       479Mi        20Gi
+Swap:             0B          0B          0B
+Disk Usage:
+/dev/sda1       394G   69G  306G  19% /
+Load Average: 0.14 0.22 0.22 1/585 444404
+
+=== SYSTEM SERVICES ===
+nginx: ✅ ACTIVE
+docker: ✅ ACTIVE
+ssh: ✅ ACTIVE
+fail2ban: ✅ ACTIVE
+
+=== NETWORK STATUS ===
+Listening Ports:
+tcp        0      0 0.0.0.0:5678            0.0.0.0:*               LISTEN      2682828/docker-prox 
+tcp        0      0 0.0.0.0:5679            0.0.0.0:*               LISTEN      3906407/docker-prox 
+tcp        0      0 0.0.0.0:6380            0.0.0.0:*               LISTEN      3906377/docker-prox 
+tcp        0      0 0.0.0.0:6379            0.0.0.0:*               LISTEN      2682855/docker-prox 
+tcp        0      0 0.0.0.0:8000            0.0.0.0:*               LISTEN      2682960/docker-prox 
+tcp        0      0 0.0.0.0:8001            0.0.0.0:*               LISTEN      3906511/docker-prox 
+tcp        0      0 0.0.0.0:40241           0.0.0.0:*               LISTEN      31243/sshd: /usr/sb 
+tcp        0      0 0.0.0.0:443             0.0.0.0:*               LISTEN      31880/nginx: master 
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      31243/sshd: /usr/sb 
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      31880/nginx: master 
+
+Firewall Status:
+Status: active
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW       Anywhere                   # SSH
+
+=== SECURITY STATUS ===
+Failed Login Attempts (last 10):
+2025-08-13T20:49:51.001272+00:00 ssdnode-11723579473 sshd[441660]: 152.32.131.45 port 11898
+2025-08-13T20:50:14.059337+00:00 ssdnode-11723579473 sshd[441790]: 118.128.237.197 port 33340
+2025-08-13T20:50:18.913927+00:00 ssdnode-11723579473 sshd[441792]: 61.222.211.114 port 39780
+2025-08-13T20:50:32.034950+00:00 ssdnode-11723579473 sshd[441923]: 150.139.201.247 port 60386
+2025-08-13T20:50:46.262346+00:00 ssdnode-11723579473 sshd[441981]: 221.159.150.85 port 45868
+2025-08-13T20:51:27.787672+00:00 ssdnode-11723579473 sshd[442283]: 152.32.131.45 port 42144
+2025-08-13T20:51:37.724232+00:00 ssdnode-11723579473 sshd[442340]: 61.222.211.114 port 57474
+2025-08-13T20:52:08.478806+00:00 ssdnode-11723579473 sshd[442525]: 221.159.150.85 port 43392
+2025-08-13T20:53:06.229363+00:00 ssdnode-11723579473 sshd[442878]: 152.32.131.45 port 17382
+2025-08-13T20:54:37.799260+00:00 ssdnode-11723579473 sshd[443452]: 152.32.131.45 port 47624
+
+Fail2ban Status:
+Status
+|- Number of jail:	1
+`- Jail list:	sshd

@@ -1,0 +1,32 @@
+=== SSL AND WEB SERVER CONFIGURATION ===
+Nginx Configuration:
+Nginx Version: nginx version: nginx/1.22.1
+Nginx Status: active
+Nginx Sites Enabled:
+total 8
+drwxr-xr-x 2 root root 4096 Aug 13 14:17 .
+drwxr-xr-x 8 root root 4096 Aug  9 01:11 ..
+lrwxrwxrwx 1 root root   43 Aug  2 19:40 development.conf -> /etc/nginx/sites-available/development.conf
+lrwxrwxrwx 1 root root   42 Aug  2 19:40 production.conf -> /etc/nginx/sites-available/production.conf
+lrwxrwxrwx 1 root root   49 Aug 13 14:17 tacticalops-fixed.conf -> /etc/nginx/sites-available/tacticalops-fixed.conf
+SSL Certificates:
+/etc/ssl/certs/Hongkong_Post_Root_CA_1.pem
+/etc/ssl/certs/GDCA_TrustAUTH_R5_ROOT.pem
+/etc/ssl/certs/GlobalSign_Root_E46.pem
+/etc/ssl/certs/Certainly_Root_R1.pem
+/etc/ssl/certs/E-Tugra_Global_Root_CA_ECC_v3.pem
+/etc/ssl/certs/Go_Daddy_Class_2_CA.pem
+/etc/ssl/certs/UCA_Extended_Validation_Root.pem
+/etc/ssl/certs/E-Tugra_Certification_Authority.pem
+/etc/ssl/certs/ISRG_Root_X2.pem
+/etc/ssl/certs/QuoVadis_Root_CA_1_G3.pem
+
+Caddy Configuration:
+Caddy not installed
+
+Certificate Expiration Check:
+Checking consulting.sa:
+notBefore=Jul 19 22:21:51 2025 GMT
+notAfter=Oct 17 23:21:27 2025 GMT
+Checking tacticalops.console.ts:
+Cannot check tacticalops.console.ts

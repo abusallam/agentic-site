@@ -1,0 +1,768 @@
+{
+  "timestamp": "2025-08-14T01:39:47.845192",
+  "total_tests": 69,
+  "passed_tests": 2,
+  "failed_tests": 67,
+  "success_rate": 2.898550724637681,
+  "agent_results": [
+    {
+      "agent_name": "InitialCustomerAgent",
+      "arabic_tests": [
+        {
+          "name": "InitialCustomerAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.5495846271514893,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "InitialCustomerAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.5381495952606201,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "InitialCustomerAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.747464656829834,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "InitialCustomerAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.912379264831543,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "InitialCustomerAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.5605719089508057,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        }
+      ],
+      "english_tests": [
+        {
+          "name": "InitialCustomerAgent English Response",
+          "status": "failed",
+          "duration": 0.9640023708343506,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "InitialCustomerAgent English Response",
+          "status": "failed",
+          "duration": 0.7639040946960449,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "InitialCustomerAgent English Response",
+          "status": "failed",
+          "duration": 0.7576959133148193,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "InitialCustomerAgent English Response",
+          "status": "failed",
+          "duration": 0.6401350498199463,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "InitialCustomerAgent English Response",
+          "status": "failed",
+          "duration": 0.6557691097259521,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        }
+      ],
+      "llm_integration": [
+        {
+          "name": "InitialCustomerAgent Gemini Integration",
+          "status": "failed",
+          "duration": 0.8807575702667236,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Gemini integration failed"
+        },
+        {
+          "name": "InitialCustomerAgent Response Speed",
+          "status": "failed",
+          "duration": 0.9209623336791992,
+          "details": {
+            "response_time": 0.9209623336791992
+          },
+          "error": "Speed test failed"
+        }
+      ],
+      "workflow_tests": [
+        {
+          "name": "InitialCustomerAgent Workflow Integration",
+          "status": "failed",
+          "duration": 0.9212265014648438,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Workflow integration test failed"
+        }
+      ],
+      "overall_score": 0.0
+    },
+    {
+      "agent_name": "N8nWorkflowAgent",
+      "arabic_tests": [
+        {
+          "name": "N8nWorkflowAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.7998654842376709,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "N8nWorkflowAgent Arabic Response",
+          "status": "failed",
+          "duration": 1.3504815101623535,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "N8nWorkflowAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.9236841201782227,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "N8nWorkflowAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.7926030158996582,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "N8nWorkflowAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.9328949451446533,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        }
+      ],
+      "english_tests": [
+        {
+          "name": "N8nWorkflowAgent English Response",
+          "status": "failed",
+          "duration": 1.0005552768707275,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "N8nWorkflowAgent English Response",
+          "status": "failed",
+          "duration": 0.9581773281097412,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "N8nWorkflowAgent English Response",
+          "status": "failed",
+          "duration": 0.9215273857116699,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "N8nWorkflowAgent English Response",
+          "status": "failed",
+          "duration": 1.2287333011627197,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "N8nWorkflowAgent English Response",
+          "status": "failed",
+          "duration": 0.9215991497039795,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        }
+      ],
+      "llm_integration": [
+        {
+          "name": "N8nWorkflowAgent Gemini Integration",
+          "status": "failed",
+          "duration": 0.921804666519165,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Gemini integration failed"
+        },
+        {
+          "name": "N8nWorkflowAgent Response Speed",
+          "status": "failed",
+          "duration": 0.6206207275390625,
+          "details": {
+            "response_time": 0.6206207275390625
+          },
+          "error": "Speed test failed"
+        }
+      ],
+      "workflow_tests": [
+        {
+          "name": "Workflow Creation via Agent",
+          "status": "failed",
+          "duration": 0.5325329303741455,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Workflow creation failed"
+        },
+        {
+          "name": "Workflow Execution via Agent",
+          "status": "failed",
+          "duration": 0.997262716293335,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Workflow execution failed"
+        }
+      ],
+      "overall_score": 0.0
+    },
+    {
+      "agent_name": "CodeGenerationAgent",
+      "arabic_tests": [
+        {
+          "name": "CodeGenerationAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.9215855598449707,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "CodeGenerationAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.8308231830596924,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "CodeGenerationAgent Arabic Response",
+          "status": "failed",
+          "duration": 1.0121915340423584,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "CodeGenerationAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.9224739074707031,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "CodeGenerationAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.9289531707763672,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        }
+      ],
+      "english_tests": [
+        {
+          "name": "CodeGenerationAgent English Response",
+          "status": "failed",
+          "duration": 0.9130120277404785,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "CodeGenerationAgent English Response",
+          "status": "failed",
+          "duration": 0.9217092990875244,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "CodeGenerationAgent English Response",
+          "status": "failed",
+          "duration": 0.9215190410614014,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "CodeGenerationAgent English Response",
+          "status": "failed",
+          "duration": 0.9118947982788086,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "CodeGenerationAgent English Response",
+          "status": "failed",
+          "duration": 0.9311630725860596,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        }
+      ],
+      "llm_integration": [
+        {
+          "name": "CodeGenerationAgent Gemini Integration",
+          "status": "failed",
+          "duration": 0.9215974807739258,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Gemini integration failed"
+        },
+        {
+          "name": "CodeGenerationAgent Response Speed",
+          "status": "failed",
+          "duration": 0.9217729568481445,
+          "details": {
+            "response_time": 0.9217729568481445
+          },
+          "error": "Speed test failed"
+        }
+      ],
+      "workflow_tests": [
+        {
+          "name": "CodeGenerationAgent Workflow Integration",
+          "status": "failed",
+          "duration": 0.9213104248046875,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Workflow integration test failed"
+        }
+      ],
+      "overall_score": 0.0
+    },
+    {
+      "agent_name": "ConsultingAgent",
+      "arabic_tests": [
+        {
+          "name": "ConsultingAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.921546459197998,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "ConsultingAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.6355564594268799,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "ConsultingAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.9006047248840332,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "ConsultingAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.9222040176391602,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "ConsultingAgent Arabic Response",
+          "status": "failed",
+          "duration": 0.920600414276123,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        }
+      ],
+      "english_tests": [
+        {
+          "name": "ConsultingAgent English Response",
+          "status": "failed",
+          "duration": 0.9221117496490479,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "ConsultingAgent English Response",
+          "status": "failed",
+          "duration": 0.9282784461975098,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "ConsultingAgent English Response",
+          "status": "failed",
+          "duration": 0.914846658706665,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "ConsultingAgent English Response",
+          "status": "failed",
+          "duration": 0.9211993217468262,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        },
+        {
+          "name": "ConsultingAgent English Response",
+          "status": "failed",
+          "duration": 0.9215888977050781,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Agent response failed"
+        }
+      ],
+      "llm_integration": [
+        {
+          "name": "ConsultingAgent Gemini Integration",
+          "status": "failed",
+          "duration": 0.9217114448547363,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Gemini integration failed"
+        },
+        {
+          "name": "ConsultingAgent Response Speed",
+          "status": "failed",
+          "duration": 0.9212732315063477,
+          "details": {
+            "response_time": 0.9212732315063477
+          },
+          "error": "Speed test failed"
+        }
+      ],
+      "workflow_tests": [
+        {
+          "name": "ConsultingAgent Workflow Integration",
+          "status": "failed",
+          "duration": 0.6347191333770752,
+          "details": {
+            "status_code": 404
+          },
+          "error": "Workflow integration test failed"
+        }
+      ],
+      "overall_score": 0.0
+    }
+  ],
+  "n8n_tests": [
+    {
+      "name": "N8N Accessibility",
+      "status": "passed",
+      "duration": 0.816842794418335,
+      "details": {
+        "status_code": 200,
+        "response_size": 1975
+      },
+      "error": null
+    },
+    {
+      "name": "N8N Authentication",
+      "status": "failed",
+      "duration": 0.770505428314209,
+      "details": {
+        "status_code": 401
+      },
+      "error": "Authentication failed"
+    },
+    {
+      "name": "N8N API Endpoints",
+      "status": "failed",
+      "duration": 1.8302950859069824,
+      "details": {
+        "endpoints": {
+          "/rest/workflows": {
+            "status_code": 401,
+            "accessible": false
+          },
+          "/rest/credentials": {
+            "status_code": 401,
+            "accessible": false
+          },
+          "/rest/executions": {
+            "status_code": 401,
+            "accessible": false
+          }
+        },
+        "accessible_count": 0
+      },
+      "error": "No endpoints accessible"
+    },
+    {
+      "name": "N8N Workflow Creation",
+      "status": "failed",
+      "duration": 0.3968639373779297,
+      "details": {
+        "status_code": 401,
+        "response": "{\"status\":\"error\",\"message\":\"Unauthorized\"}"
+      },
+      "error": "Failed to create workflow"
+    },
+    {
+      "name": "MCP N8N Integration",
+      "status": "failed",
+      "duration": 0.5401091575622559,
+      "details": {
+        "status_code": 404
+      },
+      "error": "MCP integration test failed"
+    }
+  ],
+  "e2e_tests": [
+    {
+      "name": "Frontend-Backend Integration",
+      "status": "failed",
+      "duration": 0.3067588806152344,
+      "details": {},
+      "error": "HTTPConnectionPool(host='217.79.255.54', port=3001): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f34124d6290>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "name": "Database Connectivity",
+      "status": "failed",
+      "duration": 0.9214029312133789,
+      "details": {
+        "status_code": 404
+      },
+      "error": "Database connectivity test failed"
+    },
+    {
+      "name": "Service Health Check",
+      "status": "failed",
+      "duration": 1.844005823135376,
+      "details": {
+        "services": {
+          "frontend": {
+            "status": "unhealthy",
+            "error": "HTTPConnectionPool(host='217.79.255.54', port=3001): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f34124d5050>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+          },
+          "backend": {
+            "status": "healthy",
+            "status_code": 200
+          },
+          "n8n": {
+            "status": "healthy",
+            "status_code": 200
+          }
+        },
+        "healthy_count": 2,
+        "total_count": 3
+      },
+      "error": "Only 2/3 services healthy"
+    }
+  ],
+  "performance_tests": [
+    {
+      "name": "Direct Gemini API Test",
+      "status": "failed",
+      "duration": 0.9012782573699951,
+      "details": {
+        "status_code": 404
+      },
+      "error": "Direct Gemini API test failed"
+    },
+    {
+      "name": "LLM Response Quality",
+      "status": "failed",
+      "duration": 2.764739513397217,
+      "details": {
+        "average_quality": 0,
+        "quality_scores": [],
+        "test_count": 3
+      },
+      "error": "Low average quality score"
+    },
+    {
+      "name": "Arabic LLM Processing",
+      "status": "failed",
+      "duration": 3.0721874237060547,
+      "details": {
+        "average_arabic_quality": 0,
+        "arabic_scores": [],
+        "test_count": 3
+      },
+      "error": "Low Arabic processing quality"
+    },
+    {
+      "name": "Response Times",
+      "status": "failed",
+      "duration": 2.7646803855895996,
+      "details": {
+        "response_times": {
+          "http://217.79.255.54:3001": {
+            "response_time": 0.18966245651245117,
+            "error": "HTTPConnectionPool(host='217.79.255.54', port=3001): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f34124dcf50>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+            "meets_target": false
+          },
+          "http://217.79.255.54:8001/health": {
+            "response_time": 1.0380620956420898,
+            "status_code": 200,
+            "meets_target": true
+          },
+          "http://217.79.255.54:8001/api/test": {
+            "response_time": 0.9217121601104736,
+            "status_code": 404,
+            "meets_target": true
+          },
+          "http://217.79.255.54:5680/rest/workflows": {
+            "response_time": 0.6152169704437256,
+            "status_code": 401,
+            "meets_target": true
+          }
+        },
+        "meeting_targets": 3,
+        "total_endpoints": 4
+      },
+      "error": "Only 3/4 endpoints meet response time targets"
+    },
+    {
+      "name": "Concurrent Requests",
+      "status": "passed",
+      "duration": 0.9240710735321045,
+      "details": {
+        "total_requests": 10,
+        "successful_requests": 10,
+        "success_rate": 1.0
+      },
+      "error": null
+    }
+  ],
+  "security_tests": [
+    {
+      "name": "Input Validation",
+      "status": "failed",
+      "duration": 4.604301691055298,
+      "details": {
+        "validation_results": {
+          "<script>alert('xss')</script>": {
+            "status_code": 404,
+            "blocked": false
+          },
+          "'; DROP TABLE users; --": {
+            "status_code": 404,
+            "blocked": false
+          },
+          "../../../etc/passwd": {
+            "status_code": 404,
+            "blocked": false
+          },
+          "{{7*7}}": {
+            "status_code": 404,
+            "blocked": false
+          },
+          "javascript:alert('xss')": {
+            "status_code": 404,
+            "blocked": false
+          }
+        },
+        "blocked_count": 0,
+        "total_tests": 5
+      },
+      "error": "Only 0/5 malicious inputs blocked"
+    },
+    {
+      "name": "Authentication Security",
+      "status": "failed",
+      "duration": 1.4959263801574707,
+      "details": {
+        "unauthorized_blocked": false,
+        "n8n_auth_required": true
+      },
+      "error": "Authentication security issues detected"
+    },
+    {
+      "name": "RROC Framework",
+      "status": "failed",
+      "duration": 0.5731477737426758,
+      "details": {
+        "status_code": 404
+      },
+      "error": "RROC framework test failed"
+    }
+  ]
+}

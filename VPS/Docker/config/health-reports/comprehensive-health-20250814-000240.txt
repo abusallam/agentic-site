@@ -1,0 +1,231 @@
+=== COMPREHENSIVE VPS HEALTH REPORT ===
+Generated: Thu Aug 14 12:02:40 AM +03 2025
+VPS: 217.79.255.54
+Report ID: health-20250814-000240
+
+=== SYSTEM HEALTH ===
+2025-08-14 00:02:40 [INFO] Checking system health...
+=== SYSTEM HEALTH CHECK ===
+Timestamp: Wed Aug 13 08:57:10 PM UTC 2025
+Hostname: ssdnode-11723579473
+Uptime: up 1 week, 4 days, 3 hours, 49 minutes
+
+=== RESOURCE USAGE ===
+CPU Usage:
+%Cpu(s):  0.0 us, 20.0 sy,  0.0 ni, 80.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st 
+Memory Usage:
+               total        used        free      shared  buff/cache   available
+Mem:            23Gi       3.4Gi        20Gi       7.4Mi       479Mi        20Gi
+Swap:             0B          0B          0B
+Disk Usage:
+/dev/sda1       394G   69G  306G  19% /
+Load Average: 0.14 0.22 0.22 1/585 444404
+
+=== SYSTEM SERVICES ===
+nginx: ✅ ACTIVE
+docker: ✅ ACTIVE
+ssh: ✅ ACTIVE
+fail2ban: ✅ ACTIVE
+
+=== NETWORK STATUS ===
+Listening Ports:
+tcp        0      0 0.0.0.0:5678            0.0.0.0:*               LISTEN      2682828/docker-prox 
+tcp        0      0 0.0.0.0:5679            0.0.0.0:*               LISTEN      3906407/docker-prox 
+tcp        0      0 0.0.0.0:6380            0.0.0.0:*               LISTEN      3906377/docker-prox 
+tcp        0      0 0.0.0.0:6379            0.0.0.0:*               LISTEN      2682855/docker-prox 
+tcp        0      0 0.0.0.0:8000            0.0.0.0:*               LISTEN      2682960/docker-prox 
+tcp        0      0 0.0.0.0:8001            0.0.0.0:*               LISTEN      3906511/docker-prox 
+tcp        0      0 0.0.0.0:40241           0.0.0.0:*               LISTEN      31243/sshd: /usr/sb 
+tcp        0      0 0.0.0.0:443             0.0.0.0:*               LISTEN      31880/nginx: master 
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      31243/sshd: /usr/sb 
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      31880/nginx: master 
+
+Firewall Status:
+Status: active
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW       Anywhere                   # SSH
+
+=== SECURITY STATUS ===
+Failed Login Attempts (last 10):
+2025-08-13T20:49:51.001272+00:00 ssdnode-11723579473 sshd[441660]: 152.32.131.45 port 11898
+2025-08-13T20:50:14.059337+00:00 ssdnode-11723579473 sshd[441790]: 118.128.237.197 port 33340
+2025-08-13T20:50:18.913927+00:00 ssdnode-11723579473 sshd[441792]: 61.222.211.114 port 39780
+2025-08-13T20:50:32.034950+00:00 ssdnode-11723579473 sshd[441923]: 150.139.201.247 port 60386
+2025-08-13T20:50:46.262346+00:00 ssdnode-11723579473 sshd[441981]: 221.159.150.85 port 45868
+2025-08-13T20:51:27.787672+00:00 ssdnode-11723579473 sshd[442283]: 152.32.131.45 port 42144
+2025-08-13T20:51:37.724232+00:00 ssdnode-11723579473 sshd[442340]: 61.222.211.114 port 57474
+2025-08-13T20:52:08.478806+00:00 ssdnode-11723579473 sshd[442525]: 221.159.150.85 port 43392
+2025-08-13T20:53:06.229363+00:00 ssdnode-11723579473 sshd[442878]: 152.32.131.45 port 17382
+2025-08-13T20:54:37.799260+00:00 ssdnode-11723579473 sshd[443452]: 152.32.131.45 port 47624
+
+Fail2ban Status:
+Status
+|- Number of jail:	1
+`- Jail list:	sshd
+
+=== CONTAINER HEALTH ===
+2025-08-14 00:02:47 [INFO] Checking container health...
+=== CONTAINER HEALTH CHECK ===
+Docker Status: active
+Docker Version: Docker version 28.3.3, build 980b856
+
+=== RUNNING CONTAINERS ===
+NAMES                      STATUS                      PORTS
+tacticalops-app            Up 12 minutes (unhealthy)   127.0.0.1:3020->3000/tcp
+tacticalops-redis          Up 7 hours (healthy)        127.0.0.1:6382->6379/tcp
+agentic-frontend-dev       Up 2 days (healthy)         0.0.0.0:3001->3000/tcp, [::]:3001->3000/tcp
+agentic-backend-dev        Up 2 days (healthy)         0.0.0.0:8001->8000/tcp, [::]:8001->8000/tcp
+agentic-n8n-dev            Up 2 days (unhealthy)       0.0.0.0:5679->5678/tcp, [::]:5679->5678/tcp
+agentic-redis-dev          Up 2 days (healthy)         0.0.0.0:6380->6379/tcp, [::]:6380->6379/tcp
+consulting-frontend-prod   Up 4 days (unhealthy)       0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+consulting-backend-prod    Up 4 days (healthy)         0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+consulting-n8n-prod        Up 4 days (unhealthy)       0.0.0.0:5678->5678/tcp, [::]:5678->5678/tcp
+consulting-redis-prod      Up 4 days (healthy)         0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp
+
+=== CONTAINER HEALTH STATUS ===
+tacticalops-app: ❌ UNHEALTHY
+tacticalops-redis: ✅ HEALTHY
+agentic-frontend-dev: ✅ HEALTHY
+agentic-backend-dev: ✅ HEALTHY
+agentic-n8n-dev: ❌ UNHEALTHY
+agentic-redis-dev: ✅ HEALTHY
+consulting-frontend-prod: ❌ UNHEALTHY
+consulting-backend-prod: ✅ HEALTHY
+consulting-n8n-prod: ❌ UNHEALTHY
+consulting-redis-prod: ✅ HEALTHY
+
+=== CONTAINER RESOURCE USAGE ===
+NAME                       CPU %     MEM USAGE / LIMIT     NET I/O
+tacticalops-app            0.00%     49.19MiB / 1GiB       1.01kB / 126B
+tacticalops-redis          0.92%     10.3MiB / 256MiB      3.05kB / 126B
+agentic-frontend-dev       0.00%     737.5MiB / 23.47GiB   4.04MB / 59.9MB
+agentic-backend-dev        9.10%     72.33MiB / 23.47GiB   457kB / 296kB
+agentic-n8n-dev            0.01%     196.3MiB / 23.47GiB   49.4kB / 39.5kB
+agentic-redis-dev          0.84%     7.797MiB / 23.47GiB   37kB / 15.9kB
+consulting-frontend-prod   0.02%     61.01MiB / 23.47GiB   31.2MB / 143MB
+consulting-backend-prod    6.27%     39.88MiB / 23.47GiB   1.65MB / 596kB
+consulting-n8n-prod        0.01%     193.4MiB / 23.47GiB   250kB / 3.71MB
+consulting-redis-prod      1.21%     8.293MiB / 23.47GiB   515kB / 705kB
+
+=== DOCKER NETWORKS ===
+NETWORK ID     NAME                                 DRIVER    SCOPE
+7f5e63e29ce4   agentic-dev-network                  bridge    local
+278dab5ee0a0   agentic-development                  bridge    local
+4e655db809a4   agentic-prod-network                 bridge    local
+a07a19ac65d7   agentic-production                   bridge    local
+05439df7cc1a   agentic-site_consulting-production   bridge    local
+3179d15fb45f   bridge                               bridge    local
+e3a1bc364190   development_agentic-dev              bridge    local
+20bb8ceaa87a   host                                 host      local
+fbd8a12bee0f   none                                 null      local
+3f960d991667   production_default                   bridge    local
+219954eb04f3   tacticalops_tacticalops-network      bridge    local
+
+=== DOCKER VOLUMES ===
+DRIVER    VOLUME NAME
+local     67afacfae2788e7791418d87de4338b80cc4cff92f24ff452aae6ca597c6a5e4
+local     91d9bcf35def07713be60f4f6f38f0d31214aa8e2c878725f8bd0bb2b1271d31
+local     877db30df54133babe1b5201e17cdd91726f9b38bc05f1212ed92d0ccdf3291b
+local     74393e9d22312f2692de378a09e819fe20d221ac3ec35a17eacc84fb091f7f99
+local     175673aa1e0b3878a9f45451c255eb135c6af9a8c4228eec600bc6c5d84fd7e1
+local     6020347e5955fcb5c06c90438427e8c400a097890c7183c1f4637cfcd6a47869
+local     62869281a185b822de0aeabccee582f3bd8c1551d2a2de022d3d83b7fbfe483c
+local     agentic-dev-backend-data
+local     agentic-dev-frontend-data
+
+=== APPLICATION HEALTH ===
+2025-08-14 00:02:55 [INFO] Checking application health...
+=== APPLICATION HEALTH CHECK ===
+
+=== HTTP ENDPOINT TESTS ===
+Testing port 3000:
+  ✅ Port 3000 basic check: PASSED
+Testing port 3001:
+  ✅ Port 3001 basic check: PASSED
+Testing port 8000:
+{"status":"degraded","timestamp":"2025-08-13T20:57:25.359403","environment":"production","services":{"supabase":"configured","gemini":"configured","n8n":"missing","mcp":"missing","livekit":"missing","stripe":"configured"},"uptime":0.0}  ✅ Port 8000 health check: PASSED
+Testing port 8001:
+{"status":"degraded","timestamp":"2025-08-13T20:57:25.390653","environment":"development","services":{"supabase":"configured","gemini":"configured","n8n":"configured","mcp":"missing","livekit":"configured","stripe":"configured"},"uptime":0.0}  ✅ Port 8001 health check: PASSED
+
+=== SSL CERTIFICATE STATUS ===
+Checking consulting.sa:
+notBefore=Jul 19 22:21:51 2025 GMT
+notAfter=Oct 17 23:21:27 2025 GMT
+  ✅ SSL certificate valid
+Checking tacticalops.console.ts:
+  ❌ SSL certificate issue
+
+=== NGINX STATUS ===
+Nginx: ✅ ACTIVE
+Nginx Configuration Test:
+2025/08/13 20:57:27 [info] 444787#444787: Using 116KiB of shared memory for nchan in /etc/nginx/nginx.conf:61
+2025/08/13 20:57:27 [info] 444787#444787: Using 131072KiB of shared memory for nchan in /etc/nginx/nginx.conf:61
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+Active Sites:
+  . -> 
+  .. -> 
+  development.conf -> /etc/nginx/sites-available/development.conf
+  production.conf -> /etc/nginx/sites-available/production.conf
+  tacticalops-ssl.conf -> /etc/nginx/sites-available/tacticalops-ssl.conf
+
+=== SECURITY STATUS ===
+2025-08-14 00:03:03 [INFO] Checking security status...
+=== SECURITY STATUS CHECK ===
+
+=== FIREWALL STATUS ===
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 22/tcp                     ALLOW IN    Anywhere                   # SSH
+[ 2] 80/tcp                     ALLOW IN    Anywhere                   # HTTP
+[ 3] 443/tcp                    ALLOW IN    Anywhere                   # HTTPS
+[ 4] 3001/tcp                   ALLOW IN    Anywhere                   # Frontend Dev
+[ 5] 8001/tcp                   ALLOW IN    Anywhere                   # Backend Dev
+[ 6] 5679/tcp                   ALLOW IN    Anywhere                   # n8n Dev
+[ 7] 6380/tcp                   ALLOW IN    Anywhere                   # Redis Dev
+[ 8] 22/tcp (v6)                ALLOW IN    Anywhere (v6)              # SSH
+[ 9] 80/tcp (v6)                ALLOW IN    Anywhere (v6)              # HTTP
+[10] 443/tcp (v6)               ALLOW IN    Anywhere (v6)              # HTTPS
+[11] 3001/tcp (v6)              ALLOW IN    Anywhere (v6)              # Frontend Dev
+
+=== SSH SECURITY ===
+SSH Configuration:
+Port 22
+Port 40241
+PermitRootLogin yes
+PubkeyAuthentication yes
+PasswordAuthentication yes
+
+Active SSH Sessions:
+
+=== FAIL2BAN STATUS ===
+Fail2ban: ✅ ACTIVE
+Status
+|- Number of jail:	1
+`- Jail list:	sshd
+
+=== RECENT SECURITY EVENTS ===
+Failed Login Attempts (last 24 hours):
+2401
+
+Successful Logins (last 24 hours):
+0
+
+=== SYSTEM UPDATES ===
+Available Updates:
+3
+
+Last Update:
+Modify: 2025-08-08 23:47:04.016000000 +0000
+
+=== HEALTH SCORE ===
+Overall Health Score: 100/100
+Status: ✅ EXCELLENT - System is healthy and performing well
+
+=== RECOMMENDATIONS ===
+- Regular security updates are recommended.
+- Monitor container health and restart unhealthy containers.
+- Review and rotate SSL certificates before expiration.

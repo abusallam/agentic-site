@@ -1,0 +1,940 @@
+{
+  "timestamp": "2025-08-14T18:32:40.307419",
+  "environment": "development",
+  "base_url": "https://dev.consulting.sa",
+  "total_tests": 30,
+  "passed_tests": 8,
+  "success_rate": 26.666666666666668,
+  "categories": {
+    "System Health": [
+      {
+        "category": "System Health",
+        "test": "Frontend Health Check",
+        "status": "✅ PASS",
+        "details": "Status: 200"
+      },
+      {
+        "category": "System Health",
+        "test": "Backend API Health Check",
+        "status": "✅ PASS",
+        "details": "Status: 200"
+      }
+    ],
+    "Frontend Accessibility": [
+      {
+        "category": "Frontend Accessibility",
+        "test": "Page Load: /",
+        "status": "✅ PASS",
+        "details": "Status: 200, Size: 83816 bytes"
+      },
+      {
+        "category": "Frontend Accessibility",
+        "test": "Page Load: /about",
+        "status": "✅ PASS",
+        "details": "Status: 200, Size: 64194 bytes"
+      },
+      {
+        "category": "Frontend Accessibility",
+        "test": "Page Load: /services",
+        "status": "✅ PASS",
+        "details": "Status: 200, Size: 67927 bytes"
+      },
+      {
+        "category": "Frontend Accessibility",
+        "test": "Page Load: /consulting",
+        "status": "✅ PASS",
+        "details": "Status: 200, Size: 61668 bytes"
+      },
+      {
+        "category": "Frontend Accessibility",
+        "test": "Page Load: /contact",
+        "status": "✅ PASS",
+        "details": "Status: 200, Size: 68107 bytes"
+      }
+    ],
+    "API Endpoints": [
+      {
+        "category": "API Endpoints",
+        "test": "GET /api/health",
+        "status": "✅ PASS",
+        "details": "Status: 200"
+      },
+      {
+        "category": "API Endpoints",
+        "test": "POST /api/chat",
+        "status": "❌ FAIL",
+        "details": "Status: 404"
+      }
+    ],
+    "User Scenarios - AR": [
+      {
+        "category": "User Scenarios - AR",
+        "test": "عميل جديد - استفسار عن الخدمات",
+        "status": "❌ FAIL",
+        "details": "Success Rate: 0.0% (0/3)",
+        "scenario_results": [
+          {
+            "message_index": 1,
+            "message": "مرحباً، أنا أحمد من الرياض وأريد معرفة خدماتكم في ...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 2,
+            "message": "ما هي أسعار خدمات الوكلاء الأذكياء؟...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 3,
+            "message": "هل يمكنني التحدث مع أحد المختصين؟...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          }
+        ]
+      },
+      {
+        "category": "User Scenarios - AR",
+        "test": "عميل مهتم بأتمتة سير العمل",
+        "status": "❌ FAIL",
+        "details": "Success Rate: 0.0% (0/3)",
+        "scenario_results": [
+          {
+            "message_index": 1,
+            "message": "أريد أتمتة عمليات البريد الإلكتروني في شركتي...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 2,
+            "message": "ما هي القوالب المتاحة لأتمتة البريد الإلكتروني؟...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 3,
+            "message": "كيف يمكنني إنشاء سير عمل مخصص؟...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          }
+        ]
+      },
+      {
+        "category": "User Scenarios - AR",
+        "test": "عميل يريد تطوير نظام مخصص",
+        "status": "❌ FAIL",
+        "details": "Success Rate: 0.0% (0/3)",
+        "scenario_results": [
+          {
+            "message_index": 1,
+            "message": "أحتاج بناء نظام ذكي لخدمة العملاء في متجري الإلكتر...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 2,
+            "message": "ما هو أفضل إطار عمل لبناء وكيل ذكي معقد؟...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 3,
+            "message": "كم المدة المتوقعة لتطوير هذا النظام؟...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          }
+        ]
+      },
+      {
+        "category": "User Scenarios - AR",
+        "test": "عميل يطلب استشارة استراتيجية",
+        "status": "❌ FAIL",
+        "details": "Success Rate: 0.0% (0/3)",
+        "scenario_results": [
+          {
+            "message_index": 1,
+            "message": "أريد وضع استراتيجية شاملة للذكاء الاصطناعي في شركت...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 2,
+            "message": "ما هي أنواع الاستشارات المتاحة؟...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 3,
+            "message": "أريد حجز موعد لاستشارة استراتيجية...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          }
+        ]
+      }
+    ],
+    "User Scenarios - EN": [
+      {
+        "category": "User Scenarios - EN",
+        "test": "New Customer - Service Inquiry",
+        "status": "❌ FAIL",
+        "details": "Success Rate: 0.0% (0/3)",
+        "scenario_results": [
+          {
+            "message_index": 1,
+            "message": "Hi, I'm Sarah from Dubai and I want to learn about...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 2,
+            "message": "What's the difference between AI agents and chatbo...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 3,
+            "message": "Can I get a quote for implementing AI in my startu...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          }
+        ]
+      },
+      {
+        "category": "User Scenarios - EN",
+        "test": "Business Owner - Workflow Automation",
+        "status": "❌ FAIL",
+        "details": "Success Rate: 0.0% (0/3)",
+        "scenario_results": [
+          {
+            "message_index": 1,
+            "message": "I need to automate my data processing workflows...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 2,
+            "message": "Show me available workflow templates for data proc...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 3,
+            "message": "How can I monitor workflow performance?...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          }
+        ]
+      },
+      {
+        "category": "User Scenarios - EN",
+        "test": "Developer - Custom Development",
+        "status": "❌ FAIL",
+        "details": "Success Rate: 0.0% (0/3)",
+        "scenario_results": [
+          {
+            "message_index": 1,
+            "message": "I want to build a multi-agent system for customer ...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 2,
+            "message": "Which framework would you recommend for complex wo...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 3,
+            "message": "Can you help me with the architecture design?...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          }
+        ]
+      },
+      {
+        "category": "User Scenarios - EN",
+        "test": "Enterprise Client - Strategic Consulting",
+        "status": "❌ FAIL",
+        "details": "Success Rate: 0.0% (0/3)",
+        "scenario_results": [
+          {
+            "message_index": 1,
+            "message": "We need strategic guidance for AI implementation a...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 2,
+            "message": "What consultation services do you offer?...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          },
+          {
+            "message_index": 3,
+            "message": "I'd like to schedule a feasibility study...",
+            "error": "HTTP 404",
+            "analysis": {
+              "success": false,
+              "reason": "API error"
+            }
+          }
+        ]
+      }
+    ],
+    "Agent Workflows": [
+      {
+        "category": "Agent Workflows",
+        "test": "Initial_Customer - Contact Information Collection",
+        "status": "❌ FAIL",
+        "details": "HTTP 404"
+      },
+      {
+        "category": "Agent Workflows",
+        "test": "Initial_Customer - Service Information Request",
+        "status": "❌ FAIL",
+        "details": "HTTP 404"
+      },
+      {
+        "category": "Agent Workflows",
+        "test": "N8N_Workflow - Template Listing",
+        "status": "❌ FAIL",
+        "details": "HTTP 404"
+      },
+      {
+        "category": "Agent Workflows",
+        "test": "N8N_Workflow - Workflow Creation Request",
+        "status": "❌ FAIL",
+        "details": "HTTP 404"
+      },
+      {
+        "category": "Agent Workflows",
+        "test": "Consulting - Consultation Types Inquiry",
+        "status": "❌ FAIL",
+        "details": "HTTP 404"
+      },
+      {
+        "category": "Agent Workflows",
+        "test": "Consulting - Strategic Consultation Request",
+        "status": "❌ FAIL",
+        "details": "HTTP 404"
+      },
+      {
+        "category": "Agent Workflows",
+        "test": "Code_Generation - Framework Recommendation",
+        "status": "❌ FAIL",
+        "details": "HTTP 404"
+      },
+      {
+        "category": "Agent Workflows",
+        "test": "Code_Generation - Simple Project Request",
+        "status": "❌ FAIL",
+        "details": "HTTP 404"
+      }
+    ],
+    "Bilingual Interactions": [
+      {
+        "category": "Bilingual Interactions",
+        "test": "Mixed Language Input",
+        "status": "❌ FAIL",
+        "details": "Message handled: False"
+      },
+      {
+        "category": "Bilingual Interactions",
+        "test": "Arabic to English Switch",
+        "status": "❌ FAIL",
+        "details": "Messages handled: False"
+      },
+      {
+        "category": "Bilingual Interactions",
+        "test": "English to Arabic Switch",
+        "status": "❌ FAIL",
+        "details": "Messages handled: False"
+      }
+    ],
+    "Complex Scenarios": [
+      {
+        "category": "Complex Scenarios",
+        "test": "Complete Customer Journey - Arabic",
+        "status": "❌ FAIL",
+        "details": "Success Rate: 0.0% (0/4)",
+        "step_results": [
+          {
+            "step": 1,
+            "success": false,
+            "error": "HTTP 404"
+          },
+          {
+            "step": 2,
+            "success": false,
+            "error": "HTTP 404"
+          },
+          {
+            "step": 3,
+            "success": false,
+            "error": "HTTP 404"
+          },
+          {
+            "step": 4,
+            "success": false,
+            "error": "HTTP 404"
+          }
+        ]
+      },
+      {
+        "category": "Complex Scenarios",
+        "test": "Complete Customer Journey - English",
+        "status": "❌ FAIL",
+        "details": "Success Rate: 0.0% (0/4)",
+        "step_results": [
+          {
+            "step": 1,
+            "success": false,
+            "error": "HTTP 404"
+          },
+          {
+            "step": 2,
+            "success": false,
+            "error": "HTTP 404"
+          },
+          {
+            "step": 3,
+            "success": false,
+            "error": "HTTP 404"
+          },
+          {
+            "step": 4,
+            "success": false,
+            "error": "HTTP 404"
+          }
+        ]
+      }
+    ]
+  },
+  "all_results": [
+    {
+      "category": "System Health",
+      "test": "Frontend Health Check",
+      "status": "✅ PASS",
+      "details": "Status: 200"
+    },
+    {
+      "category": "System Health",
+      "test": "Backend API Health Check",
+      "status": "✅ PASS",
+      "details": "Status: 200"
+    },
+    {
+      "category": "Frontend Accessibility",
+      "test": "Page Load: /",
+      "status": "✅ PASS",
+      "details": "Status: 200, Size: 83816 bytes"
+    },
+    {
+      "category": "Frontend Accessibility",
+      "test": "Page Load: /about",
+      "status": "✅ PASS",
+      "details": "Status: 200, Size: 64194 bytes"
+    },
+    {
+      "category": "Frontend Accessibility",
+      "test": "Page Load: /services",
+      "status": "✅ PASS",
+      "details": "Status: 200, Size: 67927 bytes"
+    },
+    {
+      "category": "Frontend Accessibility",
+      "test": "Page Load: /consulting",
+      "status": "✅ PASS",
+      "details": "Status: 200, Size: 61668 bytes"
+    },
+    {
+      "category": "Frontend Accessibility",
+      "test": "Page Load: /contact",
+      "status": "✅ PASS",
+      "details": "Status: 200, Size: 68107 bytes"
+    },
+    {
+      "category": "API Endpoints",
+      "test": "GET /api/health",
+      "status": "✅ PASS",
+      "details": "Status: 200"
+    },
+    {
+      "category": "API Endpoints",
+      "test": "POST /api/chat",
+      "status": "❌ FAIL",
+      "details": "Status: 404"
+    },
+    {
+      "category": "User Scenarios - AR",
+      "test": "عميل جديد - استفسار عن الخدمات",
+      "status": "❌ FAIL",
+      "details": "Success Rate: 0.0% (0/3)",
+      "scenario_results": [
+        {
+          "message_index": 1,
+          "message": "مرحباً، أنا أحمد من الرياض وأريد معرفة خدماتكم في ...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 2,
+          "message": "ما هي أسعار خدمات الوكلاء الأذكياء؟...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 3,
+          "message": "هل يمكنني التحدث مع أحد المختصين؟...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        }
+      ]
+    },
+    {
+      "category": "User Scenarios - AR",
+      "test": "عميل مهتم بأتمتة سير العمل",
+      "status": "❌ FAIL",
+      "details": "Success Rate: 0.0% (0/3)",
+      "scenario_results": [
+        {
+          "message_index": 1,
+          "message": "أريد أتمتة عمليات البريد الإلكتروني في شركتي...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 2,
+          "message": "ما هي القوالب المتاحة لأتمتة البريد الإلكتروني؟...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 3,
+          "message": "كيف يمكنني إنشاء سير عمل مخصص؟...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        }
+      ]
+    },
+    {
+      "category": "User Scenarios - AR",
+      "test": "عميل يريد تطوير نظام مخصص",
+      "status": "❌ FAIL",
+      "details": "Success Rate: 0.0% (0/3)",
+      "scenario_results": [
+        {
+          "message_index": 1,
+          "message": "أحتاج بناء نظام ذكي لخدمة العملاء في متجري الإلكتر...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 2,
+          "message": "ما هو أفضل إطار عمل لبناء وكيل ذكي معقد؟...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 3,
+          "message": "كم المدة المتوقعة لتطوير هذا النظام؟...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        }
+      ]
+    },
+    {
+      "category": "User Scenarios - AR",
+      "test": "عميل يطلب استشارة استراتيجية",
+      "status": "❌ FAIL",
+      "details": "Success Rate: 0.0% (0/3)",
+      "scenario_results": [
+        {
+          "message_index": 1,
+          "message": "أريد وضع استراتيجية شاملة للذكاء الاصطناعي في شركت...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 2,
+          "message": "ما هي أنواع الاستشارات المتاحة؟...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 3,
+          "message": "أريد حجز موعد لاستشارة استراتيجية...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        }
+      ]
+    },
+    {
+      "category": "User Scenarios - EN",
+      "test": "New Customer - Service Inquiry",
+      "status": "❌ FAIL",
+      "details": "Success Rate: 0.0% (0/3)",
+      "scenario_results": [
+        {
+          "message_index": 1,
+          "message": "Hi, I'm Sarah from Dubai and I want to learn about...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 2,
+          "message": "What's the difference between AI agents and chatbo...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 3,
+          "message": "Can I get a quote for implementing AI in my startu...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        }
+      ]
+    },
+    {
+      "category": "User Scenarios - EN",
+      "test": "Business Owner - Workflow Automation",
+      "status": "❌ FAIL",
+      "details": "Success Rate: 0.0% (0/3)",
+      "scenario_results": [
+        {
+          "message_index": 1,
+          "message": "I need to automate my data processing workflows...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 2,
+          "message": "Show me available workflow templates for data proc...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 3,
+          "message": "How can I monitor workflow performance?...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        }
+      ]
+    },
+    {
+      "category": "User Scenarios - EN",
+      "test": "Developer - Custom Development",
+      "status": "❌ FAIL",
+      "details": "Success Rate: 0.0% (0/3)",
+      "scenario_results": [
+        {
+          "message_index": 1,
+          "message": "I want to build a multi-agent system for customer ...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 2,
+          "message": "Which framework would you recommend for complex wo...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 3,
+          "message": "Can you help me with the architecture design?...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        }
+      ]
+    },
+    {
+      "category": "User Scenarios - EN",
+      "test": "Enterprise Client - Strategic Consulting",
+      "status": "❌ FAIL",
+      "details": "Success Rate: 0.0% (0/3)",
+      "scenario_results": [
+        {
+          "message_index": 1,
+          "message": "We need strategic guidance for AI implementation a...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 2,
+          "message": "What consultation services do you offer?...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        },
+        {
+          "message_index": 3,
+          "message": "I'd like to schedule a feasibility study...",
+          "error": "HTTP 404",
+          "analysis": {
+            "success": false,
+            "reason": "API error"
+          }
+        }
+      ]
+    },
+    {
+      "category": "Agent Workflows",
+      "test": "Initial_Customer - Contact Information Collection",
+      "status": "❌ FAIL",
+      "details": "HTTP 404"
+    },
+    {
+      "category": "Agent Workflows",
+      "test": "Initial_Customer - Service Information Request",
+      "status": "❌ FAIL",
+      "details": "HTTP 404"
+    },
+    {
+      "category": "Agent Workflows",
+      "test": "N8N_Workflow - Template Listing",
+      "status": "❌ FAIL",
+      "details": "HTTP 404"
+    },
+    {
+      "category": "Agent Workflows",
+      "test": "N8N_Workflow - Workflow Creation Request",
+      "status": "❌ FAIL",
+      "details": "HTTP 404"
+    },
+    {
+      "category": "Agent Workflows",
+      "test": "Consulting - Consultation Types Inquiry",
+      "status": "❌ FAIL",
+      "details": "HTTP 404"
+    },
+    {
+      "category": "Agent Workflows",
+      "test": "Consulting - Strategic Consultation Request",
+      "status": "❌ FAIL",
+      "details": "HTTP 404"
+    },
+    {
+      "category": "Agent Workflows",
+      "test": "Code_Generation - Framework Recommendation",
+      "status": "❌ FAIL",
+      "details": "HTTP 404"
+    },
+    {
+      "category": "Agent Workflows",
+      "test": "Code_Generation - Simple Project Request",
+      "status": "❌ FAIL",
+      "details": "HTTP 404"
+    },
+    {
+      "category": "Bilingual Interactions",
+      "test": "Mixed Language Input",
+      "status": "❌ FAIL",
+      "details": "Message handled: False"
+    },
+    {
+      "category": "Bilingual Interactions",
+      "test": "Arabic to English Switch",
+      "status": "❌ FAIL",
+      "details": "Messages handled: False"
+    },
+    {
+      "category": "Bilingual Interactions",
+      "test": "English to Arabic Switch",
+      "status": "❌ FAIL",
+      "details": "Messages handled: False"
+    },
+    {
+      "category": "Complex Scenarios",
+      "test": "Complete Customer Journey - Arabic",
+      "status": "❌ FAIL",
+      "details": "Success Rate: 0.0% (0/4)",
+      "step_results": [
+        {
+          "step": 1,
+          "success": false,
+          "error": "HTTP 404"
+        },
+        {
+          "step": 2,
+          "success": false,
+          "error": "HTTP 404"
+        },
+        {
+          "step": 3,
+          "success": false,
+          "error": "HTTP 404"
+        },
+        {
+          "step": 4,
+          "success": false,
+          "error": "HTTP 404"
+        }
+      ]
+    },
+    {
+      "category": "Complex Scenarios",
+      "test": "Complete Customer Journey - English",
+      "status": "❌ FAIL",
+      "details": "Success Rate: 0.0% (0/4)",
+      "step_results": [
+        {
+          "step": 1,
+          "success": false,
+          "error": "HTTP 404"
+        },
+        {
+          "step": 2,
+          "success": false,
+          "error": "HTTP 404"
+        },
+        {
+          "step": 3,
+          "success": false,
+          "error": "HTTP 404"
+        },
+        {
+          "step": 4,
+          "success": false,
+          "error": "HTTP 404"
+        }
+      ]
+    }
+  ]
+}

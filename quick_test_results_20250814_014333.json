@@ -1,0 +1,122 @@
+{
+  "timestamp": "2025-08-14T01:43:33.376815",
+  "summary": {
+    "total": 20,
+    "passed": 10,
+    "warnings": 1,
+    "failed": 9,
+    "success_rate": 50.0
+  },
+  "results": [
+    {
+      "test": "Backend Health",
+      "status": "PASSED",
+      "duration": 0.8444099426269531
+    },
+    {
+      "test": "Frontend Health",
+      "status": "FAILED",
+      "error": "HTTPConnectionPool(host='217.79.255.54', port=3001): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fb44d6d7b10>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "test": "N8N Health",
+      "status": "PASSED",
+      "duration": 0.5228838920593262
+    },
+    {
+      "test": "N8N UI Access",
+      "status": "PASSED"
+    },
+    {
+      "test": "N8N Health Check",
+      "status": "PASSED",
+      "health": {
+        "status": "ok"
+      }
+    },
+    {
+      "test": "N8N API Protection",
+      "status": "PASSED"
+    },
+    {
+      "test": "Backend Health",
+      "status": "PASSED",
+      "health": {
+        "status": "degraded",
+        "timestamp": "2025-08-13T22:37:51.029750",
+        "environment": "development",
+        "services": {
+          "supabase": "configured",
+          "gemini": "configured",
+          "n8n": "configured",
+          "mcp": "configured",
+          "livekit": "missing",
+          "stripe": "configured"
+        },
+        "uptime": 0.0
+      }
+    },
+    {
+      "test": "Backend /",
+      "status": "PASSED"
+    },
+    {
+      "test": "Backend /api/test",
+      "status": "FAILED"
+    },
+    {
+      "test": "Backend /docs",
+      "status": "PASSED"
+    },
+    {
+      "test": "Frontend /",
+      "status": "FAILED",
+      "error": "HTTPConnectionPool(host='217.79.255.54', port=3001): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fb44d6d6410>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "test": "Frontend /about",
+      "status": "FAILED",
+      "error": "HTTPConnectionPool(host='217.79.255.54', port=3001): Max retries exceeded with url: /about (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fb44d68e310>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "test": "Frontend /services",
+      "status": "FAILED",
+      "error": "HTTPConnectionPool(host='217.79.255.54', port=3001): Max retries exceeded with url: /services (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fb44d68d710>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "test": "Frontend /contact",
+      "status": "FAILED",
+      "error": "HTTPConnectionPool(host='217.79.255.54', port=3001): Max retries exceeded with url: /contact (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fb44d6793d0>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "test": "Frontend /consulting",
+      "status": "FAILED",
+      "error": "HTTPConnectionPool(host='217.79.255.54', port=3001): Max retries exceeded with url: /consulting (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fb44d67b110>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "test": "Bilingual Support",
+      "status": "FAILED",
+      "error": "HTTPConnectionPool(host='217.79.255.54', port=3001): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fb44d6d8c90>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "test": "Frontend Performance",
+      "status": "FAILED",
+      "error": "HTTPConnectionPool(host='217.79.255.54', port=3001): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fb44d67bf50>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "test": "Backend Performance",
+      "status": "PASSED",
+      "duration": 0.5203840732574463
+    },
+    {
+      "test": "N8N Performance",
+      "status": "PASSED",
+      "duration": 1.1143338680267334
+    },
+    {
+      "test": "Service Integration",
+      "status": "WARNING",
+      "services_up": 2
+    }
+  ]
+}

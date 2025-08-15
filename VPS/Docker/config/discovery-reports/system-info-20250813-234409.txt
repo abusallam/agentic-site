@@ -1,0 +1,10 @@
+=== SYSTEM INFO ===
+Hostname: ssdnode-11723579473
+OS: Debian GNU/Linux 12 (bookworm)
+Kernel: 6.1.0-25-amd64
+Architecture: x86_64
+CPU Cores: 6
+Memory: 23Gi
+Disk: 394G
+Load Average: 0.37 0.19 0.13 1/583 436604
+Uptime: up 1 week, 4 days, 3 hours, 31 minutes

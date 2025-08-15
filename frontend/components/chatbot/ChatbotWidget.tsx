@@ -15,7 +15,18 @@ import {
   Minimize2,
   Maximize2,
   Phone,
-  Calendar
+  Calendar,
+  Mic,
+  MicOff,
+  Upload,
+  Volume2,
+  VolumeX,
+  Video,
+  Shield,
+  FileText,
+  Code,
+  Briefcase,
+  UserPlus
 } from 'lucide-react'
 
 interface Message {
@@ -23,22 +34,76 @@ interface Message {
   content: string
   sender: 'user' | 'bot'
   timestamp: Date
-  type?: 'text' | 'action' | 'handoff'
+  type?: 'text' | 'action' | 'handoff' | 'file' | 'voice' | 'code' | 'guardrail'
+  agentType?: 'initial_customer' | 'n8n_workflow' | 'code_generation' | 'consulting'
+  fileUrl?: string
+  fileName?: string
+  voiceUrl?: string
+  codeLanguage?: string
+}
+
+interface UserProfile {
+  id: string
+  name?: string
+  email?: string
+  phone?: string
+  preferredService?: 'quick' | 'coded' | 'consulting'
+  serviceHistory: string[]
+  conversationHistory: Message[]
+  language: 'ar' | 'en'
+  registrationDate: Date
 }
 
 interface ChatbotWidgetProps {
   position?: 'bottom-right' | 'bottom-left' | 'embedded'
   theme?: 'light' | 'dark'
   initialMessage?: string
+  userId?: string
+  userProfile?: UserProfile
+  agentType?: 'initial_customer' | 'n8n_workflow' | 'code_generation' | 'consulting'
 }
 
 export default function ChatbotWidget({ 
   position = 'bottom-right',
   theme = 'light',
-  initialMessage
+  initialMessage,
+  userId,
+  userProfile,
+  agentType = 'initial_customer'
 }: ChatbotWidgetProps) {
   const { t, locale, isRTL } = useEnhancedTranslation()
   const [isOpen, setIsOpen] = useState(false)
+  
+  // Enhanced state management
+  const [isMinimized, setIsMinimized] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [inputValue, setInputValue] = useState('')
+  const [isTyping, setIsTyping] = useState(false)
+  const [isConnected, setIsConnected] = useState(true)
+  const [currentAgentType, setCurrentAgentType] = useState<string>(agentType)
+  
+  // Voice capabilities
+  const [isRecording, setIsRecording] = useState(false)
+  const [isSpeaking, setIsSpeaking] = useState(false)
+  const [voiceEnabled, setVoiceEnabled] = useState(true)
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([])
+  
+  // File upload capabilities
+  const [isDragOver, setIsDragOver] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  // Live session capabilities
+  const [isLiveSession, setIsLiveSession] = useState(false)
+  const [liveSessionId, setLiveSessionId] = useState<string | null>(null)
+  
+  // User profile and memory
+  const [currentUserProfile, setCurrentUserProfile] = useState<UserProfile | null>(userProfile || null)
+  const [guardrailsActive, setGuardrailsActive] = useState(agentType === 'initial_customer')
+  
+  // Refs
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const speechSynthesis = useRef<SpeechSynthesis | null>(null)
   
   // Debug logging
   const handleToggleOpen = () => {
@@ -47,31 +112,22 @@ export default function ChatbotWidget({
     
     // Add initial message if opening for first time
     if (!isOpen && messages.length === 0) {
-      const welcomeMessage: Message = {
-        id: Date.now().toString(),
-        content: initialMessage || 'Hello! How can I help you today?',
-        sender: 'bot',
-        timestamp: new Date()
-      }
-      setMessages([welcomeMessage])
+      loadUserContext()
     }
   }
-  const [isMinimized, setIsMinimized] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [inputValue, setInputValue] = useState('')
-  const [isTyping, setIsTyping] = useState(false)
-  const [isConnected, setIsConnected] = useState(true)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Initialize speech synthesis
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      speechSynthesis.current = window.speechSynthesis
+    }
+  }, [])
 
   useEffect(() => {
     // Initialize with welcome message using translation
-    const welcomeMessage = initialMessage || t('chatbot.initialMessage')
-    setMessages([{
-      id: '1',
-      content: welcomeMessage,
-      sender: 'bot',
-      timestamp: new Date()
-    }])
+    if (messages.length === 0) {
+      loadUserContext()
+    }
   }, [initialMessage, t])
 
   useEffect(() => {
@@ -82,30 +138,308 @@ export default function ChatbotWidget({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  const sendMessage = async (content: string) => {
+  // Load user context and conversation history
+  const loadUserContext = async () => {
+    try {
+      let welcomeMessage = initialMessage || t('chatbot.initialMessage')
+      
+      // If user has profile, personalize welcome message
+      if (currentUserProfile) {
+        const userName = currentUserProfile.name || 'valued customer'
+        const serviceHistory = currentUserProfile.serviceHistory.length > 0 
+          ? `I see you've used our ${currentUserProfile.serviceHistory.join(', ')} services before.`
+          : ''
+        
+        welcomeMessage = locale === 'ar' 
+          ? `مرحباً ${userName}! ${serviceHistory} كيف يمكنني مساعدتك اليوم؟`
+          : `Hello ${userName}! ${serviceHistory} How can I help you today?`
+        
+        // Load previous conversation if exists
+        if (currentUserProfile.conversationHistory.length > 0) {
+          setMessages(currentUserProfile.conversationHistory)
+          return
+        }
+      }
+
+      // Set agent-specific welcome message
+      const agentWelcomes = {
+        initial_customer: locale === 'ar' 
+          ? 'مرحباً! أنا مساعدك لتسجيل العملاء الجدد. سأساعدك في جمع معلوماتك وربطك بالخدمة المناسبة.'
+          : 'Hello! I\'m your new customer onboarding assistant. I\'ll help collect your information and connect you with the right service.',
+        n8n_workflow: locale === 'ar'
+          ? 'مرحباً! أنا متخصص أتمتة سير العمل. يمكنني مساعدتك في إنشاء وإدارة سير العمل باستخدام n8n.'
+          : 'Hello! I\'m your workflow automation specialist. I can help you create and manage n8n workflows.',
+        code_generation: locale === 'ar'
+          ? 'مرحباً! أنا متخصص تطوير الوكلاء الأذكياء. سأساعدك في بناء حلول ذكاء اصطناعي مخصصة.'
+          : 'Hello! I\'m your AI agent development specialist. I\'ll help you build custom AI solutions.',
+        consulting: locale === 'ar'
+          ? 'مرحباً! أنا مستشار الذكاء الاصطناعي. يمكنني تقديم الاستشارات الاستراتيجية وجدولة جلسات مباشرة.'
+          : 'Hello! I\'m your AI consulting specialist. I can provide strategic guidance and schedule live sessions.'
+      }
+
+      const initialMsg: Message = {
+        id: '1',
+        content: agentWelcomes[agentType] || welcomeMessage,
+        sender: 'bot',
+        timestamp: new Date(),
+        agentType: agentType
+      }
+
+      setMessages([initialMsg])
+      
+      // Speak welcome message if voice is enabled
+      if (voiceEnabled && !isSpeaking) {
+        speakMessage(initialMsg.content)
+      }
+      
+    } catch (error) {
+      console.error('Error loading user context:', error)
+    }
+  }
+
+  // Voice interaction functions
+  const speakMessage = (text: string) => {
+    if (!voiceEnabled || !speechSynthesis.current || isSpeaking) return
+
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = locale === 'ar' ? 'ar-SA' : 'en-US'
+    utterance.rate = 0.9
+    utterance.pitch = 1.0
+    
+    utterance.onstart = () => setIsSpeaking(true)
+    utterance.onend = () => setIsSpeaking(false)
+    utterance.onerror = () => setIsSpeaking(false)
+
+    speechSynthesis.current.speak(utterance)
+  }
+
+  const startVoiceRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const recorder = new MediaRecorder(stream)
+      
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          setAudioChunks(prev => [...prev, event.data])
+        }
+      }
+
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' })
+        await processVoiceInput(audioBlob)
+        setAudioChunks([])
+        stream.getTracks().forEach(track => track.stop())
+      }
+
+      setMediaRecorder(recorder)
+      recorder.start()
+      setIsRecording(true)
+    } catch (error) {
+      console.error('Error starting voice recording:', error)
+    }
+  }
+
+  const stopVoiceRecording = () => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop()
+      setIsRecording(false)
+    }
+  }
+
+  const processVoiceInput = async (audioBlob: Blob) => {
+    try {
+      // Convert speech to text using Web Speech API or send to backend
+      const formData = new FormData()
+      formData.append('audio', audioBlob)
+      formData.append('language', locale)
+
+      const response = await fetch('/api/speech-to-text', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (response.ok) {
+        const { text } = await response.json()
+        if (text) {
+          sendMessage(text)
+        }
+      }
+    } catch (error) {
+      console.error('Error processing voice input:', error)
+    }
+  }
+
+  // File upload functions
+  const handleFileUpload = async (file: File) => {
+    if (!file) return
+
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('agent_type', currentAgentType)
+    formData.append('user_id', userId || 'anonymous')
+
+    try {
+      const response = await fetch('/api/file-upload', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (response.ok) {
+        const { fileUrl, fileName } = await response.json()
+        
+        const fileMessage: Message = {
+          id: Date.now().toString(),
+          content: `Uploaded file: ${fileName}`,
+          sender: 'user',
+          timestamp: new Date(),
+          type: 'file',
+          fileUrl,
+          fileName
+        }
+
+        setMessages(prev => [...prev, fileMessage])
+        
+        // Process file with appropriate agent
+        await processFileWithAgent(fileUrl, fileName, file.type)
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error)
+    }
+  }
+
+  const processFileWithAgent = async (fileUrl: string, fileName: string, fileType: string) => {
+    const context = {
+      file_url: fileUrl,
+      file_name: fileName,
+      file_type: fileType,
+      agent_type: currentAgentType,
+      user_profile: currentUserProfile
+    }
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: `Process uploaded file: ${fileName}`,
+          customer_id: userId,
+          context
+        })
+      })
+
+      const data = await response.json()
+      
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: data.response?.message || `I've processed your file ${fileName}. How can I help you with it?`,
+        sender: 'bot',
+        timestamp: new Date(),
+        agentType: data.response?.agent_type
+      }
+
+      setMessages(prev => [...prev, botMessage])
+      
+      if (voiceEnabled) {
+        speakMessage(botMessage.content)
+      }
+    } catch (error) {
+      console.error('Error processing file with agent:', error)
+    }
+  }
+
+  // Guardrails for new customer agent
+  const applyGuardrails = (message: string): { allowed: boolean; reason?: string } => {
+    if (!guardrailsActive) return { allowed: true }
+
+    // Rate limiting check
+    const recentMessages = messages.filter(m => 
+      m.sender === 'user' && 
+      Date.now() - m.timestamp.getTime() < 60000 // Last minute
+    )
+    
+    if (recentMessages.length > 10) {
+      return { allowed: false, reason: 'Rate limit exceeded. Please wait a moment.' }
+    }
+
+    // Content filtering
+    const suspiciousPatterns = [
+      /hack|exploit|vulnerability|injection|script/i,
+      /(.)\1{10,}/, // Repeated characters
+      /^\s*$/, // Empty message
+    ]
+
+    for (const pattern of suspiciousPatterns) {
+      if (pattern.test(message)) {
+        return { allowed: false, reason: 'Message contains inappropriate content.' }
+      }
+    }
+
+    // Length check
+    if (message.length > 1000) {
+      return { allowed: false, reason: 'Message too long. Please keep it under 1000 characters.' }
+    }
+
+    return { allowed: true }
+  }
+
+  // Enhanced sendMessage with guardrails and agent capabilities
+  const sendMessage = async (content: string, messageType: 'text' | 'voice' | 'file' = 'text') => {
     if (!content.trim()) return
+
+    // Apply guardrails for new customer agent
+    const guardrailCheck = applyGuardrails(content)
+    if (!guardrailCheck.allowed) {
+      const warningMessage: Message = {
+        id: Date.now().toString(),
+        content: guardrailCheck.reason || 'Message blocked by security filters.',
+        sender: 'bot',
+        timestamp: new Date(),
+        type: 'guardrail'
+      }
+      setMessages(prev => [...prev, warningMessage])
+      return
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
       content,
       sender: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
+      type: messageType
     }
 
     setMessages(prev => [...prev, userMessage])
     setInputValue('')
     setIsTyping(true)
 
+    // Update user profile with conversation
+    if (currentUserProfile) {
+      const updatedProfile = {
+        ...currentUserProfile,
+        conversationHistory: [...messages, userMessage]
+      }
+      setCurrentUserProfile(updatedProfile)
+      // Save to localStorage or backend
+      localStorage.setItem(`user_profile_${userId}`, JSON.stringify(updatedProfile))
+    }
+
     try {
-      // Simulate API call to agent
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: content,
-          conversation_id: 'chat-' + Date.now()
+          customer_id: userId || 'anonymous',
+          context: {
+            session_id: `chat-${userId}-${Date.now()}`,
+            language: locale,
+            timestamp: new Date().toISOString(),
+            use_real_llm: true,
+            agent_type: currentAgentType,
+            user_profile: currentUserProfile,
+            message_type: messageType,
+            guardrails_active: guardrailsActive
+          }
         }),
       })
 
@@ -114,39 +448,130 @@ export default function ChatbotWidget({
       setTimeout(() => {
         const botMessage: Message = {
           id: (Date.now() + 1).toString(),
-          content: data.response || t('chatbot.defaultResponse') || "I understand you're interested in our AI services. Let me help you with that!",
+          content: data.response?.message || data.response || t('chatbot.defaultResponse') || "I understand you're interested in our AI services. Let me help you with that!",
           sender: 'bot',
           timestamp: new Date(),
-          type: data.type || 'text'
+          type: data.response?.type || 'text',
+          agentType: data.response?.agent_type || currentAgentType
         }
 
         setMessages(prev => [...prev, botMessage])
         setIsTyping(false)
 
-        // Check if handoff is needed
-        if (data.handoff_required) {
-          setTimeout(() => {
-            const handoffMessage: Message = {
-              id: (Date.now() + 2).toString(),
-              content: t('chatbot.handoffMessage'),
-              sender: 'bot',
-              timestamp: new Date(),
-              type: 'handoff'
-            }
-            setMessages(prev => [...prev, handoffMessage])
-          }, 1000)
+        // Speak response if voice is enabled
+        if (voiceEnabled && !isSpeaking) {
+          speakMessage(botMessage.content)
         }
+
+        // Handle agent-specific responses
+        handleAgentSpecificResponse(data.response, botMessage)
+
+        // Update user profile
+        if (currentUserProfile) {
+          const updatedProfile = {
+            ...currentUserProfile,
+            conversationHistory: [...messages, userMessage, botMessage]
+          }
+          setCurrentUserProfile(updatedProfile)
+          localStorage.setItem(`user_profile_${userId}`, JSON.stringify(updatedProfile))
+        }
+
       }, 1500)
 
     } catch (error) {
       setIsTyping(false)
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: t('chatbot.errorMessage'),
+        content: t('chatbot.errorMessage') || 'Sorry, I encountered an error. Please try again.',
         sender: 'bot',
         timestamp: new Date()
       }
       setMessages(prev => [...prev, errorMessage])
+    }
+  }
+
+  // Handle agent-specific responses and capabilities
+  const handleAgentSpecificResponse = (response: any, botMessage: Message) => {
+    if (!response) return
+
+    // Handle handoff requests
+    if (response.handoff_required || response.next_action === 'human_handoff') {
+      setTimeout(() => {
+        const handoffMessage: Message = {
+          id: (Date.now() + 2).toString(),
+          content: t('chatbot.handoffMessage') || 'Let me connect you with a human specialist.',
+          sender: 'bot',
+          timestamp: new Date(),
+          type: 'handoff'
+        }
+        setMessages(prev => [...prev, handoffMessage])
+      }, 1000)
+    }
+
+    // Handle live session requests (for consulting agent)
+    if (response.live_session_required && currentAgentType === 'consulting') {
+      initiateLiveSession()
+    }
+
+    // Handle code generation requests
+    if (response.code_generated && currentAgentType === 'code_generation') {
+      const codeMessage: Message = {
+        id: (Date.now() + 3).toString(),
+        content: response.code_content || 'Here\'s your generated code:',
+        sender: 'bot',
+        timestamp: new Date(),
+        type: 'code',
+        codeLanguage: response.code_language || 'python'
+      }
+      setTimeout(() => {
+        setMessages(prev => [...prev, codeMessage])
+      }, 2000)
+    }
+
+    // Handle workflow creation (for n8n agent)
+    if (response.workflow_created && currentAgentType === 'n8n_workflow') {
+      const workflowMessage: Message = {
+        id: (Date.now() + 4).toString(),
+        content: `Workflow "${response.workflow_name}" has been created successfully!`,
+        sender: 'bot',
+        timestamp: new Date(),
+        type: 'action'
+      }
+      setTimeout(() => {
+        setMessages(prev => [...prev, workflowMessage])
+      }, 2000)
+    }
+  }
+
+  // Live session functions
+  const initiateLiveSession = async () => {
+    try {
+      const response = await fetch('/api/live-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: userId,
+          agent_type: currentAgentType,
+          session_type: 'video_consultation'
+        })
+      })
+
+      if (response.ok) {
+        const { session_id, join_url } = await response.json()
+        setLiveSessionId(session_id)
+        setIsLiveSession(true)
+        
+        const sessionMessage: Message = {
+          id: Date.now().toString(),
+          content: `Live session initiated! Session ID: ${session_id}`,
+          sender: 'bot',
+          timestamp: new Date(),
+          type: 'action'
+        }
+        setMessages(prev => [...prev, sessionMessage])
+      }
+    } catch (error) {
+      console.error('Error initiating live session:', error)
     }
   }
 

@@ -1,0 +1,52 @@
+=== SYSTEM SERVICES ===
+Systemd Services (Active):
+  UNIT                               LOAD   ACTIVE SUB     DESCRIPTION
+  apparmor.service                   loaded active exited  Load AppArmor profiles
+  console-setup.service              loaded active exited  Set console font and keymap
+  containerd.service                 loaded active running containerd container runtime
+  cron.service                       loaded active running Regular background program processing daemon
+  dbus.service                       loaded active running D-Bus System Message Bus
+  docker.service                     loaded active running Docker Application Container Engine
+  fail2ban.service                   loaded active running Fail2Ban Service
+  getty@tty1.service                 loaded active running Getty on tty1
+  ifupdown-pre.service               loaded active exited  Helper to synchronize boot up for ifupdown
+  keyboard-setup.service             loaded active exited  Set the console keyboard layout
+  kmod-static-nodes.service          loaded active exited  Create List of Static Device Nodes
+  networking.service                 loaded active exited  Raise network interfaces
+  nginx.service                      loaded active running A high performance web server and a reverse proxy server
+  polkit.service                     loaded active running Authorization Manager
+  qemu-guest-agent.service           loaded active running QEMU Guest Agent
+  rsyslog.service                    loaded active running System Logging Service
+  ssh.service                        loaded active running OpenBSD Secure Shell server
+  systemd-journal-flush.service      loaded active exited  Flush Journal to Persistent Storage
+  systemd-journald.service           loaded active running Journal Service
+
+Key Service Status:
+nginx: active
+docker: active
+ssh: active
+fail2ban: active
+
+Top Processes by CPU:
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root      436830  100  0.0  11088  4472 ?        R    20:38   0:00 ps aux --sort=-%cpu
+root      436816  6.2  0.0   6936  3324 ?        Ss   20:38   0:00 bash -c          echo '=== SYSTEM SERVICES ==='         echo 'Systemd Services (Active):'         systemctl list-units --type=service --state=active | head -20         echo ''         echo 'Key Service Status:'         for service in nginx apache2 caddy docker ssh fail2ban ufw; do             if systemctl is-active --quiet $service 2>/dev/null; then                 echo "$service: $(systemctl is-active $service)"             fi         done         echo ''         echo 'Top Processes by CPU:'         ps aux --sort=-%cpu | head -10         echo ''         echo 'Top Processes by Memory:'         ps aux --sort=-%mem | head -10     
+1001     3906475  2.6  0.0  33956 19984 ?        Ss   Aug11  77:06 python agent/main.py
+root      362613  1.8  0.0      0     0 ?        I    17:18   3:39 [kworker/3:0-events]
+root      294733  1.6  0.0      0     0 ?        I    14:16   6:13 [kworker/3:1-events]
+root       30998  1.0  5.0 5715556 1243804 ?     Ssl  Aug02 167:37 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+999      2682767  0.9  0.0  45792  9860 ?        Ssl  Aug08  69:40 redis-server *:6379
+999       274328  0.8  0.0  37316  9512 ?        Ssl  13:29   3:38 redis-server *:6379
+root      436754  0.8  0.0  17684 10880 ?        Ss   20:38   0:00 sshd: root@notty
+
+Top Processes by Memory:
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root       30998  1.0  5.0 5715556 1243804 ?     Ssl  Aug02 167:37 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+1001     3906646  0.4  2.8 64446132 697020 ?     Sl   Aug11  13:16 next-server (v15.4.5)
+1000     3906453  0.1  0.8 32876496 211132 ?     Sl   Aug11   3:01 node /usr/local/bin/n8n
+1000     2682854  0.0  0.8 32875900 199988 ?     Sl   Aug08   6:53 node /usr/local/bin/n8n
+1001     2683014  0.1  0.4 10857768 104472 ?     Ssl  Aug08  12:25 next-server (v
+1001      276888  0.0  0.2 21348692 53084 ?      Ssl  13:35   0:04 next-server (v
+root       26282  0.4  0.1 2246636 41688 ?       Ssl  Aug02  67:41 /usr/bin/containerd
+1001     3906630  0.3  0.1  55020 39864 ?        S    Aug11  10:18 /usr/local/bin/python -B -c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=5, pipe_handle=7) --multiprocessing-fork
+1001     2682929  0.3  0.1  54792 38392 ?        Ss   Aug08  26:28 python -m uvicorn api_server:app --host 0.0.0.0 --port 8000

@@ -122,7 +122,7 @@ class N8nWorkflowAgent(Agent):
             }
         }
     
-    @tool
+    @tool("list_workflow_templates")
     async def list_workflow_templates(self, language: str = "ar") -> Dict[str, Any]:
         """
         List available workflow templates
@@ -157,7 +157,7 @@ class N8nWorkflowAgent(Agent):
                 "error": "خطأ في جلب قوالب سير العمل" if language == "ar" else "Error fetching workflow templates"
             }
     
-    @tool
+    @tool("create_workflow")
     async def create_workflow(self, customer_id: str, template_id: str, custom_config: Dict[str, Any] = None, language: str = "ar") -> Dict[str, Any]:
         """
         Create a new n8n workflow from template
@@ -232,7 +232,7 @@ class N8nWorkflowAgent(Agent):
                 "error": "خطأ في إنشاء سير العمل" if language == "ar" else "Error creating workflow"
             }
     
-    @tool
+    @tool("execute_workflow")
     async def execute_workflow(self, workflow_id: str, input_data: Dict[str, Any] = None, language: str = "ar") -> Dict[str, Any]:
         """
         Execute an existing workflow

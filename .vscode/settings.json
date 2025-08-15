@@ -75,6 +75,19 @@
         "docker-compose *",
         "ps *",
         "node *",
-        "pnpm *"
+        "pnpm *",
+        "./VPS/Docker/scripts/core/vps-discover.sh *",
+        "./VPS/Docker/scripts/ssl/ssl-manager.sh *",
+        "./VPS/Docker/scripts/monitoring/health-check.sh *",
+        "./scripts/fix-n8n-deployment.sh *",
+        "./scripts/fix-n8n-deployment-v2.sh *",
+        "./scripts/fix-n8n-deployment-production.sh *",
+        "./scripts/fix-n8n-permissions.sh *",
+        "./scripts/fix-comprehensive-deployment.sh *",
+        "./scripts/ssh/ssh-logs-v1-20250108.sh *",
+        "./scripts/deployment/validate-deployment-v1-20250814.sh *",
+        "pip *",
+        "wc *",
+        "sed *"
     ]
 }

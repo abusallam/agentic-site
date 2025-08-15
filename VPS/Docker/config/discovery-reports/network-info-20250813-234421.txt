@@ -1,0 +1,97 @@
+=== NETWORK CONFIGURATION ===
+Network Interfaces:
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    inet 127.0.0.1/8 scope host lo
+2: enp3s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    inet 217.79.255.54/24 brd 217.79.255.255 scope global enp3s0
+3: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+15: br-7f5e63e29ce4: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    inet 172.19.0.1/16 brd 172.19.255.255 scope global br-7f5e63e29ce4
+21560: br-3f960d991667: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    inet 172.20.0.1/16 brd 172.20.255.255 scope global br-3f960d991667
+21823: br-a07a19ac65d7: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    inet 172.22.0.1/16 brd 172.22.255.255 scope global br-a07a19ac65d7
+22106: br-278dab5ee0a0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    inet 172.24.0.1/16 brd 172.24.255.255 scope global br-278dab5ee0a0
+22107: veth3710e8f@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-278dab5ee0a0 state UP group default 
+22108: vethc6cbce8@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-278dab5ee0a0 state UP group default 
+22109: vetha6d2ecf@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-278dab5ee0a0 state UP group default 
+22110: veth6f8aae8@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-278dab5ee0a0 state UP group default 
+21896: br-05439df7cc1a: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    inet 172.23.0.1/16 brd 172.23.255.255 scope global br-05439df7cc1a
+
+Listening Ports:
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:5678            0.0.0.0:*               LISTEN      2682828/docker-prox 
+tcp        0      0 0.0.0.0:5679            0.0.0.0:*               LISTEN      3906407/docker-prox 
+tcp        0      0 0.0.0.0:6380            0.0.0.0:*               LISTEN      3906377/docker-prox 
+tcp        0      0 0.0.0.0:6379            0.0.0.0:*               LISTEN      2682855/docker-prox 
+tcp        0      0 0.0.0.0:8000            0.0.0.0:*               LISTEN      2682960/docker-prox 
+tcp        0      0 0.0.0.0:8001            0.0.0.0:*               LISTEN      3906511/docker-prox 
+tcp        0      0 0.0.0.0:40241           0.0.0.0:*               LISTEN      31243/sshd: /usr/sb 
+tcp        0      0 0.0.0.0:443             0.0.0.0:*               LISTEN      31880/nginx: master 
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      31243/sshd: /usr/sb 
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      31880/nginx: master 
+tcp        0      0 0.0.0.0:3000            0.0.0.0:*               LISTEN      2683046/docker-prox 
+tcp        0      0 0.0.0.0:3001            0.0.0.0:*               LISTEN      3906597/docker-prox 
+tcp        0      0 127.0.0.1:3020          0.0.0.0:*               LISTEN      276930/docker-proxy 
+tcp        0      0 127.0.0.1:6382          0.0.0.0:*               LISTEN      274371/docker-proxy 
+tcp6       0      0 :::5678                 :::*                    LISTEN      2682834/docker-prox 
+tcp6       0      0 :::5679                 :::*                    LISTEN      3906414/docker-prox 
+tcp6       0      0 :::6380                 :::*                    LISTEN      3906385/docker-prox 
+tcp6       0      0 :::6379                 :::*                    LISTEN      2682864/docker-prox 
+tcp6       0      0 :::8000                 :::*                    LISTEN      2682967/docker-prox 
+tcp6       0      0 :::8001                 :::*                    LISTEN      3906520/docker-prox 
+tcp6       0      0 :::3000                 :::*                    LISTEN      2683052/docker-prox 
+tcp6       0      0 :::3001                 :::*                    LISTEN      3906604/docker-prox 
+
+Active Connections:
+Active Internet connections (w/o servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State      
+tcp        0   4564 217.79.255.54:22        37.243.185.16:11236     ESTABLISHED
+tcp        0    505 217.79.255.54:22        152.32.131.45:44970     FIN_WAIT1  
+
+Firewall Status:
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 22/tcp                     ALLOW IN    Anywhere                   # SSH
+[ 2] 80/tcp                     ALLOW IN    Anywhere                   # HTTP
+[ 3] 443/tcp                    ALLOW IN    Anywhere                   # HTTPS
+[ 4] 3001/tcp                   ALLOW IN    Anywhere                   # Frontend Dev
+[ 5] 8001/tcp                   ALLOW IN    Anywhere                   # Backend Dev
+[ 6] 5679/tcp                   ALLOW IN    Anywhere                   # n8n Dev
+[ 7] 6380/tcp                   ALLOW IN    Anywhere                   # Redis Dev
+[ 8] 22/tcp (v6)                ALLOW IN    Anywhere (v6)              # SSH
+[ 9] 80/tcp (v6)                ALLOW IN    Anywhere (v6)              # HTTP
+[10] 443/tcp (v6)               ALLOW IN    Anywhere (v6)              # HTTPS
+[11] 3001/tcp (v6)              ALLOW IN    Anywhere (v6)              # Frontend Dev
+[12] 8001/tcp (v6)              ALLOW IN    Anywhere (v6)              # Backend Dev
+[13] 5679/tcp (v6)              ALLOW IN    Anywhere (v6)              # n8n Dev
+[14] 6380/tcp (v6)              ALLOW IN    Anywhere (v6)              # Redis Dev
+
+
+Iptables Rules:
+Chain INPUT (policy DROP)
+target     prot opt source               destination         
+f2b-sshd   6    --  0.0.0.0/0            0.0.0.0/0            multiport dports 22
+ufw-before-logging-input  0    --  0.0.0.0/0            0.0.0.0/0           
+ufw-before-input  0    --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-input  0    --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-logging-input  0    --  0.0.0.0/0            0.0.0.0/0           
+ufw-reject-input  0    --  0.0.0.0/0            0.0.0.0/0           
+ufw-track-input  0    --  0.0.0.0/0            0.0.0.0/0           
+
+Chain FORWARD (policy DROP)
+target     prot opt source               destination         
+DOCKER-USER  0    --  0.0.0.0/0            0.0.0.0/0           
+DOCKER-FORWARD  0    --  0.0.0.0/0            0.0.0.0/0           
+ufw-before-logging-forward  0    --  0.0.0.0/0            0.0.0.0/0           
+ufw-before-forward  0    --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-forward  0    --  0.0.0.0/0            0.0.0.0/0           
+ufw-after-logging-forward  0    --  0.0.0.0/0            0.0.0.0/0           
+ufw-reject-forward  0    --  0.0.0.0/0            0.0.0.0/0           
+ufw-track-forward  0    --  0.0.0.0/0            0.0.0.0/0           

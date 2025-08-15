@@ -1,0 +1,44 @@
+{
+  "discovery_timestamp": "$(date -Iseconds)",
+  "server_info": {
+    "ip": "217.79.255.54",
+    "hostname": "$(hostname)",
+    "os": "$(cat /etc/os-release | grep PRETTY_NAME | cut -d'"' -f2)",
+    "kernel": "$(uname -r)",
+    "architecture": "$(uname -m)",
+    "cpu_cores": $(nproc),
+    "memory_gb": $(free -g | awk '/^Mem:/{print $2}'),
+    "disk_gb": $(df -BG / | awk 'NR==2{gsub(/G/,"",$2); print $2}'),
+    "uptime_seconds": $(cat /proc/uptime | cut -d' ' -f1 | cut -d'.' -f1)
+  },
+  "docker_info": {
+    "installed": $(command -v docker >/dev/null 2>&1 && echo true || echo false),
+    "version": "$(docker --version 2>/dev/null | cut -d' ' -f3 | cut -d',' -f1 || echo 'N/A')",
+    "compose_installed": $(command -v docker-compose >/dev/null 2>&1 && echo true || echo false),
+    "running_containers": $(docker ps -q 2>/dev/null | wc -l || echo 0),
+    "total_containers": $(docker ps -aq 2>/dev/null | wc -l || echo 0)
+  },
+  "network_info": {
+    "listening_ports": [$(netstat -tln 2>/dev/null | awk '/LISTEN/ {print $4}' | cut -d: -f2 | sort -n | uniq | tr '\n' ',' | sed 's/,$//' || echo '')],
+    "firewall_enabled": $(ufw status 2>/dev/null | grep -q 'Status: active' && echo true || echo false)
+  },
+  "services": {
+    "nginx": {
+      "installed": $(command -v nginx >/dev/null 2>&1 && echo true || echo false),
+      "active": $(systemctl is-active nginx 2>/dev/null | grep -q 'active' && echo true || echo false)
+    },
+    "caddy": {
+      "installed": $(command -v caddy >/dev/null 2>&1 && echo true || echo false),
+      "active": $(systemctl is-active caddy 2>/dev/null | grep -q 'active' && echo true || echo false)
+    },
+    "fail2ban": {
+      "installed": $(command -v fail2ban-client >/dev/null 2>&1 && echo true || echo false),
+      "active": $(systemctl is-active fail2ban 2>/dev/null | grep -q 'active' && echo true || echo false)
+    }
+  },
+  "security": {
+    "ssh_port": $(grep '^Port' /etc/ssh/sshd_config 2>/dev/null | awk '{print $2}' || echo 22),
+    "root_login_permitted": $(grep '^PermitRootLogin' /etc/ssh/sshd_config 2>/dev/null | awk '{print $2}' || echo 'unknown'),
+    "password_auth_enabled": $(grep '^PasswordAuthentication' /etc/ssh/sshd_config 2>/dev/null | awk '{print $2}' || echo 'unknown')
+  }
+}
