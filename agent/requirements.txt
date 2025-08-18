@@ -17,7 +17,7 @@ langgraph==0.0.20
 pydantic-ai==0.0.12
 
 # HTTP and API clients
-httpx==0.25.2
+httpx==0.28.1
 requests==2.31.0
 aiohttp==3.9.1
 
