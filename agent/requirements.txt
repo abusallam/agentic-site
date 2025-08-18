@@ -6,7 +6,7 @@ python-multipart==0.0.6
 
 # Database and storage
 supabase==2.3.0
-psycopg2-binary==2.9.9
+psycopg2-binary==2.9.10
 redis==5.0.1
 
 # AI and ML libraries
