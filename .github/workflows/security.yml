@@ -54,7 +54,7 @@ jobs:
 
       - name: Setup Python (for Python analysis)
         if: matrix.language == 'python'
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -97,7 +97,7 @@ jobs:
           npm audit --audit-level=moderate
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -256,7 +256,7 @@ jobs:
           license-checker --summary
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
