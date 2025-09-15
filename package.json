@@ -89,7 +89,7 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
     "web-vitals": "^5.0.3",
-    "zod": "^4.0.5"
+    "zod": "^4.1.8"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
